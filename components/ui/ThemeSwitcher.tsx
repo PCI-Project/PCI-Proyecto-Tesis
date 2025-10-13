@@ -1,0 +1,56 @@
+import React from 'react';
+import { useTheme } from '../../contexts/ThemeContext';
+
+const SunIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
+);
+
+const MoonIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+    </svg>
+);
+
+interface ThemeSwitcherProps {
+    variant?: 'default' | 'on-primary';
+}
+
+export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ variant = 'default' }) => {
+    const { theme, setTheme } = useTheme();
+
+    const isPrimaryBg = variant === 'on-primary';
+
+    const containerClasses = isPrimaryBg
+        ? "flex items-center justify-center bg-black/20 p-1 rounded-full"
+        : "flex items-center justify-center bg-bg-muted p-1 rounded-full border border-border-muted";
+    
+    const lightButtonClasses = theme === 'light'
+        ? (isPrimaryBg ? 'bg-white text-primary' : 'bg-primary text-text-inverted')
+        : (isPrimaryBg ? 'text-white/70 hover:text-white' : 'text-text-muted hover:text-text-base');
+
+    const darkButtonClasses = theme === 'dark'
+        ? (isPrimaryBg ? 'bg-white text-primary' : 'bg-primary text-text-inverted')
+        : (isPrimaryBg ? 'text-white/70 hover:text-white' : 'text-text-muted hover:text-text-base');
+
+
+    return (
+        <div className={containerClasses}>
+            <button
+                onClick={() => setTheme('light')}
+                className={`p-1.5 rounded-full transition-colors duration-300 ${lightButtonClasses}`}
+                aria-label="Switch to light mode"
+            >
+                <SunIcon />
+            </button>
+            <button
+                onClick={() => setTheme('dark')}
+                className={`p-1.5 rounded-full transition-colors duration-300 ${darkButtonClasses}`}
+                aria-label="Switch to dark mode"
+            >
+                <MoonIcon />
+            </button>
+        </div>
+    );
+};

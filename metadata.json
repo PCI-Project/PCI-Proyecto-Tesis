@@ -1,0 +1,6 @@
+{
+  "name": "AsphaltPCI Pro",
+  "description": "Una aplicación web completa para aplicar la norma ASTM D6433. Permite ingresar datos de proyecto y tramos, calcula automáticamente el muestreo requerido, registra fallas y genera el PCI por tramo y para el proyecto total.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
