@@ -9,7 +9,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+   <link rel="icon" href="%BASE_URL%favicon.ico" />
+  <!-- usar %BASE_URL% para que Vite lo reemplace en build -->
+  <link rel="stylesheet" href="%BASE_URL%index.css">
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     :root { /* New 5-color palette */
       --color-primary: 54 200 200; /* #36C8C8 Teal */
@@ -137,7 +141,7 @@
 </head>
 <body class="bg-bg-base">
   <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-  <script src="/init.js"></script>
+  <script type="module" src="%BASE_URL%index.tsx"></script>
+  <script src="%BASE_URL%init.js"></script>
 </body>
 </html>
