@@ -100,7 +100,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index, onSelectProje
                         <div className='text-center'>
                             <p className="text-sm text-primary">{t('dashboard.tablePCI')}</p>
                             <p className="text-5xl font-bold text-primary my-1">{project.weightedPCI.toFixed(2)}</p>
-                        </div>
+                        </>
                     ) : (
                         <div className="text-center">
                              <p className="text-4xl font-bold text-text-muted/10 group-hover:text-text-muted/20 transition-colors">-</p>
