@@ -139,7 +139,7 @@ export function getSummaries(sample: Sample): DistressSummary[] {
     const distressOptions = getDistressOptions();
     const distressCurves = FLEXIBLE_DISTRESS_CURVES;
     const summaries: { [key: string]: DistressSummary } = {};
-
+    //organiza
     for (const distress of sample.distresses) {
         if (distress.quantity <= 0) continue;
 
