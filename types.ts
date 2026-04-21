@@ -13,6 +13,22 @@ export enum Severity {
   HIGH = 'H',
 }
 
+export interface User {
+  _id: string;          // ← ID nativo de Mongo
+  nombre: string;
+  email: string;
+  rol: 'admin' | 'user';
+  createdAt?: string;   // ← timestamps de Mongoose
+}
+export interface Project {
+  _id: string;          // ← reemplaza el "id" local
+  nombre: string;
+  descripcion?: string;
+  sections: Section[];
+  propietario: string;
+  createdAt?: string;
+}
+
 export interface Distress {
   id: string; // Unique ID for the specific instance of a distress entry
   type: string; // The official ID from ASTM D6433 (e.g., '1' or '19.1')

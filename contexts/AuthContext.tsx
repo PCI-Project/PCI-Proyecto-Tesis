@@ -1,7 +1,10 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode, useCallback, useMemo } from 'react';
+import axios from 'axios';
 import { useTranslations } from '../hooks/useTranslations';
+import { User as MongoUser } from '../types';
 
-interface User {
+// Interface for the user object used within the application (frontend)
+export interface User {
   id: string;
   email: string;
   name: string;
@@ -11,9 +14,16 @@ interface User {
   phone?: string;
 }
 
-// Dummy password, in a real app this would be handled by a backend.
-const DUMMY_USER_DB_KEY = 'pci-users';
-const SESSION_KEY = 'pci-session-user';
+const API = axios.create({ baseURL: 'http://localhost:5000/api' });
+
+// Interceptor: adjunta el token automáticamente a cada petición
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 interface AuthContextType {
   user: User | null;
@@ -29,26 +39,17 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const getUsersFromStorage = (): (User & { pass: string })[] => {
-    try {
-        const usersJSON = localStorage.getItem(DUMMY_USER_DB_KEY);
-        if (usersJSON) {
-            const users = JSON.parse(usersJSON);
-            return Array.isArray(users) ? users : [];
-        }
-    } catch (e) {
-        console.error("Failed to parse users from localStorage", e);
-    }
-    return [];
-};
-
-const saveUsersToStorage = (users: (User & { pass: string })[]) => {
-    try {
-        localStorage.setItem(DUMMY_USER_DB_KEY, JSON.stringify(users));
-    } catch (e) {
-        console.error("Failed to save users to localStorage", e);
-    }
-};
+// Helper to map MongoUser (backend) to User (frontend)
+const mapUser = (mongoUser: MongoUser): User => ({
+  id: mongoUser._id,
+  email: mongoUser.email,
+  name: mongoUser.nombre,
+  role: mongoUser.rol,
+  // Default values for fields not yet in backend
+  company: '',
+  country: '',
+  phone: ''
+});
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { t } = useTranslations();
@@ -56,103 +57,79 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        // Seed protected user if not exists on first load
-        try {
-            const users = getUsersFromStorage();
-            if (!users.some(u => u.email.toLowerCase() === 'dk.surfos@gmail.com')) {
-                const protectedUser = {
-                    id: 'user_dk_surfos_protected',
-                    email: 'dk.surfos@gmail.com',
-                    pass: '123456',
-                    name: 'DK Surfos',
-                    company: '', role: '', country: '', phone: '',
-                };
-                saveUsersToStorage([...users, protectedUser]);
+    // Verificar sesión al recargar la página
+    /* useEffect(() => {
+        const verificarSesion = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setIsLoading(false);
+                return;
             }
-        } catch (e) {
-            console.error("Failed to seed protected user.", e);
-        }
 
-        // Check for active session
-        try {
-            const savedUserJSON = sessionStorage.getItem(SESSION_KEY);
-            if (savedUserJSON) {
-                setUser(JSON.parse(savedUserJSON));
+            try {
+                const { data } = await API.get<MongoUser>('/auth/verify');
+                setUser(mapUser(data));
+            } catch (error) {
+                console.error("Session verification failed", error);
+                localStorage.removeItem('token');
+                setUser(null);
+            } finally {
+                setIsLoading(false);
             }
-        } catch (e) {
-            console.error("Failed to parse user from sessionStorage", e);
-        } finally {
-            setIsLoading(false);
-        }
+        };
+
+        verificarSesion();
+    }, []); */
+
+// ✅ NUEVO — nunca restaura sesión, siempre pide login
+    useEffect(() => {
+        localStorage.removeItem('token'); // limpia cualquier token previo
+        setIsLoading(false);
     }, []);
-    
+
     const logout = useCallback(() => {
+        localStorage.removeItem('token');
         setUser(null);
-        sessionStorage.removeItem(SESSION_KEY);
-        // We don't clear localStorage users db on logout
     }, []);
 
     const login = useCallback(async (email: string, pass: string): Promise<boolean> => {
         setIsLoading(true);
         setError(null);
         
-        await new Promise(res => setTimeout(res, 500)); // Simulate network delay
-
-        const users = getUsersFromStorage();
-        const foundUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-
-        if (!foundUser) {
-            setError(t('auth.errorNotFound'));
+        try {
+            const { data } = await API.post<{ token: string, user: MongoUser }>('/auth/login', { email, password: pass });
+            localStorage.setItem('token', data.token);
+            setUser(mapUser(data.user));
+            setIsLoading(false);
+            return true;
+        } catch (err: any) {
+            console.error("Login failed", err);
+            setError(err.response?.data?.message || t('auth.errorNotFound')); // Fallback error
             setIsLoading(false);
             return false;
         }
-
-        if (foundUser.pass !== pass) { // Plain text comparison for this simulation
-            setError(t('auth.errorWrongPassword'));
-            setIsLoading(false);
-            return false;
-        }
-
-        const { pass: _, ...userData } = foundUser;
-        setUser(userData);
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData));
-        setIsLoading(false);
-        return true;
     }, [t]);
 
     const signup = useCallback(async (data: { email: string; pass: string; name: string; }): Promise<boolean> => {
         setIsLoading(true);
         setError(null);
 
-        await new Promise(res => setTimeout(res, 500)); // Simulate network delay
-        
-        const users = getUsersFromStorage();
-        if (users.some(u => u.email.toLowerCase() === data.email.toLowerCase())) {
-            setError(t('auth.errorUserExists'));
+        try {
+            const { data: responseData } = await API.post<{ token: string, user: MongoUser }>('/auth/register', { 
+                email: data.email, 
+                password: data.pass, 
+                nombre: data.name 
+            });
+            localStorage.setItem('token', responseData.token);
+            setUser(mapUser(responseData.user));
+            setIsLoading(false);
+            return true;
+        } catch (err: any) {
+            console.error("Signup failed", err);
+            setError(err.response?.data?.message || t('auth.errorUserExists'));
             setIsLoading(false);
             return false;
         }
-        
-        const newUserDbEntry = {
-            id: `user_${Date.now()}`,
-            email: data.email,
-            pass: data.pass, // In real app, hash this
-            name: data.name,
-            company: '',
-            role: '',
-            country: '',
-            phone: '',
-        };
-
-        const updatedUsers = [...users, newUserDbEntry];
-        saveUsersToStorage(updatedUsers);
-
-        const { pass: __, ...userData } = newUserDbEntry;
-        setUser(userData);
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(userData));
-        setIsLoading(false);
-        return true;
     }, [t]);
 
     const updateUser = useCallback(async (updatedData: Omit<User, 'id' | 'email'>): Promise<boolean> => {
@@ -160,27 +137,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setIsLoading(true);
         setError(null);
 
-        await new Promise(res => setTimeout(res, 300));
-
-        let users = getUsersFromStorage();
-        const userIndex = users.findIndex(u => u.id === user.id);
-
-        if (userIndex === -1) {
-            setError('User not found in DB.');
+        try {
+            // Mapping frontend updates to backend structure if needed
+            // For now assuming backend accepts partial updates
+            const { data } = await API.put<MongoUser>('/users/profile', updatedData);
+            setUser(mapUser(data));
+            setIsLoading(false);
+            return true;
+        } catch (err: any) {
+            console.error("Update user failed", err);
+            setError(err.response?.data?.message || 'Failed to update profile');
             setIsLoading(false);
             return false;
         }
-
-        const updatedUser = { ...users[userIndex], ...updatedData };
-        users[userIndex] = updatedUser;
-        saveUsersToStorage(users);
-
-        const { pass: _, ...publicUserData } = updatedUser;
-        setUser(publicUserData);
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(publicUserData));
-        
-        setIsLoading(false);
-        return true;
     }, [user]);
 
     const changePassword = useCallback(async (oldPass: string, newPass: string): Promise<boolean> => {
@@ -188,50 +157,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setIsLoading(true);
         setError(null);
         
-        await new Promise(res => setTimeout(res, 300));
-        
-        let users = getUsersFromStorage();
-        const userIndex = users.findIndex(u => u.id === user.id);
-        
-        if (userIndex === -1 || users[userIndex].pass !== oldPass) {
-            setError(t('profile.passwordUpdateError'));
+        try {
+            await API.put('/users/password', { oldPassword: oldPass, newPassword: newPass });
+            setIsLoading(false);
+            return true;
+        } catch (err: any) {
+            console.error("Change password failed", err);
+            setError(err.response?.data?.message || t('profile.passwordUpdateError'));
             setIsLoading(false);
             return false;
         }
-
-        users[userIndex].pass = newPass;
-        saveUsersToStorage(users);
-        
-        setIsLoading(false);
-        return true;
     }, [user, t]);
 
     const deleteAccount = useCallback(async (userId: string): Promise<boolean> => {
-        // Check for protected user before doing anything
-        if (user && user.email.toLowerCase() === 'dk.surfos@gmail.com') {
-            setError(t('profile.errorDeleteProtectedAccount'));
-            return false;
-        }
-
         setIsLoading(true);
         setError(null);
 
-        await new Promise(res => setTimeout(res, 500));
-        
-        let users = getUsersFromStorage();
-        const updatedUsers = users.filter(u => u.id !== userId);
-
-        if (users.length === updatedUsers.length) {
-            // User not found, though this shouldn't happen in normal flow
+        try {
+            await API.delete(`/users/${userId}`); // Assuming backend uses _id which maps to userId here
+            logout();
             setIsLoading(false);
-            return false; 
+            return true;
+        } catch (err: any) {
+            console.error("Delete account failed", err);
+            setError(err.response?.data?.message || t('profile.deleteAccountErrorGeneric'));
+            setIsLoading(false);
+            return false;
         }
-
-        saveUsersToStorage(updatedUsers);
-        logout(); // Log out the user after deleting their account
-        setIsLoading(false);
-        return true;
-    }, [logout, user, t]);
+    }, [logout, t]);
     
 
     const value = useMemo(() => ({

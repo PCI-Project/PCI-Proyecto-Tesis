@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import axios from 'axios';
 import { Project, Sample, Section, PavementType, Severity, AppView, ProjectView } from './types';
 import { ProjectForm } from './components/ProjectForm';
 import { ResultsDisplay } from './components/ResultsDisplay';
@@ -14,47 +15,18 @@ import { AuthView } from './components/auth/AuthView';
 import { DataEntryView } from './components/DataEntryView';
 import { ProfileView } from './components/ProfileView';
 
+const API = axios.create({ baseURL: 'http://localhost:5000/api' });
+
+// Interceptor: adjunta el token automáticamente a cada petición
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 const VIEW_ORDER: ProjectView[] = ['SETUP', 'DATA_ENTRY', 'CALCULATION_DETAILS', 'RESULTS'];
-
-// Helper to get projects from localStorage, now user-specific
-const loadProjects = (userId: string): Project[] => {
-  try {
-    const savedProjectsJSON = localStorage.getItem(`pci-projects-${userId}`);
-    if (!savedProjectsJSON) {
-      return [];
-    }
-    const savedData = JSON.parse(savedProjectsJSON);
-    
-    // Ensure the loaded data is an array before returning
-    if (Array.isArray(savedData)) {
-      // Basic check for project structure
-      return savedData.filter(p => p && typeof p.id === 'string' && typeof p.name === 'string');
-    }
-    
-    // If data is present but not an array, it's considered corrupt.
-    console.warn(`Corrupted project data for user ${userId}; expected an array. Clearing data.`);
-    localStorage.removeItem(`pci-projects-${userId}`);
-    return [];
-
-  } catch (error) {
-    console.error(`Failed to parse projects for user ${userId}. Data might be corrupt. Clearing data.`, error);
-    // If parsing fails, the data is corrupt.
-    localStorage.removeItem(`pci-projects-${userId}`);
-    return [];
-  }
-};
-
-
-// Helper to save projects to localStorage, now user-specific
-const saveProjects = (projects: Project[], userId: string) => {
-  try {
-    localStorage.setItem(`pci-projects-${userId}`, JSON.stringify(projects));
-  } catch (error) {
-    console.error(`Failed to save projects for user ${userId}`, error);
-  }
-};
-
 
 export const App: React.FC = () => {
   const { t } = useTranslations();
@@ -65,36 +37,108 @@ export const App: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] = useState(false);
   const [projectToDeleteId, setProjectToDeleteId] = useState<string | null>(null);
+  const savingProjectIdRef = useRef<string | null>(null); // Evitar guardos duplicados sin causar re-renders
 
+  // Cargar proyectos al iniciar o cuando cambia el usuario
   useEffect(() => {
-    if (user) {
-        setProjects(loadProjects(user.id));
-        setCurrentView('DASHBOARD');
-        setSelectedProject(null);
-    } else {
-        setProjects([]);
-        setSelectedProject(null);
-        setCurrentView('DASHBOARD');
+    if (!user) {
+      setProjects([]);
+      setSelectedProject(null);
+      setCurrentView('DASHBOARD');
+      return;
     }
+    
+    const cargarProyectos = async () => {
+      try {
+        const { data } = await API.get('/projects');
+        console.log(`[cargarProyectos] Backend devolvió ${data.length} proyectos:`, data.map((p: any) => ({ _id: p._id, name: p.name })));
+        const mappedProjects: Project[] = data.map((p: any) => ({
+            ...p,
+            _id: p._id,
+            id: String(p._id),
+        }));
+        setProjects(mappedProjects);
+        setCurrentView('DASHBOARD');
+        setSelectedProject(null);
+      } catch (err) { 
+        console.error('Error cargando proyectos:', err); 
+        setProjects([]);
+      }
+    };
+    cargarProyectos();
   }, [user]);
   
-  // Persists a project to the main projects list and localStorage immediately.
-  // Used for critical saves like navigation or setup completion.
-  const saveProjectToStorage = (projectToSave: Project) => {
+  // Guardar / actualizar proyecto
+  const saveProjectToStorage = async (projectToSave: Project) => {
     if (!user) return;
-    setProjects(currentProjects => {
-      const existingIndex = currentProjects.findIndex(p => p.id === projectToSave.id);
-      const newProjects = [...currentProjects];
 
+    const isNew = !projectToSave._id; 
+    const projectKey = projectToSave._id ? String(projectToSave._id) : String(projectToSave.id);
+
+    // Evitar guardos duplicados si ya está guardándose
+    if (savingProjectIdRef.current === projectKey) {
+      console.log(`[saveProjectToStorage] ⚠️ Ya se está guardando este proyecto (${projectKey}), se ignora la solicitud duplicada`);
+      return;
+    }
+
+    savingProjectIdRef.current = projectKey;
+    console.log(`[saveProjectToStorage] ${isNew ? 'POST' : 'PUT'} - key: ${projectKey}, name: ${projectToSave.name}`);
+    console.trace('[CALL STACK]');
+
+    // Actualización optimista
+    setProjects(currentProjects => {
+      const existingIndex = currentProjects.findIndex(p => String(p._id || p.id) === projectKey);
       if (existingIndex > -1) {
-        newProjects[existingIndex] = projectToSave;
-      } else {
-        newProjects.push(projectToSave);
+        const updatedProjects = [...currentProjects];
+        updatedProjects[existingIndex] = projectToSave;
+        console.log(`[saveProjectToStorage] Proyecto reemplazado en índice ${existingIndex}`);
+        return updatedProjects;
+      } else if (isNew) {
+        console.log(`[saveProjectToStorage] Proyecto nuevo agregado a la lista`);
+        return [...currentProjects, projectToSave];
       }
-      
-      saveProjects(newProjects, user.id);
-      return newProjects;
+      return currentProjects;
     });
+
+    try {
+      if (isNew) {
+        // Proyecto nuevo: POST
+        const { _id, ...projectData } = projectToSave;
+        console.log(`[saveProjectToStorage] Enviando POST...`);
+        const { data } = await API.post('/projects', projectData);
+        const newMongoId = String(data._id);
+        console.log(`[saveProjectToStorage] POST exitoso, nuevo _id: ${newMongoId}`);
+        
+        // Reemplazar proyecto temporal por el real del backend
+        setProjects(prev => 
+          prev.map(p => String(p._id || p.id) === projectKey ? { ...data, _id: data._id, id: newMongoId } : p)
+        );
+        setSelectedProject(currentSelectedProject =>
+          currentSelectedProject && String(currentSelectedProject._id || currentSelectedProject.id) === projectKey
+            ? { ...data, _id: data._id, id: newMongoId }
+            : currentSelectedProject
+        );
+      } else {
+        // Proyecto existente: PUT
+        console.log(`[saveProjectToStorage] Enviando PUT...`);
+        const { data } = await API.put(`/projects/${projectToSave._id}`, projectToSave);
+        console.log(`[saveProjectToStorage] PUT exitoso`);
+        setProjects(prev => 
+          prev.map(p => String(p._id || p.id) === projectKey ? { ...data, _id: data._id, id: String(data._id) } : p)
+        );
+        setSelectedProject(currentSelectedProject =>
+          currentSelectedProject && String(currentSelectedProject._id || currentSelectedProject.id) === projectKey
+            ? { ...data, _id: data._id, id: String(data._id) }
+            : currentSelectedProject
+        );
+      }
+    } catch (err) { 
+      console.error('[saveProjectToStorage] Error:', err);
+      // Revertir optimista si falla
+      setProjects(prev => prev.filter(p => String(p._id || p.id) !== projectKey));
+    } finally {
+      savingProjectIdRef.current = null;
+    }
   };
 
   const handleSelectProject = (projectId: string) => {
@@ -107,11 +151,11 @@ export const App: React.FC = () => {
       const needsDetailsCalc = targetView === 'CALCULATION_DETAILS' && !project.sections.some(s => s.samples.some(smp => smp.calculationDetails));
       const needsResultsCalc = targetView === 'RESULTS' && project.weightedPCI === undefined;
 
-      // If the target view requires calculations that are missing, run them now.
-      // This handles re-loading a project that was closed on a results page.
+      // Si la vista de destino requiere cálculos que faltan, ejecútalos ahora.
+      // Esto maneja la recarga de un proyecto que fue cerrado en una página de resultados.
       if (needsDetailsCalc || needsResultsCalc) {
         projectToLoad = calculateProjectPCI(project);
-        // We save it back so the calculated data persists for next time.
+        // Lo guardamos de vuelta para que los datos calculados persistan para la próxima vez.
         saveProjectToStorage(projectToLoad);
       }
       
@@ -135,17 +179,27 @@ export const App: React.FC = () => {
     setIsDeleteModalOpen(false);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!projectToDeleteId || !user) return;
 
-    setProjects(prevProjects => {
-        const updatedProjects = prevProjects.filter(p => p.id !== projectToDeleteId);
-        saveProjects(updatedProjects, user.id);
-        return updatedProjects;
-    });
-
-    setProjectToDeleteId(null);
+    // Actualización optimista
+    const projectToDelete = projects.find(p => p.id === projectToDeleteId);
+    setProjects(prevProjects => prevProjects.filter(p => p.id !== projectToDeleteId));
     setIsDeleteModalOpen(false);
+    setProjectToDeleteId(null);
+
+    try {
+        // Usar _id si está disponible, de lo contrario usar id como respaldo (aunque delete usualmente requiere _id)
+        const idToDelete = projectToDelete?._id || projectToDeleteId;
+        await API.delete(`/projects/${idToDelete}`);
+    } catch (err) { 
+        console.error('Error eliminando proyecto:', err);
+        // Revertir si falló
+        if (projectToDelete) {
+             setProjects(prev => [...prev, projectToDelete]);
+             alert(t('dashboard.deleteError'));
+        }
+    }
   };
   
   const handleConfirmDeleteAccount = async () => {
@@ -153,9 +207,9 @@ export const App: React.FC = () => {
     const success = await deleteAccount(user.id);
     if (success) {
       setIsDeleteAccountModalOpen(false);
-      // The logout is handled inside the deleteAccount function, so UI will update automatically
+      // El logout se maneja dentro de la función deleteAccount, por lo que la UI se actualiza automáticamente
     } else {
-      // The error is handled and displayed within the context, but you could show a modal error here if needed.
+      // El error se maneja y se muestra dentro del contexto, pero podrías mostrar un modal de error aquí si es necesario.
       setIsDeleteAccountModalOpen(false);
       alert(authError || t('profile.deleteAccountErrorGeneric'));
     }
@@ -169,12 +223,10 @@ export const App: React.FC = () => {
 
   const handleLoadDemoProject = () => {
     if (!user) return;
+    // El proyecto demo es solo local por ahora, o podría publicarse en la API
     const DEMO_PROJECT_ID = 'pci-demo-project-1';
     
-    // Always create a fresh demo project, overwriting if it exists.
-    const otherProjects = projects.filter(p => p.id !== DEMO_PROJECT_ID);
-
-    const sectionArea = 100 * 3.5; // Example dimensions
+    const sectionArea = 100 * 3.5; // Dimensiones de ejemplo
     const sampleUnitArea = ASTM_DEFAULTS.FLEXIBLE_SAMPLE_AREA;
 
     const params = calculateSectionParameters(
@@ -187,6 +239,7 @@ export const App: React.FC = () => {
 
     const demoProject: Project = {
         id: DEMO_PROJECT_ID,
+        _id: '', // _id vacío para demo hasta que se guarde
         name: t('demoProject.name'),
         inspector: t('demoProject.inspector'),
         inspectionDate: new Date().toISOString().split('T')[0],
@@ -225,26 +278,29 @@ export const App: React.FC = () => {
                 ],
             },
         ],
+        // Agregar campos requeridos para la nueva interfaz Project
+        nombre: t('demoProject.name'),
+        propietario: user.id,
     };
 
-    const newProjects = [...otherProjects, demoProject];
-    setProjects(newProjects);
-    saveProjects(newProjects, user.id);
+    // No guardamos automáticamente el proyecto demo en la DB para evitar desorden,
+    // pero lo agregamos al estado local. El usuario puede guardarlo modificándolo.
+    setProjects(prev => [...prev.filter(p => p.id !== DEMO_PROJECT_ID), demoProject]);
     setSelectedProject(demoProject);
     setCurrentView('DATA_ENTRY');
 };
 
-  // This is the main state update function for an active project.
-  // It ensures data integrity by clearing any old calculation results whenever underlying data is changed.
+  // Esta es la función principal de actualización de estado para un proyecto activo.
+  // Asegura la integridad de los datos borrando cualquier resultado de cálculo antiguo cada vez que se modifican los datos subyacentes.
   const updateProjectState = (updater: (draft: Project) => void) => {
     setSelectedProject(currentSelectedProject => {
       if (!currentSelectedProject) return null;
       
       const newProject = JSON.parse(JSON.stringify(currentSelectedProject));
-      // Apply the specific data modifications from the updater function.
+      // Aplicar las modificaciones de datos específicas de la función actualizadora.
       updater(newProject);
 
-      // After any data modification, we must clear old calculation results as they are no longer valid.
+      // Después de cualquier modificación de datos, debemos borrar los resultados de cálculo antiguos ya que ya no son válidos.
       newProject.weightedPCI = undefined;
       newProject.sections.forEach((section: Section) => {
         section.pci = undefined;
@@ -253,20 +309,35 @@ export const App: React.FC = () => {
         });
       });
 
-      // Persist the updated, cleaned project state.
+      // Persistir el estado del proyecto actualizado y limpiado.
       saveProjectToStorage(newProject);
       
-      // Return the new state for an immediate UI update.
+      // Devolver el nuevo estado para una actualización inmediata de la interfaz de usuario.
       return newProject;
     });
   };
 
-  const handleProjectSetupSave = (projectData: Omit<Project, 'id' | 'lastView' | 'weightedPCI'>) => {
-    let newOrUpdatedProject: Project = selectedProject 
-      ? { ...selectedProject, ...projectData }
-      : { id: Date.now().toString(), ...projectData, sections: projectData.sections };
+  const handleProjectSetupSave = (projectData: Omit<Project, 'id' | 'lastView' | 'weightedPCI' | '_id' | 'nombre' | 'propietario'>) => {
+    if (!user) return;
 
-    // Explicitly clear any old results, as this function doesn't use updateProjectState.
+    let newOrUpdatedProject: Project;
+    
+    if (selectedProject) {
+        newOrUpdatedProject = { ...selectedProject, ...projectData };
+    } else {
+        const tempId = Date.now().toString();
+        newOrUpdatedProject = { 
+            id: tempId,
+            _id: '', // Será poblado por el backend
+            ...projectData, 
+            sections: projectData.sections,
+            // Mapear campos legacy al nuevo esquema
+            nombre: projectData.name || 'Nuevo Proyecto',
+            propietario: user.id
+        };
+    }
+
+    // Borrar explícitamente cualquier resultado antiguo, ya que esta función no utiliza updateProjectState.
     newOrUpdatedProject.weightedPCI = undefined;
     newOrUpdatedProject.sections.forEach(s => {
         s.pci = undefined;
@@ -275,10 +346,13 @@ export const App: React.FC = () => {
         });
     });
 
-    handleNavigate('DATA_ENTRY', newOrUpdatedProject);
+    // Guardamos el proyecto antes de navegar para evitar que la navegación dispare otro save.
+    setSelectedProject(newOrUpdatedProject);
+    saveProjectToStorage(newOrUpdatedProject);
+    handleNavigate('DATA_ENTRY', newOrUpdatedProject, true);
   };
   
-  const handleNavigate = (view: AppView, projectOverride?: Project) => {
+  const handleNavigate = (view: AppView, projectOverride?: Project, skipSave = false) => {
       if (view === 'PROFILE' || view === 'DASHBOARD') {
           setSelectedProject(null);
           setCurrentView(view);
@@ -288,7 +362,7 @@ export const App: React.FC = () => {
       let projectToUpdate = projectOverride || selectedProject;
       if (!projectToUpdate) return;
       
-      // If moving to calculation step, perform calculation first
+      // Si se mueve al paso de cálculo, realizar el cálculo primero
       if (view === 'CALCULATION_DETAILS' || view === 'RESULTS') {
           projectToUpdate = calculateProjectPCI(projectToUpdate);
       }
@@ -302,7 +376,9 @@ export const App: React.FC = () => {
       };
 
       setSelectedProject(updatedProject);
-      saveProjectToStorage(updatedProject);
+      if (!skipSave) {
+          saveProjectToStorage(updatedProject);
+      }
       setCurrentView(view);
   };
   
@@ -322,7 +398,7 @@ export const App: React.FC = () => {
       const section = draft.sections.find(s => s.id === sectionId);
       if (!section) return;
 
-      // Prevent adding if it already exists
+      // Evitar agregar si ya existe
       if (section.samples.some(s => s.id === sampleIdToAdd)) return;
 
       const newSample: Sample = {
@@ -333,7 +409,7 @@ export const App: React.FC = () => {
         isAdditional: true,
       };
       section.samples.push(newSample);
-      // Sort samples by ID to keep the list ordered
+      // Ordenar muestras por ID para mantener la lista ordenada
       section.samples.sort((a, b) => a.id - b.id);
     });
   };
@@ -356,19 +432,19 @@ export const App: React.FC = () => {
       return <ProfileView onInitiateDelete={() => setIsDeleteAccountModalOpen(true)} />;
     }
 
-    // SETUP can work with or without a selected project
+    // SETUP puede funcionar con o sin un proyecto seleccionado
     if (currentView === 'SETUP') {
         return <ProjectForm initialProject={selectedProject} onProjectCreateOrUpdate={handleProjectSetupSave} />;
     }
 
-    // All other views require a selected project.
+    // Todas las demás vistas requieren un proyecto seleccionado.
     if (!selectedProject) {
-        // Fallback to dashboard if project is missing for a project-specific view.
+        // Volver al panel si falta el proyecto para una vista específica del proyecto.
         return <DashboardView projects={projects} onNewProject={handleNewProject} onSelectProject={handleSelectProject} onInitiateDelete={handleInitiateDelete} onLoadExample={handleLoadDemoProject} />;
     }
     
-    // The calculation logic is now handled by navigation/selection functions,
-    // removing the risk of infinite loops during render.
+    // La lógica de cálculo ahora se maneja mediante funciones de navegación/selección,
+    // eliminando el riesgo de bucles infinitos durante la renderización.
     switch (currentView) {
       case 'DATA_ENTRY':
         return <DataEntryView project={selectedProject} onSampleUpdate={handleSampleUpdate} onSampleAdd={handleSampleAdd} onSampleDelete={handleSampleDelete} />;
