@@ -1,0 +1,23 @@
+Toma en cuenta estas modificaciones para aplicarlas en tu repositorio en GitHub y tu base de datos MongoDB:
+src/components/auth/SignUp.tsx
+Qué se hizo:
+Se añadieron los estados locales para company, jobTitle (cargo) y acceptedTerms (para la confirmación de políticas).
+Se maquetaron los campos correspondientes a la Empresa y el Cargo (Rol de empresa) debajo de las contraseñas.
+Se añadió un <input type="checkbox"> para aceptar los términos y condiciones.
+Se actualizó la función handleSubmit para validar que los términos fueron aceptados antes de enviar, e incorporar company y jobTitle en la petición signup().
+src/contexts/AuthContext.tsx
+Qué se hizo:
+Se actualizó la interfaz User para que soporte los campos opcionales company y jobTitle.
+La función signup fue modificada para aceptar estos datos (company e jobTitle) y guardarlos al momento de crear un usuario.
+Se añadió la lógica dura que evalúa si el usuario es dhworkdelgado@gmail.com, y en tal caso, se le impone la variable interna role: 'admin', en lugar del rol 'user' por defecto, sin que esto choque con el cargo (jobTitle) en su empresa.
+src/components/ProfileView.tsx
+Qué se hizo:
+Se actualizó el formulario del perfil y su estado local para incluir y permitir la edición de la Empresa y el Cargo (jobTitle).
+Se agregó la lógica para inyectar una pestaña de Panel de Administración (admin) en la vista del perfil exclusivamente cuando la variable interna de la sesión user.role sea igual a 'admin'.
+src/translations/en.ts (y de igual manera para los idiomas que manejes)
+Qué se hizo:
+Se incluyeron dentro del objeto de traducciones las claves para la interfaz (auth.company, auth.role).
+Se añadieron las nuevas frases para las validaciones y el checkbox de política de privacidad: auth.acceptTerms y auth.errorTermsRequired.
+src/translations/es.ts (o cualquier otro sistema de idiomas que tengas)
+Qué se hizo:
+Simplemente se plasmaron las equivalencias en español para que las etiquetas dicten: "Acepto los términos y condiciones...", "Debes aceptar los términos...", etc.
