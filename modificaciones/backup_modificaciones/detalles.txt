@@ -1,7 +1,7 @@
 Toma en cuenta estas modificaciones para aplicarlas en tu repositorio en GitHub y tu base de datos MongoDB:
 src/components/auth/SignUp.tsx
 Qué se hizo:
-Se añadieron los estados locales para company, jobTitle (cargo) y acceptedTerms (para la confirmación de políticas).
+* Se añadieron los estados locales para company, jobTitle (cargo) y acceptedTerms (para la confirmación de políticas).
 Se maquetaron los campos correspondientes a la Empresa y el Cargo (Rol de empresa) debajo de las contraseñas.
 Se añadió un <input type="checkbox"> para aceptar los términos y condiciones.
 Se actualizó la función handleSubmit para validar que los términos fueron aceptados antes de enviar, e incorporar company y jobTitle en la petición signup().
