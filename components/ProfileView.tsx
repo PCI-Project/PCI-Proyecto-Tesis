@@ -33,7 +33,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete }) =>
     const [activeTab, setActiveTab] = useState<ProfileTab>('info');
     
     const [formData, setFormData] = useState({
-        name: '', company: '', role: '', country: '', phone: ''
+        name: '', company: '', jobTitle: '', country: '', phone: ''
     });
     const [passwordData, setPasswordData] = useState({
         currentPassword: '', newPassword: '', confirmNewPassword: ''
@@ -45,7 +45,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete }) =>
             setFormData({
                 name: user.name || '',
                 company: user.company || '',
-                role: user.role || '',
+                jobTitle: user.jobTitle || '',
                 country: user.country || '',
                 phone: user.phone || ''
             });
@@ -58,7 +58,13 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete }) =>
     const handleInfoSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setFeedback(null);
-        const success = await updateUser(formData);
+        const success = await updateUser({
+            name: formData.name,
+            company: formData.company,
+            jobTitle: formData.jobTitle,
+            country: formData.country,
+            phone: formData.phone
+        });
         setFeedback({ type: success ? 'success' : 'error', message: success ? t('profile.updateSuccess') : error || t('profile.updateError') });
     };
     
@@ -98,7 +104,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete }) =>
                         </div>
                         <div className="grid md:grid-cols-2 gap-4">
                             <Input label={t('auth.company')} name="company" value={formData.company} onChange={handleInfoChange} />
-                            <Input label={t('auth.role')} name="role" value={formData.role} onChange={handleInfoChange} />
+                            <Input label={t('auth.jobTitle')} name="jobTitle" value={formData.jobTitle} onChange={handleInfoChange} />
                         </div>
                         <div className="grid md:grid-cols-2 gap-4">
                             <Input label={t('auth.country')} name="country" value={formData.country} onChange={handleInfoChange} />
