@@ -218,7 +218,7 @@ export const es = {
         confirmPassword: "Confirmar Contraseña",
         fullName: "Nombre completo",
         company: "Empresa (Opcional)",
-        role: "Cargo (Opcional)",
+        jobTitle: "Cargo (Opcional)",
         country: "País (Opcional)",
         phone: "Teléfono (Opcional)",
         loginButton: "Iniciar Sesión",
