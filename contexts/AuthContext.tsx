@@ -119,23 +119,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 }, [t]);
 
     const updateUser = useCallback(async (updatedData: Omit<User, 'id' | 'email'>): Promise<boolean> => {
-        if (!user) return false;
-        setIsLoading(true);
-        setError(null);
+    if (!user) return false;
+    setIsLoading(true);
+    setError(null);
 
-        try {
-            // Mapping frontend updates to backend structure if needed
-            // For now assuming backend accepts partial updates
-            const { data } = await API.put<MongoUser>('/auth/profile', updatedData);
-            setUser(mapUser(data));
-            setIsLoading(false);
-            return true;
-        } catch (err: any) {
-            console.error("Update user failed", err);
-            setError(err.response?.data?.message || 'Failed to update profile');
-            setIsLoading(false);
-            return false;
-        }
+    try {
+        const payload = {
+        nombre: updatedData.name,
+        company: updatedData.company || '',
+        jobTitle: updatedData.jobTitle || '',
+        phone: updatedData.phone || '',
+        country: updatedData.country || ''
+        };
+
+        const { data } = await API.put<MongoUser>('/auth/profile', payload);
+        setUser(mapUser(data));
+        setIsLoading(false);
+        return true;
+    } catch (err: any) {
+        console.error("Update user failed", err);
+        setError(err.response?.data?.msg || err.response?.data?.message || 'Failed to update profile');
+        setIsLoading(false);
+        return false;
+    }
     }, [user]);
 
     const changePassword = useCallback(async (oldPass: string, newPass: string): Promise<boolean> => {
