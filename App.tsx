@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Project, Sample, Section, PavementType, Severity, AppView, ProjectView } from './types';
+import { Project, MongoProject, Sample, Section, PavementType, Severity, AppView, ProjectView } from './types';
 import { ProjectForm } from './components/ProjectForm';
 import { ResultsDisplay } from './components/ResultsDisplay';
 import { CalculationDetailsView } from './components/CalculationDetailsView';
@@ -28,6 +28,31 @@ API.interceptors.request.use((config) => {
 
 const VIEW_ORDER: ProjectView[] = ['SETUP', 'DATA_ENTRY', 'CALCULATION_DETAILS', 'RESULTS'];
 
+const mapMongoProjectToProject = (mongoProject: MongoProject): Project => ({
+  id: String(mongoProject._id),
+  _id: String(mongoProject._id),
+  name: mongoProject.nombre,
+  nombre: mongoProject.nombre,
+  descripcion: mongoProject.descripcion || '',
+  inspector: mongoProject.inspector || '',
+  inspectionDate: mongoProject.inspectionDate || '',
+  propietario: mongoProject.propietario,
+  sections: mongoProject.sections || [],
+  lastView: mongoProject.lastView || 'SETUP',
+  weightedPCI: mongoProject.weightedPCI,
+});
+
+const mapProjectToMongoPayload = (project: Project, userId: string) => ({
+  nombre: project.nombre || project.name,
+  descripcion: project.descripcion || '',
+  inspector: project.inspector || '',
+  inspectionDate: project.inspectionDate || '',
+  lastView: project.lastView || 'SETUP',
+  weightedPCI: project.weightedPCI,
+  propietario: project.propietario || userId,
+  sections: project.sections || [],
+});
+
 export const App: React.FC = () => {
   const { t } = useTranslations();
   const { user, isLoading: isAuthLoading, deleteAccount, error: authError } = useAuth();
@@ -49,30 +74,32 @@ export const App: React.FC = () => {
     }
     
     const cargarProyectos = async () => {
-      try {
-        const { data } = await API.get('/projects');
-        console.log(`[cargarProyectos] Backend devolvió ${data.length} proyectos:`, data.map((p: any) => ({ _id: p._id, name: p.name })));
-        const mappedProjects: Project[] = data.map((p: any) => ({
-            ...p,
-            _id: p._id,
-            id: String(p._id),
-        }));
-        setProjects(mappedProjects);
-        setCurrentView('DASHBOARD');
-        setSelectedProject(null);
-      } catch (err) { 
-        console.error('Error cargando proyectos:', err); 
-        setProjects([]);
-      }
-    };
+  try {
+    const { data } = await API.get('/projects');
+    console.log('[cargarProyectos] data cruda del backend:', data);
+
+    const mappedProjects = data.map((p: any) => {
+      const mapped = mapMongoProjectToProject(p);
+      console.log('[cargarProyectos] proyecto mapeado:', mapped);
+      return mapped;
+    });
+
+    setProjects(mappedProjects);
+    setCurrentView('DASHBOARD');
+    setSelectedProject(null);
+  } catch (err) {
+    console.error('Error cargando proyectos:', err);
+    setProjects([]);
+  }
+};
     cargarProyectos();
   }, [user]);
   
   // Guardar / actualizar proyecto
-  const saveProjectToStorage = async (projectToSave: Project) => {
+    const saveProjectToStorage = async (projectToSave: Project) => {
     if (!user) return;
 
-    const isNew = !projectToSave._id; 
+    const isNew = !projectToSave._id;
     const projectKey = projectToSave._id ? String(projectToSave._id) : String(projectToSave.id);
 
     // Evitar guardos duplicados si ya está guardándose
@@ -110,25 +137,42 @@ export const App: React.FC = () => {
         console.log(`[saveProjectToStorage] POST exitoso, nuevo _id: ${newMongoId}`);
         
         // Reemplazar proyecto temporal por el real del backend
-        setProjects(prev => 
-          prev.map(p => String(p._id || p.id) === projectKey ? { ...data, _id: data._id, id: newMongoId } : p)
+        const mappedProject = mapMongoProjectToProject(data);
+
+        setProjects(prev =>
+          prev.map(p => String(p._id || p.id) === projectKey ? mappedProject : p)
         );
+
         setSelectedProject(currentSelectedProject =>
           currentSelectedProject && String(currentSelectedProject._id || currentSelectedProject.id) === projectKey
-            ? { ...data, _id: data._id, id: newMongoId }
+            ? mappedProject
             : currentSelectedProject
         );
       } else {
-        // Proyecto existente: PUT
         console.log(`[saveProjectToStorage] Enviando PUT...`);
-        const { data } = await API.put(`/projects/${projectToSave._id}`, projectToSave);
+        const payload = mapProjectToMongoPayload(projectToSave, user.id);
+        const { data } = await API.put(`/projects/${projectToSave._id}`, payload);
         console.log(`[saveProjectToStorage] PUT exitoso`);
-        setProjects(prev => 
-          prev.map(p => String(p._id || p.id) === projectKey ? { ...data, _id: data._id, id: String(data._id) } : p)
+
+        const mappedProject = mapMongoProjectToProject(data);
+
+        const mergedProject = {
+          ...mappedProject,
+          ...projectToSave,
+          _id: mappedProject._id || projectToSave._id,
+          id: mappedProject.id || projectToSave.id,
+          weightedPCI: projectToSave.weightedPCI,
+          lastView: projectToSave.lastView,
+          sections: projectToSave.sections,
+        };
+
+        setProjects(prev =>
+          prev.map(p => String(p._id || p.id) === projectKey ? mergedProject : p)
         );
+
         setSelectedProject(currentSelectedProject =>
           currentSelectedProject && String(currentSelectedProject._id || currentSelectedProject.id) === projectKey
-            ? { ...data, _id: data._id, id: String(data._id) }
+            ? mergedProject
             : currentSelectedProject
         );
       }
@@ -365,6 +409,15 @@ export const App: React.FC = () => {
       // Si se mueve al paso de cálculo, realizar el cálculo primero
       if (view === 'CALCULATION_DETAILS' || view === 'RESULTS') {
           projectToUpdate = calculateProjectPCI(projectToUpdate);
+          console.log('VIEW:', view);
+          console.log('weightedPCI:', projectToUpdate.weightedPCI);
+          console.log(
+            'sections:',
+            projectToUpdate.sections.map(s => ({
+              name: s.name,
+              pci: s.pci
+            }))
+          );
       }
       
       const lastViewIndex = VIEW_ORDER.indexOf(projectToUpdate.lastView || 'SETUP');

@@ -233,7 +233,9 @@ export const en = {
         errorUserExists: "An account with this email already exists.",
         errorPasswordMatch: "Passwords do not match.",
         errorPasswordLength: "Password must be at least 6 characters long.",
-        errorNameRequired: "Full name is required."
+        errorNameRequired: "Full name is required.",
+        acceptTerms: "I accept the Terms of Service and Privacy Policy.",
+        errorTermsRequired: "You must accept the terms and conditions."
     },
     ratingGood: "Good",
     ratingSatisfactory: "Satisfactory",

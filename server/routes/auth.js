@@ -9,13 +9,25 @@ const generarToken = (id) =>
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
-  const { nombre, email, password } = req.body;
-  try {
-    if (await User.findOne({ email }))
-      return res.status(400).json({ msg: 'El email ya está registrado' });
+  const { nombre, email, password, company, jobTitle } = req.body;
 
-    const usuario = await User.create({ nombre, email, password });
-    res.status(201).json({ token: generarToken(usuario._id), user: usuario });
+  try {
+    if (await User.findOne({ email })) {
+      return res.status(400).json({ msg: 'El email ya está registrado' });
+    }
+
+    const usuario = await User.create({
+      nombre,
+      email,
+      password,
+      company: company || '',
+      jobTitle: jobTitle || ''
+    });
+
+    res.status(201).json({
+      token: generarToken(usuario._id),
+      user: usuario
+    });
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
@@ -40,5 +52,52 @@ router.get('/me', protegerRuta, (req, res) => res.json(req.user));
 
 // Agrega esta ruta junto a la de /me
 router.get('/verify', protegerRuta, (req, res) => res.json(req.user));
+
+// PUT /api/auth/profile — actualizar perfil
+router.put('/profile', protegerRuta, async (req, res) => {
+  try {
+    const { nombre, company, jobTitle, phone, country } = req.body;
+
+    const usuario = await User.findById(req.user._id);
+    if (!usuario) {
+      return res.status(404).json({ msg: 'Usuario no encontrado' });
+    }
+
+    usuario.nombre = nombre ?? usuario.nombre;
+    usuario.company = company ?? usuario.company;
+    usuario.jobTitle = jobTitle ?? usuario.jobTitle;
+    usuario.phone = phone ?? usuario.phone;
+    usuario.country = country ?? usuario.country;
+
+    const actualizado = await usuario.save();
+    res.json(actualizado);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
+
+// PUT /api/auth/password — cambiar contraseña
+router.put('/password', protegerRuta, async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    const usuario = await User.findById(req.user._id);
+    if (!usuario) {
+      return res.status(404).json({ msg: 'Usuario no encontrado' });
+    }
+
+    const coincide = await usuario.compararPassword(oldPassword);
+    if (!coincide) {
+      return res.status(400).json({ msg: 'La contraseña actual es incorrecta' });
+    }
+
+    usuario.password = newPassword;
+    await usuario.save();
+
+    res.json({ msg: 'Contraseña actualizada correctamente' });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
 
 module.exports = router;

@@ -1,5 +1,3 @@
-
-
 export type ProjectView = 'SETUP' | 'DATA_ENTRY' | 'CALCULATION_DETAILS' | 'RESULTS';
 export type AppView = 'DASHBOARD' | ProjectView | 'PROFILE';
 
@@ -13,20 +11,32 @@ export enum Severity {
   HIGH = 'H',
 }
 
-export interface User {
-  _id: string;          // ← ID nativo de Mongo
+export interface MongoUser {
+  _id: string;
   nombre: string;
   email: string;
   rol: 'admin' | 'user';
-  createdAt?: string;   // ← timestamps de Mongoose
+  company?: string;
+  jobTitle?: string;
+  phone?: string;
+  country?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
-export interface Project {
-  _id: string;          // ← reemplaza el "id" local
+
+export interface MongoProject {
+  _id: string;
+  name?: string;
   nombre: string;
   descripcion?: string;
+  inspector?: string;
+  inspectionDate?: string;
+  lastView?: 'SETUP' | 'DATA_ENTRY' | 'CALCULATION_DETAILS' | 'RESULTS';
+  weightedPCI?: number;
   sections: Section[];
   propietario: string;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Distress {
@@ -64,7 +74,6 @@ export interface PCICalculationDetails {
   cdvIterationSteps: CDVIterationStep[];
 }
 
-
 export interface Sample {
   id: number; // e.g. Sample Unit #5
   area: number; // m^2
@@ -99,10 +108,14 @@ export interface Section {
 }
 
 export interface Project {
-  id:string;
+  id: string;
+  _id?: string;
   name: string;
+  nombre?: string;
+  descripcion?: string;
   inspector: string;
   inspectionDate: string;
+  propietario?: string;
   sections: Section[];
   lastView?: ProjectView;
   weightedPCI?: number;

@@ -14,28 +14,47 @@ const LoadingSpinner: React.FC = () => (
 export const SignUp: React.FC = () => {
     const { t } = useTranslations();
     const { signup, isLoading, error } = useAuth();
+
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [company, setCompany] = useState('');
+    const [jobTitle, setJobTitle] = useState('');
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setFormError(null);
+
         if (!name.trim()) {
             setFormError(t('auth.errorNameRequired'));
             return;
         }
+
         if (password.length < 6) {
             setFormError(t('auth.errorPasswordLength'));
             return;
         }
+
         if (password !== confirmPassword) {
             setFormError(t('auth.errorPasswordMatch'));
             return;
         }
-        await signup({ name, email, pass: password });
+
+        if (!acceptedTerms) {
+            setFormError(t('auth.errorTermsRequired'));
+            return;
+        }
+
+        await signup({
+            name,
+            email,
+            pass: password,
+            company,
+            jobTitle
+        });
     };
 
     return (
@@ -50,6 +69,7 @@ export const SignUp: React.FC = () => {
                 onChange={(e) => setName(e.target.value)}
                 required
             />
+
             <Input
                 type="email"
                 name="email"
@@ -60,7 +80,8 @@ export const SignUp: React.FC = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
             />
-             <Input
+
+            <Input
                 type="password"
                 name="password"
                 id="signup-password"
@@ -70,6 +91,7 @@ export const SignUp: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
             />
+
             <Input
                 type="password"
                 name="confirmPassword"
@@ -80,8 +102,56 @@ export const SignUp: React.FC = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
             />
-            {(error || formError) && <p className="text-sm text-danger text-center">{error || formError}</p>}
-            <Button type="submit" className="w-full flex justify-center !text-lg !font-bold" disabled={isLoading}>
+
+            <div className="grid grid-cols-2 gap-4">
+                <Input
+                    type="text"
+                    name="company"
+                    id="signup-company"
+                    placeholder={t('auth.company')}
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                />
+
+                <Input
+                    type="text"
+                    name="role"
+                    id="signup-role"
+                    placeholder={t('auth.role')}
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                />
+            </div>
+
+            <div className="flex items-start">
+                <div className="flex items-center h-5">
+                    <input
+                        id="terms"
+                        name="terms"
+                        type="checkbox"
+                        checked={acceptedTerms}
+                        onChange={(e) => setAcceptedTerms(e.target.checked)}
+                        className="focus:ring-primary h-4 w-4 text-primary border-border-color rounded"
+                    />
+                </div>
+                <div className="ml-3 text-sm">
+                    <label htmlFor="terms" className="font-medium text-text-primary">
+                        {t('auth.acceptTerms')}
+                    </label>
+                </div>
+            </div>
+
+            {(error || formError) && (
+                <p className="text-sm text-danger text-center">
+                    {error || formError}
+                </p>
+            )}
+
+            <Button
+                type="submit"
+                className="w-full flex justify-center !text-lg !font-bold"
+                disabled={isLoading}
+            >
                 {isLoading ? <LoadingSpinner /> : t('auth.signupButton')}
             </Button>
         </form>
