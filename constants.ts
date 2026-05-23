@@ -50,7 +50,7 @@ export const getPCIRating = (pci: number) => {
 };
 
 export const ASTM_DEFAULTS = {
-  FLEXIBLE_SAMPLE_AREA: 232, // m^2 (approx 2500 ft^2)
+  FLEXIBLE_SAMPLE_AREA: 232,  // m^2 (approx 2500 ft^2)
   ALLOWABLE_ERROR: 5, // e = 5 PCI points
   STD_DEV_AC: 10, // Assumed standard deviation for AC pavements
 };

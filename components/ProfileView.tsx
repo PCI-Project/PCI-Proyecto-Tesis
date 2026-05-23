@@ -23,11 +23,12 @@ const WarningIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" clas
 
 interface ProfileViewProps {
     onInitiateDelete: () => void;
+    onNavigate?: (view: any) => void;
 }
 
-type ProfileTab = 'info' | 'password' | 'settings' | 'danger';
+type ProfileTab = 'info' | 'password' | 'settings' | 'admin' | 'danger';
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete, onNavigate }) => {
     const { t } = useTranslations();
     const { user, updateUser, changePassword, isLoading, error } = useAuth();
     const [activeTab, setActiveTab] = useState<ProfileTab>('info');
@@ -58,15 +59,16 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete }) =>
     const handleInfoSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setFeedback(null);
-        const success = await updateUser({
-            name: formData.name,
-            company: formData.company,
-            jobTitle: formData.jobTitle,
-            country: formData.country,
-            phone: formData.phone
-        });
+    const success = await updateUser({
+        name: formData.name,
+        company: formData.company,
+        jobTitle: formData.jobTitle,
+        country: formData.country,
+        phone: formData.phone
+    });
         setFeedback({ type: success ? 'success' : 'error', message: success ? t('profile.updateSuccess') : error || t('profile.updateError') });
     };
+
     
     const handlePasswordSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -89,6 +91,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete }) =>
         { id: 'info', label: t('profile.personalInfo'), icon: UserIcon },
         { id: 'password', label: t('profile.passwordAndSecurity'), icon: LockIcon },
         { id: 'settings', label: t('profile.settings'), icon: CogIcon },
+        ...(user?.role === 'admin' ? [{ id: 'admin' as ProfileTab, label: 'Panel de Administración', icon: CogIcon }] : []),
         { id: 'danger', label: t('profile.dangerZone'), icon: WarningIcon },
     ];
 
@@ -104,7 +107,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete }) =>
                         </div>
                         <div className="grid md:grid-cols-2 gap-4">
                             <Input label={t('auth.company')} name="company" value={formData.company} onChange={handleInfoChange} />
-                            <Input label={t('auth.jobTitle')} name="jobTitle" value={formData.jobTitle} onChange={handleInfoChange} />
+                            <Input label={t('auth.role')} name="role" value={formData.jobTitle} onChange={handleInfoChange} />
                         </div>
                         <div className="grid md:grid-cols-2 gap-4">
                             <Input label={t('auth.country')} name="country" value={formData.country} onChange={handleInfoChange} />
@@ -133,7 +136,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete }) =>
                 );
             case 'settings':
                 return (
-                     <div>
+                    <div>
                         <h3 className="text-xl font-bold text-text-base mb-4">{t('profile.settings')}</h3>
                         <div className="space-y-4">
                             <div className="flex justify-between items-center p-3 bg-bg-base/60 rounded-lg border border-border-muted">
@@ -148,20 +151,39 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete }) =>
                     </div>
                 );
             case 'danger':
-                 return (
-                     <div>
-                         <h3 className="text-xl font-bold text-danger mb-2">{t('profile.dangerZone')}</h3>
-                         <p className="text-text-muted mb-4">{t('profile.deleteAccountDescription')}</p>
-                         <div className="flex justify-end">
+                return (
+                    <div>
+                        <h3 className="text-xl font-bold text-danger mb-2">{t('profile.dangerZone')}</h3>
+                        <p className="text-text-muted mb-4">{t('profile.deleteAccountDescription')}</p>
+                        <div className="flex justify-end">
                             <Button variant="danger" onClick={onInitiateDelete}>
                                 {t('profile.deleteAccount')}
                             </Button>
-                         </div>
-                     </div>
-                 );
+                        </div>
+                    </div>
+                );
+            case 'admin':
+                return (
+                    <div className="space-y-6">
+                        <h3 className="text-xl font-bold text-primary mb-2">Panel de Administración</h3>
+                        <p className="text-text-muted mb-4">Como administrador, puedes editar las configuraciones globales que afectan a todos los usuarios.</p>
+                        
+                        <div className="p-4 bg-primary/5 rounded-xl border border-primary/20">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h4 className="font-bold text-text-base">Gestión de Curvas de Corrección</h4>
+                                    <p className="text-sm text-text-muted mt-1">Configura las curvas de deducción para los distintos métodos de falla y la curva general de corrección.</p>
+                                </div>
+                                <Button onClick={() => onNavigate && onNavigate('ADMIN_SETTINGS')} variant="primary">
+                                    Ir a Configuración
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                );     
             default:
-                return null;
-        }
+                return null;   
+            }
     }
 
     return (
