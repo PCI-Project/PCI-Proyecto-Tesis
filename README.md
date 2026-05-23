@@ -9,14 +9,14 @@ cd PCI-Proyecto-Tesis
 ```
 
 ## 2. Creación del archivo local
-Crea tu archivo local de entorno a partir del archivo de ejemplo. El archivo real `server/.env` no se sube al repositorio.
+Crea tu archivo local de entorno a partir del archivo de ejemplo. El archivo real `server/.env` no se sube al repositorio.[1][2]
 
 ```bash
 cp server/.env.example server/.env
 ```
 
 ## 3. Completar los credenciales
-Abre `server/.env` y reemplaza los valores de ejemplo por tus credenciales reales. Cada colaborador debe usar su propia URI local de MongoDB Atlas.
+Abre `server/.env` y reemplaza los valores de ejemplo por tus credenciales reales. Cada colaborador debe usar su propia URI local de MongoDB Atlas.[3][4]
 
 ```env
 MONGODB_URI=mongodb+srv://tu_usuario:tu_password@tucluster.xxxxx.mongodb.net/pci_db?retryWrites=true&w=majority
@@ -26,7 +26,7 @@ NODE_ENV=development
 ```
 
 ## 4. Verificación de accesos
-Confirma que tu usuario fue creado en MongoDB Atlas y que tu IP pública fue agregada en **Network Access**. Sin esos dos puntos, la conexión al clúster fallará.
+Confirma que tu usuario fue creado en MongoDB Atlas y que tu IP pública fue agregada en **Network Access**. Sin esos dos puntos, la conexión al clúster fallará.[4][5]
 
 ## 5. Instalación de dependencias
 Instala las dependencias del proyecto en la raíz y en `server`, si aplica.
@@ -54,10 +54,10 @@ npm run dev
 ```
 
 ## 8. Verificación de si falla
-Si algo falla, revisa en este orden: el archivo `server/.env`, la URI, el usuario y contraseña de Atlas, la IP autorizada y los caracteres especiales en la contraseña.
+Si algo falla, revisa en este orden: el archivo `server/.env`, la URI, el usuario y contraseña de Atlas, la IP autorizada y los caracteres especiales en la contraseña.[3][6][7][5]
 
 ## 9. Flujo de trabajo después de la configuración
-Antes de trabajar, actualiza `main`, crea tu rama y luego sube tus cambios en esa rama. Después abre un Pull Request para revisión.
+Antes de trabajar, actualiza `main`, crea tu rama y luego sube tus cambios en esa rama. Después abre un Pull Request para revisión.[8][9]
 
 ```bash
 git checkout main
@@ -72,4 +72,13 @@ git add .
 git commit -m "feat: descripcion del cambio"
 git push origin feature/nombre-de-tu-rama
 ```
-Luego se debe abrir un Pull Request en GitHub para revisión antes de fusionar a `main`, especialmente si el repositorio usa control por ramas y revisiones de código.
+
+## 10. Flujo manual del equipo
+Como el repositorio está en privado y no tiene protección automática de `main`, el equipo debe seguir un acuerdo interno: no hacer push directo a `main`, trabajar siempre en ramas, abrir Pull Request y esperar revisión antes de fusionar cambios.[10][11]
+
+Reglas básicas:
+- No hacer push directo a `main`.
+- Trabajar siempre en una rama propia.
+- Abrir Pull Request para cada cambio importante.
+- Revisar el cambio de otro compañero antes del merge.
+- Después de cada merge, actualizar el repositorio local con `git pull origin main`.
