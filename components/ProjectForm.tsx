@@ -115,7 +115,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdat
     const samplingInterval = calculatedParams.samplingInterval > 0 ? calculatedParams.samplingInterval : 1;
     const sampleIds = newSection.evaluateAllSamples 
         ? Array.from({ length: calculatedParams.totalSampleUnits }, (_, i) => i + 1)
-        : Array.from({ length: calculatedParams.minSampleUnits }, (_, i) => startSampleUnit + i * samplingInterval).filter(id => id <= calculatedParams.totalSampleUnits);
+        : Array.from({ length: calculatedParams.minSampleUnits }, (_, i) => ((startSampleUnit - 1 + i * (samplingInterval + 1)) % calculatedParams.totalSampleUnits) + 1);
 
     const samples: Sample[] = sampleIds.map(id => ({
         id: id,
