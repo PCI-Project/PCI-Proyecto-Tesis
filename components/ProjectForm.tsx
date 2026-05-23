@@ -110,6 +110,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdat
       return;
     }
     
+    // ejemplo de prueba
     const calculatedParams = newSectionParams;
 
     const samplingInterval = calculatedParams.samplingInterval > 0 ? calculatedParams.samplingInterval : 1;
