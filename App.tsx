@@ -14,6 +14,7 @@ import { useAuth } from './contexts/AuthContext';
 import { AuthView } from './components/auth/AuthView';
 import { DataEntryView } from './components/DataEntryView';
 import { ProfileView } from './components/ProfileView';
+import { CurvesSettingsView } from './components/CurvesSettingsView';
 
 //hola//
 const API = axios.create({ baseURL: 'http://localhost:5000/api' });
@@ -398,9 +399,10 @@ export const App: React.FC = () => {
   };
   
   const handleNavigate = (view: AppView, projectOverride?: Project, skipSave = false) => {
-      if (view === 'PROFILE' || view === 'DASHBOARD') {
+      if (view === 'PROFILE' || view === 'DASHBOARD'|| view === 'ADMIN_SETTINGS') {
           setSelectedProject(null);
           setCurrentView(view);
+
           return;
       }
       
@@ -483,9 +485,17 @@ export const App: React.FC = () => {
     }
     
     if (currentView === 'PROFILE') {
-      return <ProfileView onInitiateDelete={() => setIsDeleteAccountModalOpen(true)} />;
-    }
+  return (
+    <ProfileView
+      onInitiateDelete={() => setIsDeleteAccountModalOpen(true)}
+      onNavigate={handleNavigate}
+    />
+  );
+}
 
+    if (currentView === 'ADMIN_SETTINGS') {
+        return <CurvesSettingsView />;
+    }
     // SETUP puede funcionar con o sin un proyecto seleccionado
     if (currentView === 'SETUP') {
         return <ProjectForm initialProject={selectedProject} onProjectCreateOrUpdate={handleProjectSetupSave} />;
