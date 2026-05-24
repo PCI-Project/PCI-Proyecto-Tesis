@@ -267,75 +267,6 @@ export const App: React.FC = () => {
     setCurrentView('DASHBOARD');
   };
 
-  const handleLoadDemoProject = () => {
-    if (!user) return;
-    // El proyecto demo es solo local por ahora, o podría publicarse en la API
-    const DEMO_PROJECT_ID = 'pci-demo-project-1';
-    
-    const sectionArea = 100 * 3.5; // Dimensiones de ejemplo
-    const sampleUnitArea = ASTM_DEFAULTS.FLEXIBLE_SAMPLE_AREA;
-
-    const params = calculateSectionParameters(
-        sectionArea,
-        sampleUnitArea,
-        ASTM_DEFAULTS.STD_DEV_AC,
-        ASTM_DEFAULTS.ALLOWABLE_ERROR,
-        false
-    );
-
-    const demoProject: Project = {
-        id: DEMO_PROJECT_ID,
-        _id: '', // _id vacío para demo hasta que se guarde
-        name: t('demoProject.name'),
-        inspector: t('demoProject.inspector'),
-        inspectionDate: new Date().toISOString().split('T')[0],
-        lastView: 'DATA_ENTRY',
-        sections: [
-            {
-                id: 'demo-section-1',
-                name: t('demoProject.sectionName'),
-                length: 100,
-                width: 3.5,
-                startStation: 0,
-                pavementType: PavementType.FLEXIBLE,
-                sampleUnitArea: sampleUnitArea,
-                stdDev: ASTM_DEFAULTS.STD_DEV_AC,
-                allowableError: ASTM_DEFAULTS.ALLOWABLE_ERROR,
-                evaluateAllSamples: false,
-                area: sectionArea,
-                sampleUnitLength: sampleUnitArea / 3.5,
-                ...params,
-                samples: [
-                    {
-                        id: 1,
-                        area: sampleUnitArea,
-                        pavementType: PavementType.FLEXIBLE,
-                        isAdditional: false,
-                        distresses: [
-                            { id: 'd1', type: '1', severity: Severity.HIGH, quantity: 40.822 },
-                            { id: 'd2', type: '11', severity: Severity.LOW, quantity: 16.2 },
-                            { id: 'd3', type: '11', severity: Severity.HIGH, quantity: 122.073 },
-                            { id: 'd4', type: '3', severity: Severity.HIGH, quantity: 48.3775 },
-                            { id: 'd5', type: '10', severity: Severity.MEDIUM, quantity: 35 },
-                            { id: 'd6', type: '13', severity: Severity.MEDIUM, quantity: 1 },
-                            { id: 'd7', type: '4', severity: Severity.MEDIUM, quantity: 2.34 },
-                        ],
-                    },
-                ],
-            },
-        ],
-        // Agregar campos requeridos para la nueva interfaz Project
-        nombre: t('demoProject.name'),
-        propietario: user.id,
-    };
-
-    // No guardamos automáticamente el proyecto demo en la DB para evitar desorden,
-    // pero lo agregamos al estado local. El usuario puede guardarlo modificándolo.
-    setProjects(prev => [...prev.filter(p => p.id !== DEMO_PROJECT_ID), demoProject]);
-    setSelectedProject(demoProject);
-    setCurrentView('DATA_ENTRY');
-};
-
   // Esta es la función principal de actualización de estado para un proyecto activo.
   // Asegura la integridad de los datos borrando cualquier resultado de cálculo antiguo cada vez que se modifican los datos subyacentes.
   const updateProjectState = (updater: (draft: Project) => void) => {
@@ -481,7 +412,7 @@ export const App: React.FC = () => {
   
   const renderContent = () => {
     if (currentView === 'DASHBOARD') {
-      return <DashboardView projects={projects} onNewProject={handleNewProject} onSelectProject={handleSelectProject} onInitiateDelete={handleInitiateDelete} onLoadExample={handleLoadDemoProject} />;
+      return <DashboardView projects={projects} onNewProject={handleNewProject} onSelectProject={handleSelectProject} onInitiateDelete={handleInitiateDelete} />;
     }
     
     if (currentView === 'PROFILE') {
@@ -504,7 +435,7 @@ export const App: React.FC = () => {
     // Todas las demás vistas requieren un proyecto seleccionado.
     if (!selectedProject) {
         // Volver al panel si falta el proyecto para una vista específica del proyecto.
-        return <DashboardView projects={projects} onNewProject={handleNewProject} onSelectProject={handleSelectProject} onInitiateDelete={handleInitiateDelete} onLoadExample={handleLoadDemoProject} />;
+        return <DashboardView projects={projects} onNewProject={handleNewProject} onSelectProject={handleSelectProject} onInitiateDelete={handleInitiateDelete}  />;
     }
     
     // La lógica de cálculo ahora se maneja mediante funciones de navegación/selección,

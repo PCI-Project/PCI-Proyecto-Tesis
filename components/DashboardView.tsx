@@ -130,10 +130,9 @@ interface DashboardViewProps {
   onNewProject: () => void;
   onSelectProject: (projectId: string) => void;
   onInitiateDelete: (projectId: string) => void;
-  onLoadExample: () => void;
 }
 
-export const DashboardView: React.FC<DashboardViewProps> = ({ projects, onNewProject, onSelectProject, onInitiateDelete, onLoadExample }) => {
+export const DashboardView: React.FC<DashboardViewProps> = ({ projects, onNewProject, onSelectProject, onInitiateDelete }) => {
   const { t } = useTranslations();
   
   return (
@@ -145,9 +144,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ projects, onNewPro
                   <p className="text-text-muted mt-1 max-w-lg">{t('dashboard.headerDescription')}</p>
               </div>
               <div className="flex items-center flex-shrink-0 gap-3 mt-4 md:mt-0">
-                  <Button onClick={onLoadExample} variant="secondary">
-                      {t('dashboard.loadExample')}
-                  </Button>
                   <Button onClick={onNewProject} variant="primary" className="inline-flex items-center">
                       <PlusIcon className="mr-2" /> {t('dashboard.newProject')}
                   </Button>
