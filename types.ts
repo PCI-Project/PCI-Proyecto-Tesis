@@ -1,5 +1,5 @@
 export type ProjectView = 'SETUP' | 'DATA_ENTRY' | 'CALCULATION_DETAILS' | 'RESULTS';
-export type AppView = 'DASHBOARD' | ProjectView | 'PROFILE';
+export type AppView = 'DASHBOARD' | ProjectView | 'PROFILE' | 'ADMIN_SETTINGS';
 
 export enum PavementType {
   FLEXIBLE = 'Flexible (Asfalto)',
@@ -109,7 +109,7 @@ export interface Section {
 
 export interface Project {
   id: string;
-  //_id?: string;
+  _id?: string;
   name: string;
   nombre?: string;
   descripcion?: string;
