@@ -15,6 +15,7 @@ import { AuthView } from './components/auth/AuthView';
 import { DataEntryView } from './components/DataEntryView';
 import { ProfileView } from './components/ProfileView';
 
+//hola//
 const API = axios.create({ baseURL: 'http://localhost:5000/api' });
 
 // Interceptor: adjunta el token automáticamente a cada petición
