@@ -10,16 +10,37 @@ interface DataEntryViewProps {
   onSampleUpdate: (sectionId: string, updatedSample: Sample) => void;
   onSampleAdd: (sectionId: string, sampleId: number) => void;
   onSampleDelete: (sectionId: string, sampleId: number) => void;
+  initialConfig?: { sectionId: string; focusSampleId?: number; newlyAddedIds?: number[] } | null;
 }
 
-export const DataEntryView: React.FC<DataEntryViewProps> = ({ project, onSampleUpdate, onSampleAdd, onSampleDelete }) => {
+export const DataEntryView: React.FC<DataEntryViewProps> = ({ project, onSampleUpdate, onSampleAdd, onSampleDelete, initialConfig }) => {
   const { t } = useTranslations();
-  const [activeSectionId, setActiveSectionId] = useState<string | null>(project.sections[0]?.id || null);
-  const [activeSampleId, setActiveSampleId] = useState<number | null>(project.sections[0]?.samples[0]?.id || null);
+  const [activeSectionId, setActiveSectionId] = useState<string | null>(initialConfig?.sectionId || project.sections[0]?.id || null);
+  const [activeSampleId, setActiveSampleId] = useState<number | null>(
+    initialConfig?.focusSampleId ?? project.sections.find(s => s.id === (initialConfig?.sectionId || project.sections[0]?.id))?.samples[0]?.id ?? null
+  );
   const [isSelectModalOpen, setSelectModalOpen] = useState(false);
+  const [systematicNotice, setSystematicNotice] = useState<number[] | null>(initialConfig?.newlyAddedIds || null);
 
   const activeSection = project.sections.find(s => s.id === activeSectionId);
-  
+  const systematicIds = activeSection?.systematicallyAddedSampleIds || [];
+
+  // Focuses the section/sample designated by App (e.g. the systematically-selected sample
+  // added to satisfy the ASTM §7.5.2.2 statistical check). This never opens the free-pick
+  // modal - that modal is reserved for the user explicitly adding a genuine additional
+  // (nonrepresentative) sample unit via the "+ Add Sample" button below.
+  useEffect(() => {
+    if (initialConfig) {
+      setActiveSectionId(initialConfig.sectionId);
+      if (initialConfig.focusSampleId != null) {
+        setActiveSampleId(initialConfig.focusSampleId);
+      }
+      if (initialConfig.newlyAddedIds?.length) {
+        setSystematicNotice(initialConfig.newlyAddedIds);
+      }
+    }
+  }, [initialConfig]);
+
   useEffect(() => {
      if (!activeSectionId && project.sections.length > 0) {
         setActiveSectionId(project.sections[0].id);
@@ -49,6 +70,23 @@ export const DataEntryView: React.FC<DataEntryViewProps> = ({ project, onSampleU
 
   return (
     <div className="space-y-6">
+        {systematicNotice && systematicNotice.length > 0 && (
+            <div className="bg-secondary/10 border border-secondary/30 rounded-xl p-4 flex items-start justify-between gap-4">
+                <div>
+                    <p className="font-bold text-secondary-dark">{t('dataEntry.systematicNoticeTitle')}</p>
+                    <p className="text-sm text-text-muted mt-1">
+                        {t('dataEntry.systematicNoticeDesc', { ids: systematicNotice.map(id => `#${id}`).join(', ') })}
+                    </p>
+                </div>
+                <button
+                    onClick={() => setSystematicNotice(null)}
+                    aria-label={t('modal.close')}
+                    className="text-text-muted hover:text-text-base shrink-0 text-xl leading-none px-1"
+                >
+                    &times;
+                </button>
+            </div>
+        )}
         <div className="bg-bg-surface p-4 rounded-xl shadow-md border-border-muted/50">
             <label htmlFor="section-select" className="block text-sm font-medium text-text-muted mb-1.5">{t('dataEntry.selectSection')}:</label>
             <select
@@ -70,13 +108,15 @@ export const DataEntryView: React.FC<DataEntryViewProps> = ({ project, onSampleU
                         <button
                             key={sample.id}
                             onClick={() => setActiveSampleId(sample.id)}
+                            title={systematicIds.includes(sample.id) ? t('dataEntry.systematicBadge') : undefined}
                             className={`px-4 py-2 text-sm font-bold rounded-lg whitespace-nowrap transition-colors border-2 ${
-                                activeSampleId === sample.id 
+                                activeSampleId === sample.id
                                 ? 'bg-primary text-text-inverted border-primary shadow-md'
                                 : 'bg-bg-surface text-text-muted hover:bg-primary/10 hover:text-primary border-transparent'
                             }`}
                         >
                             {t('dataEntry.sample')} #{sample.id} {sample.isAdditional ? `(${t('dataEntry.additionalShort')})` : ''}
+                            {systematicIds.includes(sample.id) && <span className="ml-1 text-secondary-dark" aria-hidden="true">&bull;</span>}
                         </button>
                     ))}
                     <Button onClick={() => setSelectModalOpen(true)} variant="secondary" className="text-sm shrink-0 !py-2 !px-4 !shadow-none !bg-secondary/30 !text-secondary-dark hover:!bg-secondary/50">
@@ -91,6 +131,7 @@ export const DataEntryView: React.FC<DataEntryViewProps> = ({ project, onSampleU
                            sectionWidth={activeSection.width}
                            sectionStartStation={activeSection.startStation}
                            sectionSampleUnitLength={activeSection.sampleUnitLength}
+                           isSystematicSupplement={systematicIds.includes(sample.id)}
                            onUpdate={updatedSample => onSampleUpdate(activeSection.id, updatedSample)}
                            onDelete={sampleId => onSampleDelete(activeSection.id, sampleId)}
                        />

@@ -5,13 +5,13 @@ import { CORRECTION_CURVES_FLEXIBLE } from './data/correctionCurves';
 import { getDistressOptions } from '../../constants';
 
 /**
- * Realiza interpolación lineal entre dos puntos.
- * @param x El valor x para el que se debe encontrar el valor y.
- * @param x1 La coordenada x del primer punto.
- * @param y1 La coordenada y del primer punto.
- * @param x2 La coordenada x del segundo punto.
- * @param y2 La coordenada y del segundo punto.
- * @returns El valor y interpolado.
+ * Performs linear interpolation between two points.
+ * @param x The x-value to find the y-value for.
+ * @param x1 The x-coordinate of the first point.
+ * @param y1 The y-coordinate of the first point.
+ * @param x2 The x-coordinate of the second point.
+ * @param y2 The y-coordinate of the second point.
+ * @returns The interpolated y-value.
  */
 function interpolate(x: number, x1: number, y1: number, x2: number, y2: number): number {
   if (x1 === x2) return y1;
@@ -19,10 +19,10 @@ function interpolate(x: number, x1: number, y1: number, x2: number, y2: number):
 }
 
 /**
- * Encuentra el valor y correspondiente para un valor x dado a partir de un conjunto de puntos que representan una curva.
- * @param points Una matriz de puntos {x, y}, ordenados por x.
- * @param x El valor x a buscar.
- * @returns El valor y de la curva.
+ * Finds the corresponding y-value for a given x-value from a set of points representing a curve.
+ * @param points An array of {x, y} points, sorted by x.
+ * @param x The x-value to look up.
+ * @returns The y-value from the curve.
  */
 function getValueFromCurve(points: { x: number; y: number }[], x: number): number {
   if (!points || points.length === 0) return 0;
@@ -32,7 +32,7 @@ function getValueFromCurve(points: { x: number; y: number }[], x: number): numbe
   const pointAfter = points.find(p => p.x >= x);
   const pointBefore = [...points].reverse().find(p => p.x < x);
 
-  if (!pointAfter) return points[points.length - 1].y; // Debería estar cubierto por la verificación anterior, pero por seguridad
+  if (!pointAfter) return points[points.length - 1].y; // Should be covered by check above, but for safety
   if (!pointBefore) return points[0].y;
 
   return interpolate(x, pointBefore.x, pointBefore.y, pointAfter.x, pointAfter.y);
@@ -40,27 +40,27 @@ function getValueFromCurve(points: { x: number; y: number }[], x: number): numbe
 
 
 /**
- * Define cómo se calcula la densidad para un tipo de daño dado, de acuerdo con ASTM D6433.
+ * Defines how density is calculated for a given distress type, according to ASTM D6433.
  */
 enum DensityCalculationType {
-    /** (cantidad / área) * 100. Para áreas o longitudes donde la curva es % de densidad. */
+    /** (quantity / area) * 100. For areas or lengths where curve is % density. */
     PERCENT_AREA,
-    /** cantidad. Para daños contados como unidades donde la curva se basa en el conteo. */
+    /** quantity. For distresses counted as units where curve is based on count. */
     COUNT,
-    /** cantidad. Para daños medidos por longitud donde la curva está en metros. */
+    /** quantity. For distresses measured by length where curve is in meters. */
     LENGTH,
-    /** cantidad / área. Para unidades como m/m^2. */
+    /** quantity / area. For units like m/m^2. */
     METERS_PER_AREA,
-    /** cantidad / área. Para unidades como conteo/m^2. */
+    /** quantity / area. For units like count/m^2. */
     COUNT_PER_AREA,
 }
 
 /**
- * Mapea cada ID de daño a su método específico de cálculo de densidad.
+ * Maps each distress ID to its specific density calculation method.
  */
 const DISTRESS_DENSITY_CONFIG: { [key: string]: DensityCalculationType } = {
-    // Daños del Pavimento Flexible
-    '1': DensityCalculationType.PERCENT_AREA, // Grietas de Cocodrilo
+    // Flexible Pavement Distresses
+    '1': DensityCalculationType.PERCENT_AREA, // Alligator Cracking
     '2': DensityCalculationType.PERCENT_AREA, // Bleeding
     '3': DensityCalculationType.PERCENT_AREA, // Block Cracking
     '4': DensityCalculationType.PERCENT_AREA, // Bumps and Sags
@@ -84,11 +84,11 @@ const DISTRESS_DENSITY_CONFIG: { [key: string]: DensityCalculationType } = {
 
 
 /**
- * Calcula el valor de densidad a utilizar en las curvas de valores de deducción.
- * @param type El ID del tipo de daño.
- * @param quantity La cantidad medida del daño.
- * @param area El área de la unidad de muestra en m^2.
- * @returns El valor de densidad calculado, o nulo si no es aplicable.
+ * Calculates the density value to be used in the deduct value curves.
+ * @param type The distress type ID.
+ * @param quantity The measured quantity of the distress.
+ * @param area The area of the sample unit in m^2.
+ * @returns The calculated density value, or null if not applicable.
  */
 function calculateDensity(type: string, quantity: number, area: number): number | null {
     if (quantity <= 0 || area <= 0) return null;
@@ -111,12 +111,12 @@ function calculateDensity(type: string, quantity: number, area: number): number 
 
 
 /**
- * Calcula el valor de deducción para un único tipo de daño, dada su densidad.
- * @param type El ID del tipo de daño.
- * @param severity El nivel de severidad del daño.
- * @param density La densidad calculada del daño.
- * @param distressCurves El conjunto de curvas para el tipo de pavimento.
- * @returns El valor de deducción calculado.
+ * Calculates the deduct value for a single distress type, given its density.
+ * @param type The distress type ID.
+ * @param severity The severity level of the distress.
+ * @param density The calculated density of the distress.
+ * @param distressCurves The set of curves for the pavement type.
+ * @returns The calculated deduct value.
  */
 function getDeductValue(type: string, severity: Severity, density: number | null, distressCurves: any): number {
   if (density === null || density <= 0) return 0;
@@ -131,15 +131,15 @@ function getDeductValue(type: string, severity: Severity, density: number | null
 }
 
 /**
- * Agrupa daños por tipo y severidad y calcula sus cantidades totales y valores de deducción.
- * @param sample La muestra a analizar.
- * @returns Una matriz de resúmenes de daños.
+ * Groups distresses by type and severity and calculates their total quantities and deduct values.
+ * @param sample The sample to analyze.
+ * @returns An array of distress summaries.
  */
 export function getSummaries(sample: Sample): DistressSummary[] {
     const distressOptions = getDistressOptions();
     const distressCurves = FLEXIBLE_DISTRESS_CURVES;
     const summaries: { [key: string]: DistressSummary } = {};
-    //organiza
+
     for (const distress of sample.distresses) {
         if (distress.quantity <= 0) continue;
 
@@ -172,11 +172,11 @@ export function getSummaries(sample: Sample): DistressSummary[] {
 
 
 /**
- * Encuentra iterativamente el valor máximo de deducción corregido (CDV) según el procedimiento
- * descrito en ASTM D6433, sección 9.5.5.
- * @param initialSortedDeducts Una matriz de valores de deducción, ordenados en orden descendente.
- * @param correctionCurve La curva de corrección apropiada para el tipo de pavimento.
- * @returns Los resultados finales incluyendo CDV máximo y todos los pasos de iteración.
+ * Iteratively finds the maximum corrected deduct value (CDV) according to the procedure
+ * outlined in ASTM D6433, section 9.5.5.
+ * @param initialSortedDeducts An array of deduct values, sorted descending.
+ * @param correctionCurve The appropriate correction curve for the pavement type.
+ * @returns The final results including max CDV and all iteration steps.
  */
 function calculateCDV(initialSortedDeducts: number[], correctionCurve: { x: number; y: number }[][]): { m: number; cdv: number; totalDeductValue: number; q: number; iterationSteps: CDVIterationStep[] } {
     const iterationSteps: CDVIterationStep[] = [];
@@ -184,15 +184,15 @@ function calculateCDV(initialSortedDeducts: number[], correctionCurve: { x: numb
         return { m: 1, cdv: 0, totalDeductValue: 0, q: 0, iterationSteps: [] };
     }
 
-    // 9.5.3: Determinar m, el número máximo de deducciones permitidas.
+    // 9.5.3: Determine m, the maximum number of allowable deducts.
     const hdv = initialSortedDeducts[0] || 0;
     const m = hdv > 0 ? 1 + (9 / 98) * (100 - hdv) : 1;
     
-    // 9.5.4: Reducir el número de valores de deducción individuales a m.
+    // 9.5.4: Reduce the number of individual deduct values to m.
     let deductsForIteration: number[];
     if (initialSortedDeducts.length > m) {
         const integerM = Math.floor(m);
-        // Según ASTM, redondear la parte fraccionaria de 'm' a un lugar decimal.
+        // Per ASTM, round the fractional part of 'm' to one decimal place.
         const fractionalM = parseFloat((m - integerM).toFixed(1));
         deductsForIteration = initialSortedDeducts.slice(0, integerM);
         if (fractionalM > 0 && initialSortedDeducts.length > integerM) {
@@ -203,14 +203,14 @@ function calculateCDV(initialSortedDeducts: number[], correctionCurve: { x: numb
         deductsForIteration = [...initialSortedDeducts];
     }
     
-    // El proceso de iteración comienza con esta lista ajustada.
+    // The iteration process starts with this adjusted list.
     let currentDeducts = [...deductsForIteration].sort((a,b) => b - a);
 
     while (true) {
-        // 9.5.5.1: Determinar TDV sumando los valores en la lista actual.
+        // 9.5.5.1: Determine TDV by summing the values in the current list.
         const totalDeductValue = currentDeducts.reduce((sum, val) => sum + val, 0);
         
-        // 9.5.5.2: Determinar q como el número de valores de deducción mayor que 2.0
+        // 9.5.5.2: Determine q as the number of deduct values greater than 2.0
         const q = currentDeducts.filter(d => d > 2.0).length;
 
         if (q === 0) {
@@ -219,13 +219,13 @@ function calculateCDV(initialSortedDeducts: number[], correctionCurve: { x: numb
                     deductsUsed: [...currentDeducts],
                     totalDeductValue: totalDeductValue,
                     q: 0,
-                    cdv: totalDeductValue, // CDV = TDV cuando q=0
+                    cdv: totalDeductValue, // CDV = TDV when q=0
                 });
             }
             break;
         }
 
-        // 9.5.5.3: Determinar CDV de TDV y q usando las curvas de corrección.
+        // 9.5.5.3: Determine CDV from TDV and q using the correction curves.
         const curveIndex = Math.min(q, correctionCurve.length) - 1;
         const correctionCurveForQ = correctionCurve[curveIndex];
         const cdv = getValueFromCurve(correctionCurveForQ, totalDeductValue);
@@ -237,16 +237,16 @@ function calculateCDV(initialSortedDeducts: number[], correctionCurve: { x: numb
             cdv,
         });
         
-        // La iteración se detiene después de completar el paso para q=1.
+        // The iteration stops after the step for q=1 is completed.
         if (q <= 1) {
             break;
         }
 
-        // 9.5.5.4: Reducir el valor de deducción individual más pequeño mayor que 2 a 2.
+        // 9.5.5.4: Reduce the smallest individual deduct value greater than 2 to 2.
         let indexOfMin = -1;
         let minVal = Infinity;
 
-        // Encuentra el valor de deducción mínimo que es mayor que 2.
+        // Find the minimum deduct value that is greater than 2.
         for (let i = 0; i < currentDeducts.length; i++) {
             if (currentDeducts[i] > 2.0 && currentDeducts[i] < minVal) {
                 minVal = currentDeducts[i];
@@ -257,7 +257,7 @@ function calculateCDV(initialSortedDeducts: number[], correctionCurve: { x: numb
         if (indexOfMin !== -1) {
             currentDeducts[indexOfMin] = 2.0;
         } else {
-            // Este caso no debería alcanzarse si q > 1, pero sirve como una salida segura.
+            // This case should not be reached if q > 1, but serves as a safe exit.
             break;
         }
     }
@@ -266,7 +266,7 @@ function calculateCDV(initialSortedDeducts: number[], correctionCurve: { x: numb
       return { m, cdv: 0, totalDeductValue: 0, q: 0, iterationSteps: [] };
     }
 
-    // 9.5.5.5: El CDV máximo es el más grande de todos los CDV encontrados.
+    // 9.5.5.5: The maximum CDV is the largest of all the CDVs found.
     const finalStep = iterationSteps.reduce(
         (maxStep, currentStep) => (currentStep.cdv > maxStep.cdv ? currentStep : maxStep),
         iterationSteps[0]
@@ -283,9 +283,9 @@ function calculateCDV(initialSortedDeducts: number[], correctionCurve: { x: numb
 
 
 /**
- * Calcula todos los detalles del PCI para una sola muestra.
- * @param sample La muestra a calcular.
- * @returns Un objeto PCICalculationDetails.
+ * Calculates all PCI details for a single sample.
+ * @param sample The sample to calculate.
+ * @returns A PCICalculationDetails object.
  */
 export function calculatePCIForSample(sample: Sample): PCICalculationDetails {
   const summaries = getSummaries(sample);
@@ -311,22 +311,138 @@ export function calculatePCIForSample(sample: Sample): PCICalculationDetails {
 
 
 /**
- * Calcula el PCI de una sección promediando el PCI de sus muestras.
- * @param section La sección a calcular.
- * @returns El PCI calculado para la sección.
+ * Computes the area-weighted average PCI of a set of samples (ASTM D6433 Eq 5 / Eq 6).
  */
-export function calculateSectionPCI(section: Section): number {
-    const validSamples = section.samples.filter(s => s.calculationDetails && s.calculationDetails.pci >= 0);
-    if (validSamples.length === 0) return 100;
-
-    const sumOfPCIs = validSamples.reduce((sum, s) => sum + (s.calculationDetails?.pci ?? 0), 0);
-    return sumOfPCIs / validSamples.length;
+function areaWeightedPCI(samples: Sample[]): number {
+    const totalArea = samples.reduce((sum, s) => sum + s.area, 0);
+    if (totalArea === 0) return 0;
+    const weightedSum = samples.reduce((sum, s) => sum + s.calculationDetails!.pci * s.area, 0);
+    return weightedSum / totalArea;
 }
 
 /**
- * Calcula el PCI ponderado final para todo el proyecto.
- * @param sections Una matriz de secciones, con sus PCIs individuales calculados.
- * @returns El PCI ponderado para el proyecto.
+ * Calculates the PCI for a section, following ASTM D6433 §11.
+ * Random sample units (including additional random units surveyed to satisfy §7.5.2.2)
+ * are combined via the area-weighted average (Eq 5). If nonrepresentative "additional
+ * sample units" per §2.1.1 (Sample.isAdditional) were also surveyed, their area-weighted
+ * PCI (Eq 6) is combined with the random PCI using Eq 7 - they are never pooled directly
+ * into the same average, since they don't represent the whole section area.
+ * @param section The section to calculate.
+ * @returns The calculated PCI for the section.
+ */
+export function calculateSectionPCI(section: Section): { pci: number; actualStdDev?: number; revisedSampleUnits?: number; missingSamples?: number; samplesSufficient?: boolean; randomPCI?: number; additionalPCI?: number } {
+    const validSamples = section.samples.filter(s => s.calculationDetails && s.calculationDetails.pci >= 0);
+    if (validSamples.length === 0) return { pci: 100 };
+
+    const randomSamples = validSamples.filter(s => !s.isAdditional);
+    const additionalSamples = validSamples.filter(s => s.isAdditional);
+
+    const pciRandom = randomSamples.length > 0 ? areaWeightedPCI(randomSamples) : undefined; // Eq 5
+    const pciAdditional = additionalSamples.length > 0 ? areaWeightedPCI(additionalSamples) : undefined; // Eq 6
+
+    let pciPromedio: number;
+    if (pciRandom !== undefined && pciAdditional !== undefined) {
+        // Eq 7: weight each group's PCI by the area it actually represents.
+        const additionalArea = additionalSamples.reduce((sum, s) => sum + s.area, 0);
+        const sectionArea = section.area;
+        pciPromedio = sectionArea > additionalArea
+            ? (pciRandom * (sectionArea - additionalArea) + pciAdditional * additionalArea) / sectionArea
+            : pciAdditional;
+    } else {
+        pciPromedio = pciRandom ?? pciAdditional!;
+    }
+
+    // The statistical adequacy check (§7.5.2) applies only to the random sampling design;
+    // nonrepresentative additional units are excluded, since they were never part of it.
+    let actualStdDev: number | undefined;
+    let revisedSampleUnits: number | undefined;
+    let missingSamples: number | undefined;
+    let samplesSufficient: boolean | undefined;
+
+    const randomPcis = randomSamples.map(s => s.calculationDetails!.pci);
+    const n = randomPcis.length;
+
+    if (n > 1) {
+       const randomMean = randomPcis.reduce((sum, p) => sum + p, 0) / n;
+       const sumSq = randomPcis.reduce((sum, p) => sum + Math.pow(p - randomMean, 2), 0);
+       actualStdDev = Math.sqrt(sumSq / (n - 1));
+
+       const N = section.totalSampleUnits;
+       const e = section.allowableError;
+
+       if (N && e) {
+           const s2 = Math.pow(actualStdDev, 2);
+           const e2 = Math.pow(e, 2);
+           const numerator = N * s2;
+           const denominator = (e2 / 4) * (N - 1) + s2;
+           revisedSampleUnits = denominator > 0 ? Math.ceil(numerator / denominator) : N;
+
+           missingSamples = revisedSampleUnits - n;
+           samplesSufficient = missingSamples <= 0;
+       }
+    } else if (n === 1) {
+       actualStdDev = 0;
+       const N = section.totalSampleUnits;
+       if (N && section.evaluateAllSamples) {
+          revisedSampleUnits = N;
+          missingSamples = revisedSampleUnits - n;
+          samplesSufficient = missingSamples <= 0;
+       }
+    }
+
+    return {
+        pci: pciPromedio,
+        actualStdDev,
+        revisedSampleUnits,
+        missingSamples,
+        samplesSufficient,
+        // Only surfaced when there's an actual additional/random split to report -
+        // otherwise randomPCI would just duplicate `pci`.
+        randomPCI: pciAdditional !== undefined ? pciRandom : undefined,
+        additionalPCI: pciAdditional,
+    };
+}
+
+/**
+ * Selects which sample unit IDs should be additionally surveyed when the statistical
+ * check (§7.5.2.2) shows the random sample is insufficient. Per ASTM D6433, these must
+ * remain random and be "spaced evenly across the section" - never freely chosen by the
+ * user (that selection mode is reserved for genuine "additional sample units", §2.1.1,
+ * used only for nonrepresentative/atypical units). Already-surveyed units are left
+ * untouched; only new IDs are picked, spread evenly across the still-unsurveyed units.
+ * @param totalSampleUnits Total number of sample units in the section (N).
+ * @param existingSampleIds IDs of sample units already surveyed.
+ * @param missingCount Number of additional random sample units needed.
+ * @returns The sample unit IDs to survey next, sorted ascending.
+ */
+export function getSystematicAdditionalSampleIds(totalSampleUnits: number, existingSampleIds: number[], missingCount: number): number[] {
+    if (missingCount <= 0) return [];
+
+    const existing = new Set(existingSampleIds);
+    const available: number[] = [];
+    for (let i = 1; i <= totalSampleUnits; i++) {
+        if (!existing.has(i)) available.push(i);
+    }
+    if (available.length <= missingCount) return available;
+
+    const interval = available.length / missingCount;
+    const selected = new Set<number>();
+    for (let i = 0; i < missingCount; i++) {
+        const idx = Math.min(Math.floor(i * interval), available.length - 1);
+        selected.add(available[idx]);
+    }
+    // Rounding can collide indices; top up with the next unused available units.
+    for (let cursor = 0; selected.size < missingCount && cursor < available.length; cursor++) {
+        selected.add(available[cursor]);
+    }
+
+    return Array.from(selected).sort((a, b) => a - b);
+}
+
+/**
+ * Calculates the final weighted PCI for the entire project.
+ * @param sections An array of sections, with their individual PCIs calculated.
+ * @returns The weighted PCI for the project.
  */
 export function calculateProjectWeightedPCI(sections: Section[]): number {
     const validSections = sections.filter(s => s.pci !== undefined && s.pci >= 0);
@@ -341,7 +457,7 @@ export function calculateProjectWeightedPCI(sections: Section[]): number {
 }
 
 /**
- * Calcula los parámetros de muestreo para una sección.
+ * Calculates sampling parameters for a section.
  */
 export function calculateSectionParameters(
   area: number,
@@ -358,7 +474,7 @@ export function calculateSectionParameters(
     minSampleUnits = totalSampleUnits;
     samplingInterval = 1;
   } else {
-    // Fórmula de ASTM D6433
+    // Formula from ASTM D6433
     // n = (N * s^2) / (((e^2/4)*(N-1)) + s^2)
     const N = totalSampleUnits;
     const s2 = Math.pow(stdDev, 2);
@@ -368,8 +484,8 @@ export function calculateSectionParameters(
     const denominator = (e2 / 4) * (N - 1) + s2;
     minSampleUnits = denominator > 0 ? Math.ceil(numerator / denominator) : N;
     
-    minSampleUnits = Math.min(minSampleUnits, totalSampleUnits); // No puede ser más que el total
-    minSampleUnits = Math.max(1, minSampleUnits); // Debe ser al menos 1
+    minSampleUnits = Math.min(minSampleUnits, totalSampleUnits); // Cannot be more than total
+    minSampleUnits = Math.max(1, minSampleUnits); // Must be at least 1
     
     samplingInterval = Math.floor(totalSampleUnits / minSampleUnits);
   }

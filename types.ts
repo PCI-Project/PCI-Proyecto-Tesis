@@ -105,6 +105,13 @@ export interface Section {
   // Data
   samples: Sample[];
   pci?: number;
+  actualStdDev?: number;
+  revisedSampleUnits?: number;
+  missingSamples?: number;
+  samplesSufficient?: boolean;
+  randomPCI?: number;
+  additionalPCI?: number;
+  systematicallyAddedSampleIds?: number[];
 }
 
 export interface Project {
