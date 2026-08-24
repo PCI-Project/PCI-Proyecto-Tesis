@@ -35,7 +35,14 @@ export const calculateProjectPCI = (project: Project): Project => {
 
     // 2. Calculate PCI for each section
     projectWithCalculations.sections.forEach(section => {
-        section.pci = calculateSectionPCI(section);
+        const stats = calculateSectionPCI(section);
+        section.pci = stats.pci;
+        section.actualStdDev = stats.actualStdDev;
+        section.revisedSampleUnits = stats.revisedSampleUnits;
+        section.missingSamples = stats.missingSamples;
+        section.samplesSufficient = stats.samplesSufficient;
+        section.randomPCI = stats.randomPCI;
+        section.additionalPCI = stats.additionalPCI;
     });
 
     // 3. Calculate weighted PCI for the project
@@ -62,4 +69,22 @@ export const calculateSectionParameters = (
     evaluateAllSamples: boolean
 ) => {
     return calculateParams(area, sampleUnitArea, stdDev, allowableError, evaluateAllSamples);
+};
+
+/**
+ * Determines which sample unit IDs to survey next when the statistical check (ASTM D6433
+ * §7.5.2.2) shows the random sample is insufficient. Per the standard, these must be
+ * additional RANDOM sample units spaced evenly across the section - not freely chosen by
+ * the user. Already-surveyed units are never re-selected or discarded.
+ * @param totalSampleUnits Total number of sample units in the section (N).
+ * @param existingSampleIds IDs of sample units already surveyed.
+ * @param missingCount Number of additional random sample units required.
+ * @returns The sample unit IDs to survey next, sorted ascending.
+ */
+export const getAdditionalRandomSampleIds = (
+    totalSampleUnits: number,
+    existingSampleIds: number[],
+    missingCount: number
+): number[] => {
+    return getSystematicAdditionalSampleIds(totalSampleUnits, existingSampleIds, missingCount);
 };

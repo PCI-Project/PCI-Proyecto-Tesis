@@ -5,7 +5,7 @@ import { ProjectForm } from './components/ProjectForm';
 import { ResultsDisplay } from './components/ResultsDisplay';
 import { CalculationDetailsView } from './components/CalculationDetailsView';
 import { DashboardView } from './components/DashboardView';
-import { calculateProjectPCI, calculateSectionParameters } from './services/pciService';
+import { calculateProjectPCI, calculateSectionParameters, getAdditionalRandomSampleIds } from './services/pciService';
 import { AppHeader } from './components/AppHeader';
 import { ConfirmationModal } from './components/ui/ConfirmationModal';
 import { useTranslations } from './hooks/useTranslations';
@@ -64,6 +64,7 @@ export const App: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] = useState(false);
   const [projectToDeleteId, setProjectToDeleteId] = useState<string | null>(null);
+  const [dataEntryConfig, setDataEntryConfig] = useState<{ sectionId: string; focusSampleId?: number; newlyAddedIds?: number[] } | null>(null);
   const savingProjectIdRef = useRef<string | null>(null); // Evitar guardos duplicados sin causar re-renders
 
   // Cargar proyectos al iniciar o cuando cambia el usuario
@@ -76,29 +77,29 @@ export const App: React.FC = () => {
     }
     
     const cargarProyectos = async () => {
-  try {
-    const { data } = await API.get('/projects');
-    console.log('[cargarProyectos] data cruda del backend:', data);
+      try {
+        const { data } = await API.get('/projects');
+        console.log('[cargarProyectos] data cruda del backend:', data);
 
-    const mappedProjects = data.map((p: any) => {
-      const mapped = mapMongoProjectToProject(p);
-      console.log('[cargarProyectos] proyecto mapeado:', mapped);
-      return mapped;
-    });
+        const mappedProjects = data.map((p: any) => {
+          const mapped = mapMongoProjectToProject(p);
+          console.log('[cargarProyectos] proyecto mapeado:', mapped);
+          return mapped;
+        });
 
-    setProjects(mappedProjects);
-    setCurrentView('DASHBOARD');
-    setSelectedProject(null);
-  } catch (err) {
-    console.error('Error cargando proyectos:', err);
-    setProjects([]);
-  }
-};
+        setProjects(mappedProjects);
+        setCurrentView('DASHBOARD');
+        setSelectedProject(null);
+      } catch (err) {
+        console.error('Error cargando proyectos:', err);
+        setProjects([]);
+      }
+    };
     cargarProyectos();
   }, [user]);
   
   // Guardar / actualizar proyecto
-    const saveProjectToStorage = async (projectToSave: Project) => {
+  const saveProjectToStorage = async (projectToSave: Project) => {
     if (!user) return;
 
     const isNew = !projectToSave._id;
@@ -212,6 +213,7 @@ export const App: React.FC = () => {
 
   const handleNewProject = () => {
     setSelectedProject(null);
+    setDataEntryConfig(null);
     setCurrentView('SETUP');
   };
 
@@ -261,10 +263,178 @@ export const App: React.FC = () => {
     }
   };
 
-
   const handleGoToDashboard = () => {
     setSelectedProject(null);
+    setDataEntryConfig(null);
     setCurrentView('DASHBOARD');
+  };
+
+  const handleLoadDemoProject = () => {
+    if (!user) return;
+    const DEMO_PROJECT_ID = 'pci-demo-project-1';
+
+    const sampleUnitArea = 225;
+    const sampleUnitLength = 35;
+    const width = sampleUnitArea / sampleUnitLength;
+    const totalSampleUnits = 84;
+    const sectionArea = totalSampleUnits * sampleUnitArea;
+    const length = totalSampleUnits * sampleUnitLength;
+
+    const params = calculateSectionParameters(
+        sectionArea,
+        sampleUnitArea,
+        ASTM_DEFAULTS.STD_DEV_AC,
+        ASTM_DEFAULTS.ALLOWABLE_ERROR,
+        false
+    );
+
+    const makeSample = (id: number, entries: [string, Severity, number][]): Sample => ({
+        id,
+        area: sampleUnitArea,
+        pavementType: PavementType.FLEXIBLE,
+        isAdditional: false,
+        distresses: entries.map(([type, severity, quantity], i) => ({
+            id: `demo-${id}-${i}`,
+            type,
+            severity,
+            quantity,
+        })),
+    });
+
+    const { HIGH, MEDIUM, LOW } = Severity;
+
+    const samples: Sample[] = [
+        makeSample(3, [['11', MEDIUM, 19.925], ['10', MEDIUM, 29.1], ['1', HIGH, 4.11], ['11', HIGH, 18.373], ['1', MEDIUM, 5.06]]),
+        makeSample(9, [['3', MEDIUM, 14.57], ['10', MEDIUM, 23.88], ['11', MEDIUM, 45.57], ['1', HIGH, 10.592], ['3', HIGH, 133.565]]),
+        makeSample(15, [['1', HIGH, 45.93], ['10', MEDIUM, 16.2], ['3', HIGH, 87.295], ['11', MEDIUM, 38.775], ['11', HIGH, 1.6675]]),
+        makeSample(21, [['11', LOW, 110.122], ['1', HIGH, 11.7525], ['13', HIGH, 1], ['3', HIGH, 97.1655], ['10', MEDIUM, 6.35]]),
+        makeSample(27, [['3', HIGH, 148.635], ['10', MEDIUM, 35], ['11', MEDIUM, 37.28]]),
+        makeSample(33, [['11', MEDIUM, 63.67], ['3', HIGH, 25.38], ['11', LOW, 78.89], ['2', MEDIUM, 5.04], ['1', HIGH, 25.34], ['13', HIGH, 14.94], ['13', LOW, 1]]),
+        makeSample(39, [['1', HIGH, 40.822], ['11', LOW, 16.2], ['11', HIGH, 122.073], ['3', HIGH, 48.3775], ['10', MEDIUM, 35], ['13', MEDIUM, 1], ['4', MEDIUM, 2.34]]),
+        makeSample(45, [['11', MEDIUM, 126.1222], ['11', LOW, 6.8414], ['11', HIGH, 58.8396], ['1', HIGH, 36.024]]),
+        makeSample(51, [['11', LOW, 112.45], ['11', HIGH, 23.775], ['11', MEDIUM, 52.925], ['3', HIGH, 39.343]]),
+        makeSample(57, [['10', MEDIUM, 12.3], ['1', HIGH, 9.84], ['3', HIGH, 84.412], ['11', LOW, 14.24], ['13', HIGH, 1], ['11', MEDIUM, 90.627], ['13', MEDIUM, 1], ['11', HIGH, 18.737]]),
+        makeSample(63, [['10', MEDIUM, 7.11], ['11', MEDIUM, 68.6875], ['3', HIGH, 18.2], ['13', HIGH, 1], ['3', HIGH, 115.6672], ['1', HIGH, 13.8959], ['11', HIGH, 20.6325]]),
+        makeSample(69, [['11', HIGH, 24.425], ['11', LOW, 80.905], ['11', MEDIUM, 51.685], ['3', HIGH, 66.03], ['13', LOW, 1]]),
+        makeSample(75, [['3', HIGH, 47.8808], ['10', MEDIUM, 12.1], ['11', MEDIUM, 132.3795], ['13', HIGH, 0.52], ['13', HIGH, 1], ['11', HIGH, 3.8475], ['13', HIGH, 0.4], ['1', HIGH, 21.12]]),
+        makeSample(81, [['3', HIGH, 183.522], ['13', HIGH, 0.55], ['10', MEDIUM, 93.61], ['11', HIGH, 49.093], ['13', HIGH, 1], ['1', HIGH, 3.239], ['11', LOW, 15.484]]),
+    ];
+
+    const demoProject: Project = {
+        id: DEMO_PROJECT_ID,
+        name: t('demoProject.name'),
+        nombre: t('demoProject.name'),
+        inspector: t('demoProject.inspector'),
+        inspectionDate: '2025-06-06',
+        lastView: 'DATA_ENTRY',
+        propietario: user.id,
+        sections: [
+            {
+                id: 'demo-section-1',
+                name: t('demoProject.sectionName'),
+                length,
+                width,
+                startStation: 0,
+                pavementType: PavementType.FLEXIBLE,
+                sampleUnitArea: sampleUnitArea,
+                stdDev: ASTM_DEFAULTS.STD_DEV_AC,
+                allowableError: ASTM_DEFAULTS.ALLOWABLE_ERROR,
+                evaluateAllSamples: false,
+                area: sectionArea,
+                sampleUnitLength,
+                ...params,
+                samples,
+            },
+        ],
+    };
+
+    saveProjectToStorage(demoProject);
+    setSelectedProject(demoProject);
+    setCurrentView('DATA_ENTRY');
+  };
+
+  const handleLoadInsufficientExample = () => {
+    if (!user) return;
+    const DEMO_PROJECT_ID = 'pci-demo-insufficient-1';
+
+    const sampleUnitArea = 225;
+    const sampleUnitLength = 35;
+    const width = sampleUnitArea / sampleUnitLength;
+    const totalSampleUnits = 84;
+    const sectionArea = totalSampleUnits * sampleUnitArea;
+    const length = totalSampleUnits * sampleUnitLength;
+
+    const params = calculateSectionParameters(
+        sectionArea,
+        sampleUnitArea,
+        ASTM_DEFAULTS.STD_DEV_AC,
+        ASTM_DEFAULTS.ALLOWABLE_ERROR,
+        false
+    );
+
+    const makeSample = (id: number, entries: [string, Severity, number][]): Sample => ({
+        id,
+        area: sampleUnitArea,
+        pavementType: PavementType.FLEXIBLE,
+        isAdditional: false,
+        distresses: entries.map(([type, severity, quantity], i) => ({
+            id: `demo-variability-${id}-${i}`,
+            type,
+            severity,
+            quantity,
+        })),
+    });
+
+    const { HIGH, MEDIUM, LOW } = Severity;
+
+    const samples: Sample[] = [
+        makeSample(3, [['19.2', LOW, 0.9]]),
+        makeSample(9, [['19.2', LOW, 1.575]]),
+        makeSample(15, [['19.2', LOW, 2.7]]),
+        makeSample(21, [['19.2', LOW, 4.5]]),
+        makeSample(27, [['19.2', LOW, 7.875]]),
+        makeSample(33, [['19.2', LOW, 13.5]]),
+        makeSample(39, [['19.2', LOW, 22.5]]),
+        makeSample(45, [['11', MEDIUM, 126.1222], ['11', LOW, 6.8414], ['11', HIGH, 58.8396], ['1', HIGH, 36.024]]),
+        makeSample(51, [['11', LOW, 112.45], ['11', HIGH, 23.775], ['11', MEDIUM, 52.925], ['3', HIGH, 39.343]]),
+        makeSample(57, [['10', MEDIUM, 12.3], ['1', HIGH, 9.84], ['3', HIGH, 84.412], ['11', LOW, 14.24], ['13', HIGH, 1], ['11', MEDIUM, 90.627], ['13', MEDIUM, 1], ['11', HIGH, 18.737]]),
+        makeSample(63, [['10', MEDIUM, 7.11], ['11', MEDIUM, 68.6875], ['3', HIGH, 18.2], ['13', HIGH, 1], ['3', HIGH, 115.6672], ['1', HIGH, 13.8959], ['11', HIGH, 20.6325]]),
+        makeSample(69, [['11', HIGH, 24.425], ['11', LOW, 80.905], ['11', MEDIUM, 51.685], ['3', HIGH, 66.03], ['13', LOW, 1]]),
+        makeSample(75, [['3', HIGH, 47.8808], ['10', MEDIUM, 12.1], ['11', MEDIUM, 132.3795], ['13', HIGH, 0.52], ['13', HIGH, 1], ['11', HIGH, 3.8475], ['13', HIGH, 0.4], ['1', HIGH, 21.12]]),
+        makeSample(81, [['3', HIGH, 183.522], ['13', HIGH, 0.55], ['10', MEDIUM, 93.61], ['11', HIGH, 49.093], ['13', HIGH, 1], ['1', HIGH, 3.239], ['11', LOW, 15.484]]),
+    ];
+
+    const variabilityProject: Project = {
+        id: DEMO_PROJECT_ID,
+        name: t('demoProjectInsufficient.name'),
+        nombre: t('demoProjectInsufficient.name'),
+        inspector: t('demoProjectInsufficient.inspector'),
+        inspectionDate: '2025-06-06',
+        lastView: 'DATA_ENTRY',
+        propietario: user.id,
+        sections: [
+            {
+                id: 'demo-variability-section-1',
+                name: t('demoProjectInsufficient.sectionName'),
+                length,
+                width,
+                startStation: 0,
+                pavementType: PavementType.FLEXIBLE,
+                sampleUnitArea,
+                stdDev: ASTM_DEFAULTS.STD_DEV_AC,
+                allowableError: ASTM_DEFAULTS.ALLOWABLE_ERROR,
+                evaluateAllSamples: false,
+                area: sectionArea,
+                sampleUnitLength,
+                ...params,
+                samples,
+            },
+        ],
+    };
+
+    saveProjectToStorage(variabilityProject);
+    setSelectedProject(variabilityProject);
+    setCurrentView('DATA_ENTRY');
   };
 
   // Esta es la función principal de actualización de estado para un proyecto activo.
@@ -330,6 +500,7 @@ export const App: React.FC = () => {
   };
   
   const handleNavigate = (view: AppView, projectOverride?: Project, skipSave = false) => {
+      setDataEntryConfig(null);
       if (view === 'PROFILE' || view === 'DASHBOARD'|| view === 'ADMIN_SETTINGS') {
           setSelectedProject(null);
           setCurrentView(view);
@@ -409,20 +580,61 @@ export const App: React.FC = () => {
       }
     });
   };
+
+  const handleEvaluateAdditional = (sectionId: string, missingCount: number) => {
+    if (!selectedProject) return;
+    const section = selectedProject.sections.find(s => s.id === sectionId);
+    if (!section) return;
+
+    const existingIds = section.samples.map(s => s.id);
+    const idsToAdd = getAdditionalRandomSampleIds(section.totalSampleUnits, existingIds, missingCount);
+    if (idsToAdd.length === 0) return;
+
+    updateProjectState(draft => {
+      const draftSection = draft.sections.find(s => s.id === sectionId);
+      if (!draftSection) return;
+      idsToAdd.forEach(id => {
+        draftSection.samples.push({
+          id,
+          area: draftSection.sampleUnitArea,
+          pavementType: draftSection.pavementType,
+          distresses: [],
+          isAdditional: false,
+        });
+      });
+      draftSection.samples.sort((a, b) => a.id - b.id);
+      draftSection.systematicallyAddedSampleIds = [
+        ...(draftSection.systematicallyAddedSampleIds || []),
+        ...idsToAdd,
+      ];
+    });
+
+    setDataEntryConfig({ sectionId, focusSampleId: idsToAdd[0], newlyAddedIds: idsToAdd });
+    setCurrentView('DATA_ENTRY');
+  };
   
   const renderContent = () => {
     if (currentView === 'DASHBOARD') {
-      return <DashboardView projects={projects} onNewProject={handleNewProject} onSelectProject={handleSelectProject} onInitiateDelete={handleInitiateDelete} />;
+      return (
+        <DashboardView
+          projects={projects}
+          onNewProject={handleNewProject}
+          onSelectProject={handleSelectProject}
+          onInitiateDelete={handleInitiateDelete}
+          //onLoadExample={handleLoadDemoProject}
+          //onLoadInsufficientExample={handleLoadInsufficientExample}
+        />
+      );
     }
     
     if (currentView === 'PROFILE') {
-  return (
-    <ProfileView
-      onInitiateDelete={() => setIsDeleteAccountModalOpen(true)}
-      onNavigate={handleNavigate}
-    />
-  );
-}
+      return (
+        <ProfileView
+          onInitiateDelete={() => setIsDeleteAccountModalOpen(true)}
+          onNavigate={handleNavigate}
+        />
+      );
+    }
 
     if (currentView === 'ADMIN_SETTINGS') {
         return <CurvesSettingsView />;
@@ -435,18 +647,40 @@ export const App: React.FC = () => {
     // Todas las demás vistas requieren un proyecto seleccionado.
     if (!selectedProject) {
         // Volver al panel si falta el proyecto para una vista específica del proyecto.
-        return <DashboardView projects={projects} onNewProject={handleNewProject} onSelectProject={handleSelectProject} onInitiateDelete={handleInitiateDelete}  />;
+        return (
+          <DashboardView
+            projects={projects}
+            onNewProject={handleNewProject}
+            onSelectProject={handleSelectProject}
+            onInitiateDelete={handleInitiateDelete}
+            //onLoadExample={handleLoadDemoProject}
+            //onLoadInsufficientExample={handleLoadInsufficientExample}
+          />
+        );
     }
     
     // La lógica de cálculo ahora se maneja mediante funciones de navegación/selección,
     // eliminando el riesgo de bucles infinitos durante la renderización.
     switch (currentView) {
       case 'DATA_ENTRY':
-        return <DataEntryView project={selectedProject} onSampleUpdate={handleSampleUpdate} onSampleAdd={handleSampleAdd} onSampleDelete={handleSampleDelete} />;
+        return (
+          <DataEntryView
+            project={selectedProject}
+            onSampleUpdate={handleSampleUpdate}
+            onSampleAdd={handleSampleAdd}
+            onSampleDelete={handleSampleDelete}
+            initialConfig={dataEntryConfig}
+          />
+        );
       case 'CALCULATION_DETAILS':
         return <CalculationDetailsView project={selectedProject} />;
       case 'RESULTS':
-        return <ResultsDisplay project={selectedProject} />;
+        return (
+          <ResultsDisplay
+            project={selectedProject}
+            onEvaluateAdditionalSamples={handleEvaluateAdditional}
+          />
+        );
       default:
         return <div>{t('app.unknownView')}</div>;
     }

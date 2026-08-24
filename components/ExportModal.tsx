@@ -52,7 +52,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
             }
         } catch (error) {
             console.error("Failed to generate report:", error);
-            alert("An error occurred while generating the report.");
+            alert(t('exportModal.generationError'));
         }
         setIsGenerating(false);
         onClose();

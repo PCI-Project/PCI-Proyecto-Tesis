@@ -24,10 +24,47 @@ const formatStation = (station: number): string => {
     return `${km}+${m.toFixed(2).padStart(6, '0')}`;
 };
 
-const SectionRow: React.FC<{ section: Section }> = ({ section }) => {
+const SampleDetailRows: React.FC<{ samples: Sample[]; section: Section }> = ({ samples, section }) => {
+  const { t } = useTranslations();
+  return (
+    <>
+      {samples.sort((a, b) => a.id - b.id).map(sample => {
+        const details = sample.calculationDetails;
+        const sampleStartStation = section.startStation + (sample.id - 1) * section.sampleUnitLength;
+        return (
+            <tr key={sample.id} className="odd:bg-secondary/5">
+              <td className='py-2 px-3 font-medium'>{sample.id}</td>
+              <td className='py-2 px-3 font-mono'>{formatStation(sampleStartStation)}</td>
+              <td className='py-2 px-3 font-medium text-primary'>{details?.pci?.toFixed(2) ?? 'N/A'}</td>
+              <td className='py-2 px-3 font-medium text-danger'>{details?.cdv?.toFixed(2) ?? 'N/A'}</td>
+              <td className='py-2 px-3'>
+                <div className='flex flex-wrap gap-x-3 gap-y-1'>
+                {details?.summaries?.sort((a,b) => b.deductValue - a.deductValue).map((d, i) => (
+                  <span key={i} className="text-xs text-text-muted">{t(d.nameKey)}: <strong className="text-text-base">{d.deductValue.toFixed(1)}</strong></span>
+                ))}
+                 {details?.summaries?.length === 0 && <span className="text-xs text-text-muted">{t('results.noDistresses')}</span>}
+                </div>
+              </td>
+            </tr>
+        )
+      })}
+    </>
+  );
+};
+
+const SectionRow: React.FC<{ section: Section; onEvaluateAdditionalSamples?: (sectionId: string, count: number) => void }> = ({ section, onEvaluateAdditionalSamples }) => {
   const { t } = useTranslations();
   const [isExpanded, setIsExpanded] = useState(false);
   const sectionRating = getPCIRating(section.pci ?? 100);
+
+  const regularSamples = section.samples.filter(s => !s.isAdditional);
+  // Genuine ASTM "additional sample units" (§2.1.1): nonrepresentative units the user
+  // chose freely, never pooled into the random-sample average. Shown as their own block.
+  const additionalSamples = section.samples.filter(s => s.isAdditional);
+
+  // Matches calculateSectionPCI: the §7.5.2 statistical check only covers random sample
+  // units, excluding nonrepresentative "additional" units (§2.1.1).
+  const n = regularSamples.filter(s => s.calculationDetails && s.calculationDetails.pci >= 0).length;
 
   return (
     <>
@@ -47,43 +84,123 @@ const SectionRow: React.FC<{ section: Section }> = ({ section }) => {
       {isExpanded && (
         <tr>
           <td colSpan={5} className="p-0 bg-bg-base/60">
-            <div className="p-4">
-              <h4 className="font-bold text-md text-text-base mb-2">{t('results.sampleDetailsTitle', { name: section.name })}</h4>
-              <div className="border border-border-muted rounded-lg overflow-hidden">
-                <table className="min-w-full bg-bg-surface text-sm">
-                  <thead className='bg-secondary/20 text-secondary-dark'>
-                    <tr>
-                      <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tableSample')}</th>
-                      <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tableStation')}</th>
-                      <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tablePCI')}</th>
-                      <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tableCDV')}</th>
-                      <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tableDVs')}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border-muted">
-                    {section.samples.sort((a,b) => a.id - b.id).map(sample => {
-                      const details = sample.calculationDetails;
-                      const sampleStartStation = section.startStation + (sample.id - 1) * section.sampleUnitLength;
-                      return (
-                          <tr key={sample.id} className="odd:bg-secondary/5">
-                            <td className='py-2 px-3 font-medium'>{sample.id}{sample.isAdditional ? ` (${t('results.additional')})` : ''}</td>
-                            <td className='py-2 px-3 font-mono'>{formatStation(sampleStartStation)}</td>
-                            <td className='py-2 px-3 font-medium text-primary'>{details?.pci?.toFixed(2) ?? 'N/A'}</td>
-                            <td className='py-2 px-3 font-medium text-danger'>{details?.cdv?.toFixed(2) ?? 'N/A'}</td>
-                            <td className='py-2 px-3'>
-                              <div className='flex flex-wrap gap-x-3 gap-y-1'>
-                              {details?.summaries?.sort((a,b) => b.deductValue - a.deductValue).map((d, i) => (
-                                <span key={i} className="text-xs text-text-muted">{t(d.nameKey)}: <strong className="text-text-base">{d.deductValue.toFixed(1)}</strong></span>
-                              ))}
-                               {details?.summaries?.length === 0 && <span className="text-xs text-text-muted">{t('results.noDistresses')}</span>}
-                              </div>
-                            </td>
-                          </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
+            <div className="p-4 space-y-4">
+              <div>
+                  <h4 className="font-bold text-md text-text-base mb-2">{t('results.sampleDetailsTitle', { name: section.name })}</h4>
+                  <div className="border border-border-muted rounded-lg overflow-hidden">
+                    <table className="min-w-full bg-bg-surface text-sm">
+                      <thead className='bg-secondary/20 text-secondary-dark'>
+                        <tr>
+                          <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tableSample')}</th>
+                          <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tableStation')}</th>
+                          <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tablePCI')}</th>
+                          <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tableCDV')}</th>
+                          <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tableDVs')}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border-muted">
+                        <SampleDetailRows samples={regularSamples} section={section} />
+                      </tbody>
+                    </table>
+                  </div>
               </div>
+              
+              {additionalSamples.length > 0 && (
+                  <div>
+                      <h4 className="font-bold text-md text-text-base mb-1">{t('results.additionalSamplesTitle')}</h4>
+                      <p className="text-sm text-text-muted mb-2">{t('results.additionalSamplesDesc')}</p>
+                      <div className="border border-accent/40 rounded-lg overflow-hidden mb-4">
+                        <table className="min-w-full bg-bg-surface text-sm">
+                          <thead className='bg-accent/10 text-accent'>
+                            <tr>
+                              <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tableSample')}</th>
+                              <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tableStation')}</th>
+                              <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tablePCI')}</th>
+                              <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tableCDV')}</th>
+                              <th className="text-left py-2 px-3 uppercase font-semibold text-xs">{t('results.tableDVs')}</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border-muted">
+                            <SampleDetailRows samples={additionalSamples} section={section} />
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <Card className="border border-border-muted bg-bg-surface">
+                          <h5 className="font-bold text-sm text-text-base mb-1">{t('results.pciBreakdownTitle')}</h5>
+                          <p className="text-xs text-text-muted mb-3">{t('results.pciBreakdownSubtitle')}</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-2 gap-x-4 text-sm">
+                              <div className="flex justify-between sm:flex-col sm:justify-start border-b sm:border-b-0 border-border-muted/50 pb-1">
+                                  <span className="text-text-muted">{t('results.pciRandomLabel')}</span>
+                                  <span className="font-bold text-primary">{section.randomPCI?.toFixed(2) ?? 'N/A'}</span>
+                              </div>
+                              <div className="flex justify-between sm:flex-col sm:justify-start border-b sm:border-b-0 border-border-muted/50 pb-1">
+                                  <span className="text-text-muted">{t('results.pciAdditionalLabel')}</span>
+                                  <span className="font-bold text-accent">{section.additionalPCI?.toFixed(2) ?? 'N/A'}</span>
+                              </div>
+                              <div className="flex justify-between sm:flex-col sm:justify-start pb-1">
+                                  <span className="text-text-muted">{t('results.pciCombinedLabel')}</span>
+                                  <span className="font-bold text-text-base">{section.pci?.toFixed(2) ?? 'N/A'}</span>
+                              </div>
+                          </div>
+                      </Card>
+                  </div>
+              )}
+
+              {section.actualStdDev !== undefined && !section.evaluateAllSamples && (
+                  <Card className="border border-border-muted bg-bg-surface">
+                     <h4 className="font-bold text-md text-text-base mb-1">{t('results.stat_title')}</h4>
+                     <p className="text-sm text-text-muted mb-4">{t('results.stat_subtitle')}</p>
+
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 text-sm mb-4">
+                         <div className="flex justify-between border-b border-border-muted/50 pb-1">
+                             <span className="text-text-muted">{t('results.stat_n')}:</span>
+                             <span className="font-bold">{n}</span>
+                         </div>
+                         <div className="flex justify-between border-b border-border-muted/50 pb-1">
+                             <span className="text-text-muted">{t('results.stat_s')}:</span>
+                             <span className="font-bold">{section.actualStdDev.toFixed(2)}</span>
+                         </div>
+                         <div className="flex justify-between border-b border-border-muted/50 pb-1">
+                             <span className="text-text-muted">{t('results.stat_n_rev')}:</span>
+                             <span className="font-bold">{section.revisedSampleUnits ?? 'N/A'}</span>
+                         </div>
+                         <div className="flex justify-between border-b border-border-muted/50 pb-1">
+                             <span className="text-text-muted">{t('results.stat_e')}:</span>
+                             <span className="font-bold">±{section.allowableError} pts PCI</span>
+                         </div>
+                         <div className="flex justify-between border-b border-border-muted/50 pb-1">
+                             <span className="text-text-muted">{t('results.stat_conf')}:</span>
+                             <span className="font-bold">95%</span>
+                         </div>
+                     </div>
+
+                     <div className="mt-4 p-4 rounded-lg border border-border-muted bg-bg-base/50">
+                         <h5 className="text-xs font-bold uppercase tracking-wider text-text-muted mb-2">{t('results.stat_verdict')}</h5>
+                         {section.samplesSufficient ? (
+                             <div>
+                                 <p className="text-primary font-bold text-lg">{t('results.stat_sufficient_title')}</p>
+                                 <p className="text-sm text-text-muted">{t('results.stat_sufficient_desc')}</p>
+                             </div>
+                         ) : (
+                             <div>
+                                 <p className="text-danger font-bold text-lg mb-1">{t('results.stat_insufficient_title')}</p>
+                                 <p className="text-sm text-text-muted mb-4">
+                                     {t('results.stat_insufficient_desc', { count: section.missingSamples ?? 0 })}
+                                 </p>
+                                 {onEvaluateAdditionalSamples && (
+                                     <Button
+                                         variant="primary"
+                                         onClick={() => onEvaluateAdditionalSamples(section.id, section.missingSamples ?? 0)}
+                                     >
+                                         {t('results.stat_button', { count: section.missingSamples ?? 0 })}
+                                     </Button>
+                                 )}
+                             </div>
+                         )}
+                     </div>
+                  </Card>
+              )}
             </div>
           </td>
         </tr>
@@ -92,7 +209,7 @@ const SectionRow: React.FC<{ section: Section }> = ({ section }) => {
   );
 };
 
-export const ResultsDisplay: React.FC<{ project: Project }> = ({ project }) => {
+export const ResultsDisplay: React.FC<{ project: Project; onEvaluateAdditionalSamples?: (sectionId: string, count: number) => void }> = ({ project, onEvaluateAdditionalSamples }) => {
   const { t } = useTranslations();
   const [isRatingScaleVisible, setIsRatingScaleVisible] = useState(false);
   const [isExportModalOpen, setExportModalOpen] = useState(false);
@@ -160,7 +277,7 @@ export const ResultsDisplay: React.FC<{ project: Project }> = ({ project }) => {
           </thead>
           <tbody className="text-text-base">
             {project.sections.map(section => (
-              <SectionRow key={section.id} section={section} />
+              <SectionRow key={section.id} section={section} onEvaluateAdditionalSamples={onEvaluateAdditionalSamples} />
             ))}
           </tbody>
         </table>

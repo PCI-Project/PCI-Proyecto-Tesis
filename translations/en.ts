@@ -15,6 +15,7 @@ export const en = {
       headerDescription: "Create, manage, and analyze your pavement evaluation projects.",
       newProject: "Create Project",
       loadExample: "Load Example",
+      loadInsufficientExample: "Load Example (Insufficient Sample)",
       tableProject: "Project",
       tableDate: "Date",
       tablePCI: "PCI",
@@ -31,9 +32,14 @@ export const en = {
       statusDraft: "Draft",
     },
     demoProject: {
-        name: "Demonstration Project",
-        inspector: "AsphaltPCI Pro Team",
-        sectionName: "Example Section"
+        name: "Santiago - Montijo Road (Real Data)",
+        inspector: "Sujeidi Quintero, Rosa Guevara, Jesús Delgado",
+        sectionName: "Section 1"
+    },
+    demoProjectInsufficient: {
+        name: "Santiago - Montijo Road (Example: High Variability)",
+        inspector: "Sujeidi Quintero, Rosa Guevara, Jesús Delgado",
+        sectionName: "Section 1 (high variability)"
     },
     projectForm: {
       projectDataTitle: "1. Project Details",
@@ -92,11 +98,16 @@ export const en = {
         selectSampleToAdd: "Select Sample Unit to Evaluate",
         availableUnits: "Available Units",
         unit: "Unit",
-        allUnitsSelected: "All units in the section have been evaluated."
+        allUnitsSelected: "All units in the section have been evaluated.",
+        systematicNoticeTitle: "Additional random samples generated",
+        systematicNoticeDesc: "The statistical check (ASTM D6433 §7.5.2) found more samples were needed. These were added automatically, spaced systematically: {ids}.",
+        systematicBadge: "Added by additional random sampling (§7.5.2)",
     },
     sampleCard: {
         title: "Sample Unit",
         additional: "Additional",
+        systematicSupplement: "Additional Sampling",
+        systematicSupplementHint: "This unit was added automatically by the statistical sufficiency check (ASTM D6433 §7.5.2), not manually chosen.",
         dimensions: "Dimensions (Length x Width)",
         area: "Sample Area (m²)",
         distressLogTitle: "Distress Log",
@@ -147,6 +158,27 @@ export const en = {
         noDistresses: "No distresses",
         viewRatingScale: "View rating scale",
         pciRatingScaleTitle: "PCI Rating Scale",
+        stat_title: "STATISTICAL SAMPLING VERIFICATION",
+        stat_subtitle: "ASTM D6433 — Section 7.5.2",
+        stat_n: "Samples inspected (n)",
+        stat_s: "Actual standard deviation (s)",
+        stat_n_rev: "Required samples (revised n)",
+        stat_e: "Allowable error (e)",
+        stat_conf: "Confidence Level",
+        stat_verdict: "VERDICT:",
+        stat_sufficient_title: "✓ SUFFICIENT SAMPLE",
+        stat_sufficient_desc: "The inspection is valid at 95% confidence",
+        stat_insufficient_title: "✗ INSUFFICIENT SAMPLE",
+        stat_insufficient_desc: "{count} additional samples are required to achieve 95% confidence",
+        stat_missing: "Missing Samples",
+        stat_button: "Evaluate {count} additional samples →",
+        additionalSamplesTitle: "Additional Samples (Nonrepresentative)",
+        additionalSamplesDesc: "Units evaluated outside the random sample for showing nonrepresentative conditions (ASTM D6433 §2.1.1). Not averaged together with the random samples.",
+        pciBreakdownTitle: "Section PCI Calculation (ASTM D6433 §11)",
+        pciBreakdownSubtitle: "The random and additional PCI are calculated separately and combined weighting by the area each group represents.",
+        pciRandomLabel: "Random Samples PCI (Eq. 5)",
+        pciAdditionalLabel: "Additional Samples PCI (Eq. 6)",
+        pciCombinedLabel: "Combined Section PCI (Eq. 7)",
     },
     exportModal: {
         title: "Export Project Report",
@@ -160,6 +192,8 @@ export const en = {
         calculationDetails: "Per-Sample Calculation Details",
         generateButton: "Generate & Download",
         generatingMessage: "Generating report...",
+        pdfTitle: "Pavement Condition Report",
+        generationError: "An error occurred while generating the report.",
     },
     cdvTable: {
         noDeducts: "No deduct values to calculate CDV.",
@@ -233,9 +267,7 @@ export const en = {
         errorUserExists: "An account with this email already exists.",
         errorPasswordMatch: "Passwords do not match.",
         errorPasswordLength: "Password must be at least 6 characters long.",
-        errorNameRequired: "Full name is required.",
-        acceptTerms: "I accept the Terms of Service and Privacy Policy.",
-        errorTermsRequired: "You must accept the terms and conditions."
+        errorNameRequired: "Full name is required."
     },
     ratingGood: "Good",
     ratingSatisfactory: "Satisfactory",

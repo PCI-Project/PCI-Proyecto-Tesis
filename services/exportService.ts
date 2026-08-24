@@ -50,21 +50,39 @@ export const generateCsvZip = async (project: Project, options: ExportOptions, t
     if (options.sectionResults) {
         const headers = [
             { key: 'SectionName', label: t('projectForm.sectionName') },
-            { key: 'Length_m', label: `${t('projectForm.length')} (m)` },
-            { key: 'Width_m', label: `${t('projectForm.width')} (m)` },
+            { key: 'Length_m', label: t('projectForm.length') },
+            { key: 'Width_m', label: t('projectForm.width') },
             { key: 'Area_m2', label: `${t('results.tableArea')} (m²)` },
             { key: 'SectionPCI', label: t('results.tableSectionPCI') },
-            { key: 'Rating', label: t('results.tableRating') }
+            { key: 'Rating', label: t('results.tableRating') },
+            { key: 'RandomPCI', label: t('results.pciRandomLabel') },
+            { key: 'AdditionalPCI', label: t('results.pciAdditionalLabel') },
+            // ASTM D6433 §7.5.2 statistical sufficiency check
+            { key: 'SamplesInspected_n', label: t('results.stat_n') },
+            { key: 'ActualStdDev_s', label: t('results.stat_s') },
+            { key: 'RevisedMinSamples', label: t('results.stat_n_rev') },
+            { key: 'MissingSamples', label: t('results.stat_missing') },
+            { key: 'SamplesSufficient', label: t('results.stat_verdict') },
         ];
         const data = project.sections.map(sec => {
             const rating = getPCIRating(sec.pci ?? 100);
+            const n = sec.samples.filter(s => !s.isAdditional && s.calculationDetails && s.calculationDetails.pci >= 0).length;
             return {
                 SectionName: sec.name,
                 Length_m: sec.length,
                 Width_m: sec.width,
                 Area_m2: sec.area.toFixed(2),
                 SectionPCI: sec.pci?.toFixed(2) ?? 'N/A',
-                Rating: t(rating.labelKey)
+                Rating: t(rating.labelKey),
+                RandomPCI: sec.randomPCI?.toFixed(2) ?? 'N/A',
+                AdditionalPCI: sec.additionalPCI?.toFixed(2) ?? 'N/A',
+                SamplesInspected_n: n,
+                ActualStdDev_s: sec.actualStdDev?.toFixed(2) ?? 'N/A',
+                RevisedMinSamples: sec.revisedSampleUnits ?? 'N/A',
+                MissingSamples: sec.missingSamples ?? 'N/A',
+                SamplesSufficient: sec.samplesSufficient === undefined
+                    ? 'N/A'
+                    : t(sec.samplesSufficient ? 'results.stat_sufficient_title' : 'results.stat_insufficient_title'),
             };
         });
         zip.file("section_results.csv", toCSV(data, headers));
@@ -75,27 +93,33 @@ export const generateCsvZip = async (project: Project, options: ExportOptions, t
             { key: 'SectionName', label: t('projectForm.sectionName') },
             { key: 'SampleID', label: t('results.tableSample') },
             { key: 'IsAdditional', label: t('sampleCard.additional') },
+            { key: 'SystematicSupplement', label: t('sampleCard.systematicSupplement') },
             { key: 'SampleArea_m2', label: t('projectForm.sampleArea') },
             { key: 'DistressID', label: 'Distress ID' },
             { key: 'DistressName', label: t('sampleCard.tableDistressType') },
             { key: 'Severity', label: t('sampleCard.tableSeverity') },
             { key: 'Quantity', label: t('sampleCard.tableQuantity') },
-            { key: 'Density_pc', label: `${t('summaryTable.density')} (%)` },
+            { key: 'Density_pc', label: t('summaryTable.density') },
             { key: 'DeductValue', label: t('summaryTable.deductValue') }
         ];
         const data: Record<string, any>[] = [];
         project.sections.forEach(section => {
+            const systematicIds = new Set(section.systematicallyAddedSampleIds || []);
             section.samples.forEach(sample => {
                 const summaries = sample.calculationDetails?.summaries || [];
+                const base = {
+                    SectionName: section.name,
+                    SampleID: sample.id,
+                    IsAdditional: sample.isAdditional,
+                    SystematicSupplement: systematicIds.has(sample.id),
+                    SampleArea_m2: sample.area,
+                };
                 if (summaries.length === 0) {
-                     data.push({ SectionName: section.name, SampleID: sample.id, IsAdditional: sample.isAdditional, SampleArea_m2: sample.area, DistressName: t('results.noDistresses') });
+                     data.push({ ...base, DistressName: t('results.noDistresses') });
                 } else {
                     summaries.forEach(summary => {
                         data.push({
-                            SectionName: section.name,
-                            SampleID: sample.id,
-                            IsAdditional: sample.isAdditional,
-                            SampleArea_m2: sample.area,
+                            ...base,
                             DistressID: summary.type,
                             DistressName: t(summary.nameKey),
                             Severity: summary.severity,
@@ -109,11 +133,12 @@ export const generateCsvZip = async (project: Project, options: ExportOptions, t
         });
         zip.file("distress_data.csv", toCSV(data, headers));
     }
-    
+
     if (options.calculationDetails) {
          const headers = [
             { key: 'SectionName', label: t('projectForm.sectionName') },
             { key: 'SampleID', label: t('results.tableSample') },
+            { key: 'IsAdditional', label: t('sampleCard.additional') },
             { key: 'TotalDeductValue', label: 'TDV' },
             { key: 'CorrectedDeductValue', label: 'CDV' },
             { key: 'PCI', label: 'PCI' },
@@ -127,6 +152,7 @@ export const generateCsvZip = async (project: Project, options: ExportOptions, t
                     data.push({
                         SectionName: section.name,
                         SampleID: sample.id,
+                        IsAdditional: sample.isAdditional,
                         TotalDeductValue: details.totalDeductValue.toFixed(2),
                         CorrectedDeductValue: details.cdv.toFixed(2),
                         PCI: details.pci.toFixed(2),
@@ -155,93 +181,177 @@ export const generatePdfReport = async (project: Project, options: ExportOptions
     const { jsPDF } = jspdf;
     const doc = new jsPDF();
     const finalRating = getPCIRating(project.weightedPCI ?? 0);
-    
+    const pageWidth = doc.internal.pageSize.getWidth();
+
     // --- Title Page ---
     doc.setFontSize(24);
     doc.setTextColor(54, 200, 200); // Primary color
-    doc.text("Pavement Condition Report", doc.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
+    doc.text(t('exportModal.pdfTitle'), pageWidth / 2, 30, { align: 'center' });
 
     doc.setFontSize(18);
     doc.setTextColor(29, 35, 42); // text-base
-    doc.text(project.name, doc.internal.pageSize.getWidth() / 2, 45, { align: 'center' });
+    doc.text(project.name, pageWidth / 2, 45, { align: 'center' });
 
-    doc.autoTable({
-        startY: 60,
-        body: [
-            [{ content: t('projectForm.inspectorName'), styles: { fontStyle: 'bold' } }, project.inspector],
-            [{ content: t('projectForm.inspectionDate'), styles: { fontStyle: 'bold' } }, project.inspectionDate],
-        ],
-        theme: 'plain',
-        styles: { fontSize: 12 },
-        tableWidth: 'wrap',
-        margin: { left: doc.internal.pageSize.getWidth() / 2 - 40 }
-    });
-    
-    doc.autoTable({
-        startY: doc.previousAutoTable.finalY + 20,
-        body: [
-            [t('results.weightedPCI')],
-            [{ content: (project.weightedPCI ?? 0).toFixed(2), styles: { fontSize: 48, fontStyle: 'bold' } }],
-            [t(finalRating.labelKey)]
-        ],
-        theme: 'plain',
-        styles: { halign: 'center', fontSize: 14, fontStyle: 'bold' },
-    });
-    
-    let finalY = doc.previousAutoTable.finalY;
+    let finalY = 45;
+
+    if (options.projectSummary) {
+        // Plain centered text instead of a fixed-width table: autoTable's `tableWidth:
+        // 'wrap'` sizes itself to its (variable-length, translated) label text, so a
+        // hardcoded margin can't keep it centered across languages/labels.
+        doc.setFontSize(12);
+        doc.setTextColor(29, 35, 42);
+        doc.setFont(undefined, 'bold');
+        doc.text(t('projectForm.inspectorName'), pageWidth / 2, 62, { align: 'center' });
+        doc.setFont(undefined, 'normal');
+        doc.text(project.inspector, pageWidth / 2, 69, { align: 'center' });
+        doc.setFont(undefined, 'bold');
+        doc.text(t('projectForm.inspectionDate'), pageWidth / 2, 79, { align: 'center' });
+        doc.setFont(undefined, 'normal');
+        doc.text(project.inspectionDate, pageWidth / 2, 86, { align: 'center' });
+
+        doc.autoTable({
+            startY: 101,
+            body: [
+                [t('results.weightedPCI')],
+                [{ content: (project.weightedPCI ?? 0).toFixed(2), styles: { fontSize: 48, fontStyle: 'bold' } }],
+                [t(finalRating.labelKey)]
+            ],
+            theme: 'plain',
+            styles: { halign: 'center', fontSize: 14, fontStyle: 'bold' },
+        });
+
+        finalY = doc.previousAutoTable.finalY;
+    }
 
     // --- Page Content ---
     project.sections.forEach(section => {
         const sectionRating = getPCIRating(section.pci ?? 0);
+        const additionalSamples = section.samples.filter(s => s.isAdditional);
+        const systematicIds = new Set(section.systematicallyAddedSampleIds || []);
+        const n = section.samples.filter(s => !s.isAdditional && s.calculationDetails && s.calculationDetails.pci >= 0).length;
+
         if (options.sectionResults) {
             if (finalY > 250) doc.addPage();
             doc.setFontSize(16);
             doc.setTextColor(54, 200, 200);
             doc.text(`${t('projectForm.sectionName')}: ${section.name}`, 14, (finalY > 250 ? 20 : finalY + 15));
-            
+
             doc.autoTable({
                 startY: (finalY > 250 ? 28 : finalY + 23),
-                head: [[t('results.tableArea'), 'Section PCI', t('results.tableRating')]],
+                head: [[t('results.tableArea'), t('results.tableSectionPCI'), t('results.tableRating')]],
                 body: [[`${section.area.toFixed(2)} m²`, section.pci?.toFixed(2) ?? 'N/A', t(sectionRating.labelKey)]],
                 theme: 'striped',
                 headStyles: { fillColor: [54, 200, 200] },
             });
             finalY = doc.previousAutoTable.finalY;
+
+            // Additional/nonrepresentative samples breakdown (ASTM D6433 §11, Eq 5/6/7) -
+            // mirrors the order shown in the Results view.
+            if (additionalSamples.length > 0) {
+                if (finalY > 250) doc.addPage();
+                doc.setFontSize(11);
+                doc.setTextColor(29, 35, 42);
+                doc.text(t('results.pciBreakdownTitle'), 14, (finalY > 250 ? 20 : finalY + 10));
+                doc.autoTable({
+                    startY: (finalY > 250 ? 26 : finalY + 14),
+                    head: [[t('results.pciRandomLabel'), t('results.pciAdditionalLabel'), t('results.pciCombinedLabel')]],
+                    body: [[
+                        section.randomPCI?.toFixed(2) ?? 'N/A',
+                        section.additionalPCI?.toFixed(2) ?? 'N/A',
+                        section.pci?.toFixed(2) ?? 'N/A',
+                    ]],
+                    theme: 'grid',
+                    headStyles: { fillColor: [244, 241, 187], textColor: [80, 75, 30] },
+                });
+                finalY = doc.previousAutoTable.finalY;
+            }
+
+            // Statistical sufficiency check (ASTM D6433 §7.5.2).
+            if (section.actualStdDev !== undefined && !section.evaluateAllSamples) {
+                if (finalY > 250) doc.addPage();
+                doc.setFontSize(11);
+                doc.setTextColor(29, 35, 42);
+                doc.text(t('results.stat_title'), 14, (finalY > 250 ? 20 : finalY + 10));
+                const verdict = section.samplesSufficient ? t('results.stat_sufficient_title') : t('results.stat_insufficient_title');
+                doc.autoTable({
+                    startY: (finalY > 250 ? 26 : finalY + 14),
+                    head: [[t('results.stat_n'), t('results.stat_s'), t('results.stat_n_rev'), t('results.stat_e'), t('results.stat_verdict')]],
+                    body: [[
+                        String(n),
+                        section.actualStdDev.toFixed(2),
+                        String(section.revisedSampleUnits ?? 'N/A'),
+                        `±${section.allowableError}`,
+                        verdict,
+                    ]],
+                    theme: 'grid',
+                    headStyles: { fillColor: [155, 193, 188] },
+                });
+                finalY = doc.previousAutoTable.finalY;
+            }
         }
 
-        if (options.distressData) {
-            section.samples.sort((a,b) => a.id - b.id).forEach(sample => {
+        if (options.distressData || options.calculationDetails) {
+            // Sort a copy - never mutate the project's own sample array as a side effect.
+            [...section.samples].sort((a, b) => a.id - b.id).forEach(sample => {
                  if (finalY > 240) doc.addPage();
                  const details = sample.calculationDetails;
                  doc.setFontSize(12);
                  doc.setTextColor(29, 35, 42);
-                 doc.text(`${t('sampleCard.title')} #${sample.id} | PCI: ${details?.pci?.toFixed(2) ?? 'N/A'}`, 14, (finalY > 240 ? 20 : finalY + 10));
-                 
-                 const head = [[t('sampleCard.tableDistressType'), t('sampleCard.tableSeverity'), t('sampleCard.tableQuantity'), t('summaryTable.density'), t('summaryTable.deductValue')]];
-                 
-                 let body;
-                 if (details?.summaries && details.summaries.length > 0) {
-                     body = details.summaries.map(s => [
-                         `${s.type}. ${t(s.nameKey)}`,
-                         s.severity,
-                         s.quantity.toFixed(2),
-                         s.density?.toFixed(2) ?? 'N/A',
-                         s.deductValue.toFixed(2)
-                     ]);
-                 } else {
-                     body = [
-                         [{ content: t('results.noDistresses'), colSpan: 5, styles: { halign: 'center' } }]
-                     ];
+                 let sampleLabel = `${t('sampleCard.title')} #${sample.id} | PCI: ${details?.pci?.toFixed(2) ?? 'N/A'}`;
+                 if (sample.isAdditional) {
+                     sampleLabel += ` (${t('sampleCard.additional')})`;
+                 } else if (systematicIds.has(sample.id)) {
+                     sampleLabel += ` (${t('sampleCard.systematicSupplement')})`;
+                 }
+                 doc.text(sampleLabel, 14, (finalY > 240 ? 20 : finalY + 10));
+                 let currentY = (finalY > 240 ? 28 : finalY + 18);
+
+                 if (options.distressData) {
+                     const head = [[t('sampleCard.tableDistressType'), t('sampleCard.tableSeverity'), t('sampleCard.tableQuantity'), t('summaryTable.density'), t('summaryTable.deductValue')]];
+
+                     let body;
+                     if (details?.summaries && details.summaries.length > 0) {
+                         body = details.summaries.map(s => [
+                             `${s.type}. ${t(s.nameKey)}`,
+                             s.severity,
+                             s.quantity.toFixed(2),
+                             s.density?.toFixed(2) ?? 'N/A',
+                             s.deductValue.toFixed(2)
+                         ]);
+                     } else {
+                         body = [
+                             [{ content: t('results.noDistresses'), colSpan: 5, styles: { halign: 'center' } }]
+                         ];
+                     }
+
+                     doc.autoTable({
+                        startY: currentY,
+                        head: head,
+                        body: body,
+                        theme: 'grid',
+                        headStyles: { fillColor: [155, 193, 188] },
+                     });
+                     currentY = doc.previousAutoTable.finalY + 4;
                  }
 
-                 doc.autoTable({
-                    startY: (finalY > 240 ? 28 : finalY + 18),
-                    head: head,
-                    body: body,
-                    theme: 'grid',
-                    headStyles: { fillColor: [155, 193, 188] },
-                 });
-                 finalY = doc.previousAutoTable.finalY;
+                 if (options.calculationDetails && details) {
+                     doc.autoTable({
+                        startY: currentY,
+                        head: [['TDV', 'CDV', 'm', t('calcDetails.step2Title')]],
+                        body: [[
+                            details.totalDeductValue.toFixed(2),
+                            details.cdv.toFixed(2),
+                            details.m.toFixed(2),
+                            details.sortedDeducts.length > 0 ? details.sortedDeducts.map(d => d.toFixed(1)).join(' | ') : t('calcDetails.noDistresses'),
+                        ]],
+                        theme: 'plain',
+                        styles: { fontSize: 9 },
+                        headStyles: { fontStyle: 'bold', textColor: [107, 114, 128] },
+                     });
+                     currentY = doc.previousAutoTable.finalY;
+                 }
+
+                 finalY = currentY;
             });
         }
     });

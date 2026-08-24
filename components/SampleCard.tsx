@@ -11,6 +11,7 @@ interface SampleCardProps {
   sectionWidth: number;
   sectionStartStation: number;
   sectionSampleUnitLength: number;
+  isSystematicSupplement?: boolean;
   onUpdate: (updatedSample: Sample) => void;
   onDelete: (sampleId: number) => void;
 }
@@ -61,7 +62,7 @@ const getSeverityColorClass = (severity: Severity): string => {
   }[severity] || 'bg-gray-400';
 };
 
-export const SampleCard: React.FC<SampleCardProps> = ({ sample, sectionWidth, sectionStartStation, sectionSampleUnitLength, onUpdate, onDelete }) => {
+export const SampleCard: React.FC<SampleCardProps> = ({ sample, sectionWidth, sectionStartStation, sectionSampleUnitLength, isSystematicSupplement, onUpdate, onDelete }) => {
   const { t } = useTranslations();
   const [localQuantities, setLocalQuantities] = useState<Record<string, string>>({});
   
@@ -132,6 +133,14 @@ export const SampleCard: React.FC<SampleCardProps> = ({ sample, sectionWidth, se
                 {sample.isAdditional && (
                     <span className="ml-3 text-xs font-semibold bg-accent text-accent-text px-2 py-1 rounded-full">
                         {t('sampleCard.additional')}
+                    </span>
+                )}
+                {isSystematicSupplement && (
+                    <span
+                        className="ml-3 text-xs font-semibold bg-secondary/20 text-secondary-dark px-2 py-1 rounded-full"
+                        title={t('sampleCard.systematicSupplementHint')}
+                    >
+                        {t('sampleCard.systematicSupplement')}
                     </span>
                 )}
             </h3>
