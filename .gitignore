@@ -35,3 +35,9 @@ server/.env.*
 *.njsproj
 *.sln
 *.sw?
+
+# Agente de IA (Python)
+agent/venv/
+agent/__pycache__/
+*.pyc
+.pytest_cache/
