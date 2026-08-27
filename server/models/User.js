@@ -6,11 +6,13 @@ const UserSchema = new mongoose.Schema({
   email:    { type: String, required: true, unique: true, lowercase: true, trim: true },
   password: { type: String, required: true },
   rol:      { type: String, enum: ['admin', 'user'], default: 'user' },
-
   company:  { type: String, default: '', trim: true },
   jobTitle: { type: String, default: '', trim: true },
   phone: { type: String, default: '' },
   country: { type: String, default: '' },
+  //Recuperación de contrasenas
+  resetPasswordToken: { type: String, default: null },
+  resetPasswordExpires: { type: Date, default: null },
 }, { timestamps: true });
 
 UserSchema.pre('save', async function () {
