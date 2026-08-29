@@ -107,7 +107,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete, onNa
                         </div>
                         <div className="grid md:grid-cols-2 gap-4">
                             <Input label={t('auth.company')} name="company" value={formData.company} onChange={handleInfoChange} />
-                            <Input label={t('auth.role')} name="role" value={formData.jobTitle} onChange={handleInfoChange} />
+                            <Input label={t('auth.role')} name="jobTitle" value={formData.jobTitle} onChange={handleInfoChange} />
                         </div>
                         <div className="grid md:grid-cols-2 gap-4">
                             <Input label={t('auth.country')} name="country" value={formData.country} onChange={handleInfoChange} />

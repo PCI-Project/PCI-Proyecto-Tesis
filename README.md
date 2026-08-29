@@ -63,7 +63,46 @@ npm run dev
 
 Si algo falla, revisa en este orden: el archivo `server/.env`, la URI, el usuario y contraseña de Atlas, la IP autorizada y los caracteres especiales en la contraseña.
 
-## 9. Flujo de trabajo después de la configuración
+## 9. Configuración inicial del agente
+
+1. Entrar a la carpeta del agente:
+
+```bash
+cd agent
+```
+
+2. Crear un entorno virtual propio:
+
+```bash
+python -m venv venv
+```
+
+3. Activar el entorno virtual e instalar las dependencias desde `requirements.txt`.
+
+### En Windows (PowerShell)
+
+```powershell
+.\venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+## Nota importante
+
+Cada colaborador debe tener **Ollama** instalado en su sistema y haber ejecutado previamente:
+
+```bash
+ollama pull llama3.2
+```
+
+## 10. Actualizar `requirements.txt`
+
+Cada vez que se instale una nueva librería de Python con `pip install nombre-libreria`, se recomienda actualizar el archivo `requirements.txt` antes de hacer `git push`.
+
+```bash
+pip freeze > requirements.txt
+```
+
+## 11. Flujo de trabajo después de la configuración
 
 Antes de trabajar, actualiza `main`, crea tu rama y luego sube tus cambios en esa rama. Después abre un Pull Request para revisión.
 
@@ -81,7 +120,7 @@ git commit -m "feat: descripcion del cambio"
 git push origin feature/nombre-de-tu-rama
 ```
 
-## 10. Flujo manual del equipo
+## 12. Flujo manual del equipo
 
 Como el repositorio está en privado y no tiene protección automática de `main`, el equipo debe seguir un acuerdo interno: no hacer push directo a `main`, trabajar siempre en ramas, abrir Pull Request y esperar revisión antes de fusionar cambios.
 

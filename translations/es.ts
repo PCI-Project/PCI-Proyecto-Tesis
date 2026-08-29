@@ -267,7 +267,8 @@ export const es = {
         errorUserExists: "Ya existe una cuenta con este correo electrónico.",
         errorPasswordMatch: "Las contraseñas no coinciden.",
         errorPasswordLength: "La contraseña debe tener al menos 6 caracteres.",
-        errorNameRequired: "El nombre completo es obligatorio."
+        errorNameRequired: "El nombre completo es obligatorio.",
+        acceptTerms: "Al registrarse, acepta nuestros Términos de Servicio y Política de Privacidad.",
     },
     ratingGood: "Bueno",
     ratingSatisfactory: "Satisfactorio",
