@@ -1,7 +1,7 @@
 
 import { Project, Sample, Distress, PavementType, Severity, Section, DistressSummary, PCICalculationDetails } from '../types';
 import { getDistressOptions } from '../constants';
-import { calculatePCIForSample, getSummaries, calculateSectionParameters as calculateParams, calculateSectionPCI, calculateProjectWeightedPCI } from './pci/calculation';
+import { calculatePCIForSample, getSummaries, calculateSectionParameters as calculateParams, calculateSectionPCI, calculateProjectWeightedPCI, getSystematicAdditionalSampleIds } from './pci/calculation';
 
 
 /**
