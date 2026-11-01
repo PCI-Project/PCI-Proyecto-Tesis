@@ -22,7 +22,9 @@ export interface User {
   jobTitle?: string;
 }
 
-const API = axios.create({baseURL: 'http://localhost:5000/api',});
+const API = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'https://pci-backend-mqoc.onrender.com/api',
+});
 
 // Adjunta automáticamente el token a cada petición
 API.interceptors.request.use((config) => {

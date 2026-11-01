@@ -13,7 +13,15 @@ dotenv.config();
 connectDB();
 
 const app = express();
-app.use(cors({ origin: ['http://localhost:3000', 'http://192.168.56.1:3000' , 'http://192.168.0.10:3000 , https://pci-687s.onrender.com'] })); // URL de tu frontend Vite
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://192.168.56.1:3000',
+    'http://192.168.0.10:3000',
+    'https://pci-project.github.io',
+    'https://pci-687s.onrender.com'
+  ]
+})); // URLs permitidas para el frontend (local, red y GitHub Pages)
 app.use(express.json());
 
 app.use('/api/auth', Authroute);

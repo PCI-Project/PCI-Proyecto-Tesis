@@ -18,7 +18,9 @@ import { CurvesSettingsView } from './components/CurvesSettingsView';
 
 //hola//
 //const API = axios.create({ baseURL: 'http://localhost:5000/api' });//
-const API = axios.create({ baseURL: 'https://pci-backend-mqoc.onrender.com/api' });
+const API = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'https://pci-backend-mqoc.onrender.com/api',
+});
 
 // Interceptor: adjunta el token automáticamente a cada petición
 API.interceptors.request.use((config) => {
