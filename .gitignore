@@ -1,0 +1,43 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencias y build
+node_modules/
+server/node_modules/
+dist/
+dist-ssr/
+build/
+coverage/
+
+# Archivos locales
+*.local
+
+# Variables de entorno
+.env
+.env.*
+server/.env
+server/.env.*
+!server/.env.example
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Agente de IA (Python)
+agent/venv/
+agent/__pycache__/
+*.pyc
+.pytest_cache/

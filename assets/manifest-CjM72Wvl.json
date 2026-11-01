@@ -1,0 +1,21 @@
+{
+  "name": "AsphaltPCI Pro",
+  "short_name": "PCI Pro",
+  "description": "Una aplicación web completa para aplicar la norma ASTM D6433.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#E6EBE0",
+  "theme_color": "#36C9C6",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

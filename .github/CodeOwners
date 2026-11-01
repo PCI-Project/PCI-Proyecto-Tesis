@@ -1,0 +1,4 @@
+* @PCI-Project/maintainers
+src/ @PCI-Project/frontend
+server/ @PCI-Project/backend
+.github/ @PCI-Project/maintainers
