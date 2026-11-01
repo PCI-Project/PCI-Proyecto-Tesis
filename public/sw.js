@@ -1,9 +1,9 @@
 const CACHE_NAME = 'asphalt-pci-pro-cache-v1';
 const URLS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/init.js',
-  '/manifest.json'
+  './',
+  './index.html',
+  './init.js',
+  './manifest.json'
   // The index.tsx and CDN dependencies will be fetched by the browser when it loads index.html
   // and are best handled by the standard HTTP cache.
 ];
