@@ -11,6 +11,11 @@ on:
       - main
       - develop
 
+# Evita que se solapen ejecuciones del mismo branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   frontend:
     runs-on: ubuntu-latest
