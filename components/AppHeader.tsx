@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Project, AppView, ProjectView } from '../types';
 import { useTranslations } from '../hooks/useTranslations';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { useAuth } from '../contexts/AuthContext';
 import { ThemeSwitcher } from './ui/ThemeSwitcher';
 import { Avatar } from './ui/Avatar';
+import { Logo } from './ui/Logo';
 
 // Icons
 const HamburgerIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>);
@@ -40,6 +41,37 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ project, currentView, onNa
     const { user, logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [installPrompt, setInstallPrompt] = useState<Event | null>(null);
+    const headerRef = useRef<HTMLElement>(null);
+    const [isHidden, setIsHidden] = useState(false);
+    const [headerHeight, setHeaderHeight] = useState(0);
+
+    // El contenido se desplaza dentro de <main>: se oculta el encabezado al bajar y se muestra al subir.
+    useEffect(() => {
+        let lastTop = 0;
+        let lockedUntil = 0;
+        const onScroll = (event: Event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement) || target.tagName !== 'MAIN') return;
+            const top = target.scrollTop;
+            const delta = top - lastTop;
+            lastTop = top;
+            if (top <= 10) { setIsHidden(false); return; }
+            const now = performance.now();
+            if (now < lockedUntil) return; // evita rebotes mientras el contenido se reacomoda
+            if (delta > 6 && top > 80) {
+                setHeaderHeight(headerRef.current?.offsetHeight ?? 65);
+                setIsHidden(true);
+                lockedUntil = now + 400;
+            } else if (delta < -6) {
+                setIsHidden(false);
+                lockedUntil = now + 400;
+            }
+        };
+        window.addEventListener('scroll', onScroll, true);
+        return () => window.removeEventListener('scroll', onScroll, true);
+    }, []);
+
+    useEffect(() => { setIsHidden(false); }, [currentView, project?.id]);
 
     useEffect(() => {
         const handleBeforeInstallPrompt = (e: Event) => {
@@ -95,7 +127,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ project, currentView, onNa
                                    )
                                })}
                            </div>
-                        </div>
+                       </div>
                     )}
 
                     <div className="border-t border-border-muted pt-6 space-y-4">
@@ -125,15 +157,17 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ project, currentView, onNa
     );
 
     return (
-        <header className="sticky top-0 bg-bg-surface border-b border-border-base z-30 shadow-sm">
+        <header ref={headerRef} style={{ marginTop: isHidden ? -headerHeight : 0 }} className="relative bg-bg-surface border-b border-border-base z-30 shadow-sm transition-[margin-top] duration-300 ease-in-out">
             <div className="container mx-auto px-4 sm:px-6 md:px-8">
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center gap-4">
                         <button onClick={() => setIsMenuOpen(true)} className="p-2 text-text-base" aria-label={t('header.openMenu')}>
                             <HamburgerIcon />
                         </button>
-                        <button onClick={onGoHome} className="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity">
-                            <h1 className="text-xl font-bold">AsphaltPCI Pro</h1>
+                        <button onClick={onGoHome} className="flex items-center text-primary hover:opacity-80 transition-opacity" aria-label="AsphaltPCI Pro">
+                            <h1 className="sr-only">AsphaltPCI Pro</h1>
+                            <Logo variant="horizontal" height={42} className="hidden min-[360px]:block" />
+                            <Logo variant="emblema" height={40} className="block min-[360px]:hidden" />
                         </button>
                     </div>
 

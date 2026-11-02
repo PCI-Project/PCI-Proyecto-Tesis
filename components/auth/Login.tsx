@@ -13,13 +13,19 @@ const LoadingSpinner: React.FC = () => (
 
 export const Login: React.FC = () => {
     const { t } = useTranslations();
-    const { login, isLoading, error } = useAuth();
+    const { login, requestPasswordReset, isLoading, error } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         await login(email, password);
+    };
+
+    const handleForgotPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        await requestPasswordReset(email);
+        alert(t('auth.sentTitle'));
     };
 
     return (
@@ -48,6 +54,11 @@ export const Login: React.FC = () => {
              <Button variant="primary" type="submit" className="w-full flex justify-center !text-lg !font-bold" disabled={isLoading}>
                 {isLoading ? <LoadingSpinner /> : t('auth.loginButton')}
             </Button>
+            <div className="text-center">
+                <button type="button" onClick={handleForgotPassword} className="text-sm font-semibold text-primary hover:text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed" disabled={isLoading}>
+                    {t('auth.forgotPassword')}
+                </button>
+            </div>
         </form>
     );
 };

@@ -201,7 +201,7 @@ export const App: React.FC = () => {
       const needsDetailsCalc = targetView === 'CALCULATION_DETAILS' && !project.sections.some(s => s.samples.some(smp => smp.calculationDetails));
       const needsResultsCalc = targetView === 'RESULTS' && project.weightedPCI === undefined;
 
-      // Si la vista de destino requiere cálculos que faltan, ejecútalos ahora.
+      // Si la vista de destino requiere cálculos que faltan, execútalos ahora.
       // Esto maneja la recarga de un proyecto que fue cerrado en una página de resultados.
       if (needsDetailsCalc || needsResultsCalc) {
         projectToLoad = calculateProjectPCI(project);

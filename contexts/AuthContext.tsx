@@ -56,6 +56,9 @@ interface AuthContextType {
         newPass: string
     ) => Promise<boolean>;
     deleteAccount: (userId: string) => Promise<boolean>;
+    resetPassword: (email: string, code: string, newPass: string) => Promise<boolean>;
+    requestPasswordReset: (email: string) => Promise<{ emailDelivery: boolean }>;
+    generateRecoveryCode: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -230,6 +233,36 @@ export const AuthProvider: React.FC<{children: ReactNode;}> = ({ children }) => 
                 }
         }, [logout, t]);
 
+    const resetPassword = useCallback(async (email: string, code: string, newPass: string): Promise<boolean> => {
+        setError(null);
+        try {
+            const { data } = await API.post<{ recoveryCode: string }>('/auth/reset-password', { email, code, newPassword: newPass });
+            return true;
+        } catch (err: any) {
+            setError(err.response?.data?.message || t('auth.resetError'));
+            return false;
+        }
+    }, [t]);
+
+    const requestPasswordReset = useCallback(async (email: string): Promise<{ emailDelivery: boolean }> => {
+        try {
+            const { data } = await API.post<{ emailDelivery: boolean }>('/auth/forgot-password', { email });
+            return { emailDelivery: Boolean(data.emailDelivery) };
+        } catch {
+            return { emailDelivery: false };
+        }
+    }, []);
+
+    const generateRecoveryCode = useCallback(async (): Promise<boolean> => {
+        try {
+            const { data } = await API.post<{ recoveryCode: string }>('/auth/recovery-code');
+            return true;
+        } catch (err: any) {
+            setError(err.response?.data?.message || t('auth.resetError'));
+            return false;
+        }
+    }, [t]);
+
     const value = useMemo(() => ({
         user,
         isLoading,
@@ -239,7 +272,10 @@ export const AuthProvider: React.FC<{children: ReactNode;}> = ({ children }) => 
         logout,
         updateUser,
         changePassword,
-        deleteAccount}),
+        deleteAccount,
+        resetPassword,
+        requestPasswordReset,
+        generateRecoveryCode}),
         [
         user,
         isLoading,
@@ -250,6 +286,9 @@ export const AuthProvider: React.FC<{children: ReactNode;}> = ({ children }) => 
         updateUser,
         changePassword,
         deleteAccount,
+        resetPassword,
+        requestPasswordReset,
+        generateRecoveryCode,
         ]
     );
     return (

@@ -83,6 +83,25 @@ export interface Sample {
   calculationDetails?: PCICalculationDetails;
 }
 
+export type LngLatTuple = [number, number];
+export type GeodeticDatum = 'WGS84' | 'NAD27';
+
+export interface RouteLocation {
+  coordinateType: 'GEOGRAPHIC' | 'UTM';
+  datum: GeodeticDatum;
+  utmZone: number;
+  hemisphere: 'N' | 'S';
+  startPoint: LngLatTuple;
+  endPoint: LngLatTuple;
+  intermediatePoints: LngLatTuple[];
+  snappedWaypoints: LngLatTuple[];
+  routeCoordinates: LngLatTuple[];
+  routingDistance: number;
+  engineeringLength: number;
+  startName?: string;
+  endName?: string;
+}
+
 export interface Section {
   id: string;
   name: string;
@@ -106,6 +125,8 @@ export interface Section {
   samples: Sample[];
   pci?: number;
   actualStdDev?: number;
+  location?: string;
+  routeLocation?: RouteLocation;
   revisedSampleUnits?: number;
   missingSamples?: number;
   samplesSufficient?: boolean;

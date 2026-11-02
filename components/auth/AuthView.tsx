@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card } from '../ui/Card';
+import { Logo } from '../ui/Logo';
 import { Login } from './Login';
 import { SignUp } from './SignUp';
 import { useTranslations } from '../../hooks/useTranslations';
@@ -29,14 +30,14 @@ export const AuthView: React.FC = () => {
                 <div className={`grid md:grid-cols-2 bg-bg-surface shadow-xl rounded-2xl overflow-hidden border border-border-muted transition-all duration-300`}>
                     {/* Left Panel: Branding */}
                     <div className="hidden md:flex flex-col items-center justify-center bg-primary p-12 text-center text-text-inverted">
-                        <h1 className="text-5xl font-bold">AsphaltPCI Pro</h1>
+                        <Logo variant="emblema" height={80} className="mb-4" />
                         <p className="mt-4 text-lg text-white/80">{t('auth.welcome')}</p>
                     </div>
 
                     {/* Right Panel: Form */}
                     <div className="p-6 sm:p-10 flex flex-col justify-center">
                         <div className="md:hidden text-center mb-8">
-                            <h1 className="text-4xl font-bold text-primary">AsphaltPCI Pro</h1>
+                            <Logo variant="emblema" height={64} className="mx-auto mb-2" />
                         </div>
                         <h2 className="text-2xl font-bold text-center text-text-base mb-6">
                             {view === 'login' ? t('auth.loginTitle') : t('auth.signupTitle')}
