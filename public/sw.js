@@ -1,18 +1,18 @@
 const CACHE_NAME = 'asphalt-pci-pro-cache-v2';
 const URLS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/init.js',
-  '/manifest.json',
-  '/brand/emblema-positivo.svg',
-  '/brand/emblema-negativo.svg',
-  '/brand/emblema-sobre-turquesa.svg',
-  '/brand/horizontal-positivo.svg',
-  '/brand/horizontal-negativo.svg',
-  '/brand/icono-app.svg',
-  '/icon-192.png',
-  '/icon-512.png',
-  '/icon-maskable-512.png'
+  './',
+  './index.html',
+  './init.js',
+  './manifest.json',
+  './brand/emblema-positivo.svg',
+  './brand/emblema-negativo.svg',
+  './brand/emblema-sobre-turquesa.svg',
+  './brand/horizontal-positivo.svg',
+  './brand/horizontal-negativo.svg',
+  './brand/icono-app.svg',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-512.png'
   // The index.tsx and CDN dependencies will be fetched by the browser when it loads index.html
   // and are best handled by the standard HTTP cache.
 ];
