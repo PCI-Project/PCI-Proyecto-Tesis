@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AsphaltPCI Pro</title>
     <link rel="manifest" href="/PCI-Proyecto-Tesis/manifest.json" />
-    <meta name="theme-color" content="#E6EBE0" />
+    <link rel="icon" type="image/svg+xml" href="/PCI-Proyecto-Tesis/brand/icono-app.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/PCI-Proyecto-Tesis/icon-192.png" />
+    <link rel="apple-touch-icon" href="/PCI-Proyecto-Tesis/icon-192.png" />
+    <meta name="theme-color" content="#36C8C8" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -13,109 +16,7 @@
       rel="stylesheet"
     />
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      :root {
-        /* New 5-color palette */
-        --color-primary: 54 200 200; /* #36C8C8 Teal */
-        --color-primary-dark: 40 150 150; /* Darker Teal */
-
-        --color-secondary: 155 193 188; /* #9BC1BC Opal */
-        --color-secondary-dark: 120 150 145;
-
-        --color-accent: 244 241 187; /* #F4F1BB Pale Spring Bud */
-        --color-accent-text: 80 75 30;
-
-        --color-danger: 237 106 90; /* #ED6A5A Terra Cotta */
-        --color-danger-dark: 190 80 70;
-
-        --color-bg-base: 230 235 224; /* #E6EBE0 Alabaster */
-        --color-bg-surface: 247 249 244; /* Lighter off-white */
-
-        --color-text-base: 29 35 42;
-        --color-text-muted: 107 114 128;
-        --color-text-inverted: 255 255 255;
-
-        --color-border-base: 209 213 219;
-        --color-border-muted: 229 231 235;
-      }
-      .dark:root {
-        --color-primary: 54 200 200;
-        --color-primary-dark: 40 150 150;
-
-        --color-secondary: 120 160 155;
-        --color-secondary-dark: 100 130 125;
-
-        --color-accent: 244 241 187;
-        --color-accent-text: 80 75 30;
-
-        --color-danger: 239 120 100;
-        --color-danger-dark: 200 90 80;
-
-        --color-bg-base: 20 24 30;
-        --color-bg-surface: 30 36 44;
-
-        --color-text-base: 230 235 224;
-        --color-text-muted: 156 163 175;
-        --color-text-inverted: 20 24 30;
-
-        --color-border-base: 48 56 68;
-        --color-border-muted: 60 70 82;
-      }
-      body {
-        font-family: "Inter", sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-      .font-mono {
-        font-family: "IBM Plex Mono", monospace;
-      }
-      /* Custom modal animation */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-      @keyframes scaleIn {
-        from {
-          transform: scale(0.95);
-          opacity: 0;
-        }
-        to {
-          transform: scale(1);
-          opacity: 1;
-        }
-      }
-      .modal-enter {
-        animation: fadeIn 0.3s ease-out forwards;
-      }
-      .modal-content-enter {
-        animation: scaleIn 0.3s ease-out forwards;
-      }
-      @keyframes simpleFadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(-5px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      .animate-simple-fade-in {
-        animation: simpleFadeIn 0.3s ease-out forwards;
-      }
-      /* Hide scrollbar for clean mobile look */
-      .no-scrollbar::-webkit-scrollbar {
-        display: none;
-      }
-      .no-scrollbar {
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
-      }
-    </style>
+    <style>:root{--color-primary:54 200 200;--color-primary-dark:40 150 150;--color-secondary:155 193 188;--color-secondary-dark:120 150 145;--color-accent:244 241 187;--color-accent-text:80 75 30;--color-danger:237 106 90;--color-danger-dark:190 80 70;--color-bg-base:230 235 224;--color-bg-surface:247 249 244;--color-text-base:29 35 42;--color-text-muted:107 114 128;--color-text-inverted:255 255 255;--color-border-base:209 213 219;--color-border-muted:229 231 235}.dark:root{--color-primary:54 200 200;--color-primary-dark:40 150 150;--color-secondary:120 160 155;--color-secondary-dark:100 130 125;--color-accent:244 241 187;--color-accent-text:80 75 30;--color-danger:239 120 100;--color-danger-dark:200 90 80;--color-bg-base:20 24 30;--color-bg-surface:30 36 44;--color-text-base:230 235 224;--color-text-muted:156 163 175;--color-text-inverted:20 24 30;--color-border-base:48 56 68;--color-border-muted:60 70 82}body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:Inter,sans-serif}.font-mono{font-family:IBM Plex Mono,monospace}@keyframes fadeIn{0%{opacity:0}to{opacity:1}}@keyframes scaleIn{0%{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}.modal-enter{animation:.3s ease-out forwards fadeIn}.modal-content-enter{animation:.3s ease-out forwards scaleIn}@keyframes simpleFadeIn{0%{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}.animate-simple-fade-in{animation:.3s ease-out forwards simpleFadeIn}.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}</style>
     <script>
       tailwind.config = {
         theme: {
@@ -146,7 +47,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script type="importmap">
       {
         "imports": {
@@ -156,10 +57,11 @@
         }
       }
     </script>
-    <script type="module" crossorigin src="/PCI-Proyecto-Tesis/assets/index-CPTkJbx5.js"></script>
-  </head>
+  <script type="module" crossorigin src="/PCI-Proyecto-Tesis/assets/index-cYuSsQTk.js"></script>
+  <link rel="stylesheet" crossorigin href="/PCI-Proyecto-Tesis/assets/index-qvkd0SPb.css">
+</head>
   <body class="bg-bg-base">
     <div id="root"></div>
-    <script src="/PCI-Proyecto-Tesis/init.js"></script>
+    <script type="module" src="/PCI-Proyecto-Tesis/init.js"></script>
   </body>
 </html>
