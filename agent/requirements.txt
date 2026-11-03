@@ -30,7 +30,7 @@ langgraph-checkpoint==4.2.0
 langgraph-prebuilt==1.1.0
 langgraph-sdk==0.4.3
 langsmith==0.11.1
-multidict==6.7.1
+multidict==6.9.1
 numpy==2.5.2
 ollama==0.6.2
 orjson==3.12.0
