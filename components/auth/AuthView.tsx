@@ -3,11 +3,12 @@ import { Card } from '../ui/Card';
 import { Logo } from '../ui/Logo';
 import { Login } from './Login';
 import { SignUp } from './SignUp';
+import { ForgotPassword } from './ForgotPassword';
 import { useTranslations } from '../../hooks/useTranslations';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import { ThemeSwitcher } from '../ui/ThemeSwitcher';
 
-type View = 'login' | 'signup';
+type View = 'login' | 'signup' | 'forgot';
 
 export const AuthView: React.FC = () => {
     const { t } = useTranslations();
@@ -16,11 +17,22 @@ export const AuthView: React.FC = () => {
     const toggleView = () => {
         setView(v => v === 'login' ? 'signup' : 'login');
     }
-    
+
+    const goToForgot = () => {
+        setView('forgot');
+    }
+
+    const goBackToLogin = () => {
+        setView('login');
+    }
+
     const renderAuthContent = () => {
-        if (view === 'login') return <Login />;
+        if (view === 'login') return <Login onForgotPassword={goToForgot} />;
         if (view === 'signup') {
             return <SignUp />;
+        }
+        if (view === 'forgot') {
+            return <ForgotPassword onBack={goBackToLogin} />;
         }
     }
 
@@ -40,15 +52,17 @@ export const AuthView: React.FC = () => {
                             <Logo variant="emblema" height={64} className="mx-auto mb-2" />
                         </div>
                         <h2 className="text-2xl font-bold text-center text-text-base mb-6">
-                            {view === 'login' ? t('auth.loginTitle') : t('auth.signupTitle')}
+                            {view === 'login' ? t('auth.loginTitle') : view === 'signup' ? t('auth.signupTitle') : t('auth.forgotTitle')}
                         </h2>
                         
                         {renderAuthContent()}
                         
                         <div className="mt-6 text-center">
-                            <button onClick={toggleView} className="text-sm font-semibold text-text-muted hover:text-primary hover:underline">
-                                {view === 'login' ? t('auth.switchToSignup') : t('auth.switchToLogin')}
-                            </button>
+                            {view !== 'forgot' && (
+                                <button onClick={toggleView} className="text-sm font-semibold text-text-muted hover:text-primary hover:underline">
+                                    {view === 'login' ? t('auth.switchToSignup') : t('auth.switchToLogin')}
+                                </button>
+                            )}
                         </div>
 
                         <div className="mt-8 flex justify-center items-center gap-4">
