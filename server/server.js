@@ -37,9 +37,6 @@ app.use(cors({
 })); // URLs permitidas para el frontend (local, red y GitHub Pages)
 app.use(express.json());
 
-// Manejo explícito de preflight OPTIONS para CORS
-app.options('*', cors());
-
 app.use('/api/auth', Authroute);
 app.use('/api/projects', Projectroute);
 
