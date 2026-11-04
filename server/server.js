@@ -19,6 +19,9 @@ app.use(cors({
     'http://192.168.56.1:3000',
     'http://192.168.0.10:3000',
     'http://www.asphaltpcipro.company/',
+    'https://pci-project.github.io',
+    'http://asphaltpcipro.com',
+    
     'https://pci-687s.onrender.com'
   ]
 })); // URLs permitidas para el frontend (local, red y GitHub Pages)
