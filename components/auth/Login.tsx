@@ -11,11 +11,7 @@ const LoadingSpinner: React.FC = () => (
   </svg>
 );
 
-interface LoginProps {
-    onForgotPassword: () => void;
-}
-
-export const Login: React.FC<LoginProps> = ({ onForgotPassword }) => {
+export const Login: React.FC<{ onForgot?: () => void }> = ({ onForgot }) => {
     const { t } = useTranslations();
     const { login, isLoading, error } = useAuth();
     const [email, setEmail] = useState('');
@@ -48,15 +44,15 @@ export const Login: React.FC<LoginProps> = ({ onForgotPassword }) => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
             />
+            {onForgot && (
+                <div className="-mt-3 text-right">
+                    <button type="button" onClick={onForgot} className="text-sm font-semibold text-primary hover:underline">{t('auth.forgotPassword')}</button>
+                </div>
+            )}
             {error && <p className="text-sm text-danger text-center">{error}</p>}
              <Button variant="primary" type="submit" className="w-full flex justify-center !text-lg !font-bold" disabled={isLoading}>
                 {isLoading ? <LoadingSpinner /> : t('auth.loginButton')}
             </Button>
-            <div className="text-center">
-                <button type="button" onClick={onForgotPassword} className="text-sm font-semibold text-primary hover:text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed" disabled={isLoading}>
-                    {t('auth.forgotPassword')}
-                </button>
-            </div>
         </form>
     );
 };
