@@ -16,16 +16,28 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:3000',
+    'http://localhost:3500',
     'http://192.168.56.1:3000',
     'http://192.168.0.10:3000',
-    'http://www.asphaltpcipro.company/',
+    'https://asphaltpcipro.company',
+    'https://www.asphaltpcipro.company',
     'https://pci-project.github.io',
-    'http://asphaltpcipro.com',
-    
     'https://pci-687s.onrender.com'
-  ]
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin'
+  ],
 })); // URLs permitidas para el frontend (local, red y GitHub Pages)
 app.use(express.json());
+
+// Manejo explícito de preflight OPTIONS para CORS
+app.options('*', cors());
 
 app.use('/api/auth', Authroute);
 app.use('/api/projects', Projectroute);
