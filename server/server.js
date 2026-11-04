@@ -22,7 +22,8 @@ app.use(cors({
     'https://asphaltpcipro.company',
     'https://www.asphaltpcipro.company',
     'https://pci-project.github.io',
-    'https://pci-687s.onrender.com'
+    'https://pci-687s.onrender.com',
+    'https://pci-backend-mqoc.onrender.com'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
