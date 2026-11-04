@@ -15,14 +15,14 @@ connectDB();
 const app = express();
 app.use(cors({
   origin: [
-    'http://localhost:3000',
-    'http://localhost:3500',
-    'http://192.168.56.1:3000',
-    'http://192.168.0.10:3000',
+    //'http://localhost:3000',
+    //'http://localhost:3500',
+    //'http://192.168.56.1:3000',
+    //'http://192.168.0.10:3000',
     'https://asphaltpcipro.company',
     'https://www.asphaltpcipro.company',
     'https://pci-project.github.io',
-    'https://pci-687s.onrender.com',
+    //'https://pci-687s.onrender.com',
     'https://pci-backend-mqoc.onrender.com'
   ],
   credentials: true,
