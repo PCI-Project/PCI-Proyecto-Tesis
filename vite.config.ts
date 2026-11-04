@@ -37,7 +37,7 @@ export default defineConfig(() => {
       // MapLibre 6 carga su worker (maplibre-gl-worker.mjs) junto al módulo principal; el optimizador de
       // dependencias de Vite no lo copia y en desarrollo el mapa queda sin teselas ni geometrías.
       optimizeDeps: { exclude: ['maplibre-gl'] },
-      base: 'asphaltpcipro.company',
+      base: '/asphaltpcipro.company/',
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
