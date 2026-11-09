@@ -108,17 +108,7 @@ export const RecommendationsView: React.FC<{ project: Project }> = ({
   const { t } = useTranslations();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [recommendations, setRecommendations] = useState<Array<{
-    section: Section;
-    recommendation: {
-      tratamiento_recomendado: string;
-      costo_estimado: number;
-      beneficio_costo: number;
-      prioridad: 'alta' | 'media' | 'baja';
-      alerta_suficiencia_estadistica: boolean;
-      observaciones: string;
-    };
-  }>>([]);
+  const [recommendations, setRecommendations] = useState<RecommendationCardProps[]>([]);
   const [serviceStatus, setServiceStatus] = useState<{ status: string; version: string } | null>(null);
 
   // Verificar estado del servicio al montar
@@ -148,17 +138,23 @@ export const RecommendationsView: React.FC<{ project: Project }> = ({
       getRecommendations(project)
         .then((response) => {
           if (!ignored && response.success) {
-            const recs = response.recommendations.map(rec => ({
-              section: project.sections.find(s => s.id === rec.sectionId) || rec.section,
-              recommendation: {
-                tratamientoRecomendado: rec.tratamientoRecomendado,
-                costoEstimado: rec.costoEstimado,
-                beneficioCosto: rec.beneficioCosto,
-                prioridad: rec.prioridad,
-                alertaSuficienciaEstadistica: rec.alertaSuficienciaEstadistica ?? false,
-                observaciones: rec.observaciones ?? ''
-              }
-            }));
+            const recs: RecommendationCardProps[] = response.recommendations
+              .map(rec => {
+                const section = project.sections.find(s => s.id === rec.sectionId);
+                if (!section) return null;
+                return {
+                  section,
+                  recommendation: {
+                    tratamientoRecomendado: rec.tratamientoRecomendado,
+                    costoEstimado: rec.costoEstimado,
+                    beneficioCosto: rec.beneficioCosto,
+                    prioridad: rec.prioridad,
+                    alertaSuficienciaEstadistica: rec.alertaSuficienciaEstadistica ?? false,
+                    observaciones: rec.observaciones ?? ''
+                  }
+                };
+              })
+              .filter((item): item is RecommendationCardProps => item !== null);
             setRecommendations(recs);
           }
         })
