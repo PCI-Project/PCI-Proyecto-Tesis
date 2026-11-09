@@ -9,6 +9,22 @@ export const zh = {
         profile: "个人资料",
         dashboard: "仪表板"
     },
+    recommendations: {
+        viewRecommendations: "查看推荐",
+        tratamiento: "处理",
+        costo: "费用",
+        beneficio_costo: "效益/成本",
+        prioridad: "优先级",
+        observaciones: "观察",
+    },
+    rating: {
+        excelente: "优秀",
+        muy_bueno: "Muy Bueno",
+        bueno: "Bueno",
+        regular: "Regular",
+        malo: "Malo",
+        muy_malo: "Muy Malo"
+    },
     dashboard: {
       title: "AsphaltPCI Pro",
       subtitle: "项目仪表板",

@@ -1,4 +1,4 @@
-export type ProjectView = 'SETUP' | 'DATA_ENTRY' | 'CALCULATION_DETAILS' | 'RESULTS';
+export type ProjectView = 'SETUP' | 'DATA_ENTRY' | 'CALCULATION_DETAILS' | 'RESULTS' | 'RECOMMENDATIONS';
 export type AppView = 'DASHBOARD' | ProjectView | 'PROFILE' | 'ADMIN_SETTINGS';
 
 export enum PavementType {

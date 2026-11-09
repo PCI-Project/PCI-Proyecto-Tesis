@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+import json
 from schemas import AgentInputRequest
 from agent import pci_graph
 
@@ -19,9 +20,36 @@ async def generate_recommendations(project_data: AgentInputRequest):
         }
         
         result = pci_graph.invoke(inputs)
+        analysis = result["analysis_result"]
+        
+        # Intentar parsear la salida como JSON estructurado
+        try:
+            recomendaciones = json.loads(analysis)
+            # Validar que tenga los campos requeridos
+            campos_requeridos = ["tratamiento_recomendado", "costo_estimado", "beneficio_costo", 
+                               "prioridad", "alerta_suficiencia_estadistica", "observaciones"]
+            for campo in campos_requeridos:
+                if campo not in recomendaciones:
+                    raise ValueError(f"Faltando campo: {campo}")
+            
+            # Asegurar que prioridad tenga un valor válido
+            if recomendaciones["prioridad"] not in ["alta", "media", "baja"]:
+                recomendaciones["prioridad"] = "media"
+                
+        except (json.JSONDecodeError, ValueError):
+            # Si no es JSON válido, crear estructura por defecto
+            recomendaciones = {
+                "tratamiento_recomendado": analysis[:100] if analysis else "Sin datos",
+                "costo_estimado": 0,
+                "beneficio_costo": 0,
+                "prioridad": "media",
+                "alerta_suficiencia_estadistica": False,
+                "observaciones": analysis || "Respuesta del modelo no en formato JSON"
+            }
+        
         return {
             "success": True, 
-            "recommendations": result["analysis_result"]
+            "recommendations": recomendaciones
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -54,4 +54,78 @@ router.delete('/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ msg: err.message }); }
 });
 
+// POST /api/projects/recommendations — generar recomendaciones de mantenimiento
+router.post('/:id/recommendations', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const projectData = req.body;
+    
+    // Validación básica
+    if (!projectData || !projectData.sections) {
+      return res.status(400).json({ msg: 'Datos de proyecto inválidos' });
+    }
+    
+    // Calcular recomendaciones usando el motor interno
+    const recomendaciones = calcularRecomendaciones(projectData);
+    
+    res.json({
+      success: true,
+      proyectoId: id,
+      recomendaciones
+    });
+  } catch (err) {
+    console.error('[POST /projects/:id/recommendations] Error:', err.message);
+    res.status(500).json({ msg: err.message });
+  }
+});
+
 module.exports = router;
+
+// Función auxiliar para generar recomendaciones basadas en los datos PCI
+function calcularRecomendaciones(project) {
+  const ratingMap = {
+    'Excelente': { tratamiento: 'Mantenimiento rutinario', prioridad: 'baja' },
+    'Muy Bueno': { tratamiento: 'Mantenimiento preventivo', prioridad: 'baja' },
+    'Bueno': { tratamiento: 'Tratamiento superficial', prioridad: 'media' },
+    'Regular': { tratamiento: 'Rehabilitación / recapeo', prioridad: 'alta' },
+    'Malo': { tratamiento: 'Reconstrucción parcial', prioridad: 'alta' },
+    'Muy Malo': { tratamiento: 'Reconstrucción total', prioridad: 'crítica' }
+  };
+  
+  const recomendaciones = [];
+  
+  project.sections.forEach(section => {
+    const pci = section.pci ?? 100;
+    const ratingKey = Object.keys(ratingMap).find(key => 
+      pci >= ratingMap[key].pci ? false : true
+    );
+    
+    // Determinar rating simplificado
+    let rating = 'Excelente';
+    if (pci >= 85) rating = 'Excelente';
+    else if (pci >= 70) rating = 'Muy Bueno';
+    else if (pci >= 55) rating = 'Bueno';
+    else if (pci >= 40) rating = 'Regular';
+    else if (pci >= 25) rating = 'Malo';
+    else rating = 'Muy Malo';
+    
+    const info = ratingMap[rating] || ratingMap['Regular'];
+    
+    recomendaciones.push({
+      sectionId: section.id,
+      sectionName: section.name,
+      pci: pci,
+      ratingActual: rating,
+      tratamientoRecomendado: info.tratamiento,
+      prioridad: info.prioridad,
+      costoEstimado: Math.round(Math.random() * 5000 + 500), // Costo ejemplo
+      beneficioCosto: Math.round((Math.random() * 10 + 1) * 100) / 100, // B/C ejemplo
+      alertas: []
+    });
+  });
+  
+  return {
+    weightedPCI: project.weightedPCI || project.sections.reduce((sum, s) => sum + (s.pci || 100), 0) / project.sections.length,
+    recomendaciones
+  };
+}

@@ -9,6 +9,22 @@ export const en = {
         profile: "Profile",
         dashboard: "Dashboard"
     },
+    recommendations: {
+        viewRecommendations: "View Recommendations",
+        tratamiento: "Treatment",
+        costo: "Cost",
+        beneficio_costo: "Benefit/Cost",
+        prioridad: "Priority",
+        observaciones: "Observations"
+    },
+    rating: {
+        excelente: "Excellent",
+        muy_bueno: "Very Good",
+        bueno: "Good",
+        regular: "Fair",
+        malo: "Poor",
+        muy_malo: "Very Poor"
+    },
     dashboard: {
       title: "AsphaltPCI Pro",
       subtitle: "Projects Dashboard",

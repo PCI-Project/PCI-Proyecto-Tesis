@@ -15,9 +15,8 @@ import { AuthView } from './components/auth/AuthView';
 import { DataEntryView } from './components/DataEntryView';
 import { ProfileView } from './components/ProfileView';
 import { CurvesSettingsView } from './components/CurvesSettingsView';
+import { RecommendationsView } from './components/RecommendationsView';
 
-//hola//
-//const API = axios.create({ baseURL: 'http://localhost:5000/api' });//
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'https://pci-backend-mqoc.onrender.com/api',
 });
@@ -188,6 +187,23 @@ export const App: React.FC = () => {
       setProjects(prev => prev.filter(p => String(p._id || p.id) !== projectKey));
     } finally {
       savingProjectIdRef.current = null;
+      
+      // Generar recomendaciones automáticamente después de guardar el proyecto
+      if (projectToSave.sections && projectToSave.sections.length > 0) {
+        try {
+          console.log('[saveProjectToStorage] Generando recomendaciones automáticas...');
+          // Llamada al backend para obtener recomendaciones
+          const { data } = await API.post(`/projects/${projectToSave._id || projectToSave.id}/recommendations`, projectToSave);
+          if (data.success) {
+            console.log('[saveProjectToStorage] Recomendaciones generadas:', data.recomendaciones.length, 'secciones');
+            // Aquí podríamos almacenar las recomendaciones o navegar a la vista
+            // Por ahora, solo registramos en consola
+          }
+        } catch (recError) {
+          // No fallar el guardado si el agente falla
+          console.error('[saveProjectToStorage] Error generando recomendaciones:', recError);
+        }
+      }
     }
   };
 
@@ -682,8 +698,11 @@ export const App: React.FC = () => {
           <ResultsDisplay
             project={selectedProject}
             onEvaluateAdditionalSamples={handleEvaluateAdditional}
+            setCurrentView={setCurrentView}
           />
         );
+      case 'RECOMMENDATIONS':
+        return <RecommendationsView project={selectedProject} />;
       default:
         return <div>{t('app.unknownView')}</div>;
     }
