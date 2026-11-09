@@ -21,11 +21,11 @@ const InfoIcon: React.FC<{ className?: string }> = ({ className }) => (
 export interface RecommendationCardProps {
   section: Section;
   recommendation: {
-    tratamiento_recomendado: string;
-    costo_estimado: number;
-    beneficio_costo: number;
+    tratamientoRecomendado: string;
+    costoEstimado: number;
+    beneficioCosto: number;
     prioridad: 'alta' | 'media' | 'baja';
-    alerta_suficiencia_estadistica: boolean;
+    alertaSuficienciaEstadistica: boolean;
     observaciones: string;
   };
 }
@@ -65,13 +65,13 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
         <div>
           <h4 className="text-sm text-text-muted mb-2">{t('recommendations.tratamiento')}</h4>
           <p className="text-lg font-medium text-primary">
-            {recommendation.tratamiento_recomendado}
+            {recommendation.tratamientoRecomendado}
           </p>
         </div>
         <div>
           <h4 className="text-sm text-text-muted mb-2">{t('recommendations.costo')}</h4>
           <p className="text-lg font-medium text-primary">
-            ${recommendation.costo_estimado.toLocaleString()}
+            ${recommendation.costoEstimado.toLocaleString()}
           </p>
         </div>
       </div>
@@ -80,7 +80,7 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
         <div>
           <h4 className="text-sm text-text-muted mb-2">{t('recommendations.beneficio_costo')}</h4>
           <p className="text-lg font-medium text-primary">
-            {recommendation.beneficio_costo.toFixed(2)}
+            {recommendation.beneficioCosto.toFixed(2)}
           </p>
         </div>
         <div>
@@ -151,12 +151,12 @@ export const RecommendationsView: React.FC<{ project: Project }> = ({
             const recs = response.recommendations.map(rec => ({
               section: project.sections.find(s => s.id === rec.sectionId) || rec.section,
               recommendation: {
-                tratamiento_recomendado: rec.tratamiento_recomendado,
-                costo_estimado: rec.costo_estimado,
-                beneficio_costo: rec.beneficio_costo,
+                tratamientoRecomendado: rec.tratamientoRecomendado,
+                costoEstimado: rec.costoEstimado,
+                beneficioCosto: rec.beneficioCosto,
                 prioridad: rec.prioridad,
-                alerta_suficiencia_estadistica: rec.alerta_suficiencia_estadistica,
-                observaciones: rec.observaciones
+                alertaSuficienciaEstadistica: rec.alertaSuficienciaEstadistica ?? false,
+                observaciones: rec.observaciones ?? ''
               }
             }));
             setRecommendations(recs);

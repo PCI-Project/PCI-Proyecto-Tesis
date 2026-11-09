@@ -6,11 +6,12 @@ import axios from 'axios';
  */
 
 export interface RecommendationResult {
-  tratamiento_recomendado: string;
-  costo_estimado: number;
-  beneficio_costo: number;
+  sectionId: string;
+  tratamientoRecomendado: string;
+  costoEstimado: number;
+  beneficioCosto: number;
   prioridad: 'alta' | 'media' | 'baja';
-  alerta_suficiencia_estadistica: boolean;
+  alertaSuficienciaEstadistica: boolean;
   observaciones: string;
 }
 
