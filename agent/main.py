@@ -44,7 +44,7 @@ async def generate_recommendations(project_data: AgentInputRequest):
                 "beneficio_costo": 0,
                 "prioridad": "media",
                 "alerta_suficiencia_estadistica": False,
-                "observaciones": analysis || "Respuesta del modelo no en formato JSON"
+                "observaciones": analysis or "Respuesta del modelo no en formato JSON"
             }
         
         return {
