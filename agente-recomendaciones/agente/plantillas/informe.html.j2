@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="proyecto" content="{{ a.proyecto.nombre }}">
+<meta name="codigo" content="{{ codigo }}">
+<title>Informe de intervención vial · {{ a.proyecto.nombre }}</title>
+<style>{{ css|safe }}</style>
+</head>
+<body>
+
+{# ============================ PORTADA ============================ #}
+<section class="portada">
+  <div class="portada-banda">
+    {% if logo %}<img class="logo" src="{{ logo }}" alt="Logo">{% endif %}
+    <p class="sobretitulo">AsphaltPCI Pro · Agente de recomendaciones</p>
+    <h1>Informe de recomendaciones de mantenimiento y rehabilitación vial</h1>
+    <p class="proyecto">{{ a.proyecto.nombre }}</p>
+  </div>
+  <table class="ficha-portada">
+    <tr><th>Entidad</th><td>{{ a.proyecto.get('entidad') or '—' }}</td></tr>
+    <tr><th>Ubicación</th><td>{{ a.proyecto.get('ubicacion') or '—' }}</td></tr>
+    <tr><th>Inspector</th><td>{{ a.proyecto.inspector }}</td></tr>
+    <tr><th>Fecha de inspección</th><td>{{ a.proyecto.fecha_inspeccion }}</td></tr>
+    <tr><th>Fecha del informe</th><td>{{ fecha }}</td></tr>
+    <tr><th>Código del informe</th><td>{{ codigo }} · motor {{ a.proyecto.version_motor }} · textos {{ 'del modelo de lenguaje' if origen == 'modelo' else 'automáticos' }}</td></tr>
+    <tr><th>Norma de evaluación</th><td>ASTM D6433-24 (Índice de Condición del Pavimento, PCI)</td></tr>
+  </table>
+  <p class="aviso-portada">Documento de apoyo a la decisión. Las recomendaciones, cantidades y costos deben ser revisados y firmados por un ingeniero idóneo antes de usarse para contratar u ordenar obras.</p>
+</section>
+
+{# ============================ CONTENIDO ============================ #}
+<section class="indice">
+  <h2>Contenido</h2>
+  <ol>
+    <li>Resumen ejecutivo</li>
+    <li>Alcance y metodología</li>
+    <li>Datos de entrada y calibración</li>
+    <li>Resultados por tramo{% for t in tramos %}<span class="sub">{{ t.id }} · {{ t.nombre }}</span>{% endfor %}</li>
+    <li>Priorización y presupuesto</li>
+    <li>Alertas</li>
+    <li>Conclusiones, recomendaciones y limitaciones</li>
+    <li>Referencias</li>
+    <li>Revisión y firma</li>
+    <li>Anexos: A. Fallas por unidad de muestra · B. Glosario · C. Parámetros y supuestos</li>
+  </ol>
+</section>
+
+{# ============================ 1. RESUMEN ============================ #}
+<section class="capitulo">
+  <h2><span class="n">1</span> Resumen ejecutivo</h2>
+  <div class="kpis">
+    <div class="kpi"><span class="k">Área evaluada</span><span class="v">{{ red.area_total_m2|num(0) }} m²</span><span class="d">{{ tramos|length }} tramos</span></div>
+    <div class="kpi"><span class="k">PCI ponderado</span><span class="v">{{ red.pci_ponderado|num(1) }} <span class="flecha">→</span> {{ red.pci_ponderado_despues|num(1) }}</span><span class="d">actual → con lo financiado</span></div>
+    <div class="kpi"><span class="k">Costo necesario</span><span class="v">{{ red.costo_total_necesario|dinero }}</span><span class="d">{{ moneda }}, con imprevistos</span></div>
+    <div class="kpi"><span class="k">Presupuesto</span><span class="v">{{ cal.presupuesto|dinero if cal.presupuesto is not none else 'Sin tope' }}</span><span class="d">{{ MODOS[cal.modo_priorizacion] }}</span></div>
+    <div class="kpi"><span class="k">Financiado</span><span class="v">{{ red.costo_financiado|dinero }}</span><span class="d">seguridad: {{ red.costo_seguridad|dinero }}</span></div>
+    <div class="kpi {{ 'kpi-alerta' if red.faltante > 0 else '' }}"><span class="k">Faltante</span><span class="v">{{ red.faltante|dinero }}</span><span class="d">{{ moneda }}</span></div>
+  </div>
+
+  <p class="lead">{{ n.resumen_ejecutivo }}</p>
+
+  <h3>Distribución del área por nivel de intervención</h3>
+  <div class="barra-dist">
+    {% for d in dist %}<div class="seg f{{ d.franja }}" style="width: {{ d.pct|round(2) }}%" title="{{ d.nivel }}">{% if d.pct >= 9 %}{{ d.pct|num(0) }} %{% endif %}</div>{% endfor %}
+  </div>
+  <table class="tabla compacta">
+    <thead><tr><th>Nivel</th><th>Tramos</th><th class="r">Área (m²)</th><th class="r">% del área</th></tr></thead>
+    <tbody>
+    {% for d in dist %}<tr><td><span class="chip f{{ d.franja }}">{{ d.id }}</span> {{ d.nivel }}</td><td>{{ d.tramos|join(', ') }}</td><td class="r">{{ d.area|num(0) }}</td><td class="r">{{ d.pct|num(1) }}</td></tr>{% endfor %}
+    </tbody>
+  </table>
+
+  {% if n_criticas %}
+  <div class="caja critica">
+    <p class="caja-t">Alertas críticas ({{ n_criticas }})</p>
+    <ul>{% for al in alertas if al.nivel == 'critica' %}<li><b>{{ al.tramo }}:</b> {{ al.mensaje }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+</section>
+
+{# ============================ 2. METODOLOGÍA ============================ #}
+<section class="capitulo salto">
+  <h2><span class="n">2</span> Alcance y metodología</h2>
+  <p>La condición de cada tramo se evaluó con el Índice de Condición del Pavimento (PCI, <i>Pavement Condition Index</i>) según ASTM D6433-24, registrando en cada unidad de muestra el tipo de falla, su severidad (baja L, media M, alta H) y su cantidad. Con esos datos el agente:</p>
+  <ol class="pasos">
+    <li><b>Clasifica</b> cada tramo en la matriz de tres franjas por su PCI: A mantenimiento preventivo, B rehabilitación (menor y mayor) y C reconstrucción.</li>
+    <li><b>Aplica la regla del nivel</b>: en la franja A el deterioro dominante; en la B la altura libre del bordillo o el carácter rural de la vía; en la C el porcentaje de área con daño estructural y el drenaje.</li>
+    <li><b>Filtra</b> las soluciones por el equipo que el inspector declaró disponible, por la clase de tránsito y por fallas incompatibles. Si la preferida no es posible usa la siguiente; si ninguna lo es, propone una solución interina y lo advierte.</li>
+    <li><b>Calcula los trabajos previos obligatorios</b> (sellado de grietas, bacheo, parcheo, fresado local, nivelación de hombros) a partir de cada falla y severidad, extrapolando las cantidades de las muestras al área del tramo.</li>
+    <li><b>Presupuesta</b> con los costos unitarios calibrados por el inspector o, en su defecto, con costos de ejemplo, y añade imprevistos.</li>
+    <li><b>Prioriza</b>: reserva primero el dinero de las reparaciones de seguridad de todos los tramos y reparte el resto según el modo elegido.</li>
+  </ol>
+
+  <h3>Matriz de niveles usada</h3>
+  <div class="gauge grande">
+    {% for s in segmentos %}<div class="g f{{ s.franja }}" style="width: {{ s.ancho }}%"><span>{{ s.id }}</span></div>{% endfor %}
+  </div>
+  <div class="gauge-esc"><span>0</span>{% for s in segmentos[1:] %}<span style="left: {{ s.desde }}%">{{ s.desde|num(0) }}</span>{% endfor %}<span style="left: 100%">100</span></div>
+  <table class="tabla compacta">
+    <thead><tr><th>Nivel</th><th>PCI</th><th>Intervención</th><th>Regla de decisión</th></tr></thead>
+    <tbody>
+    {% for s in segmentos|reverse %}
+      <tr><td><span class="chip f{{ s.franja }}">{{ s.id }}</span></td><td>{{ s.desde|num(0) }} a {{ '100' if s.hasta == 100 else (s.hasta|num(0) ~ ' (excl.)') }}</td>
+        <td>{{ {'A1':'Mantenimiento preventivo','A2':'Mantenimiento preventivo','B1':'Rehabilitación menor','B2':'Rehabilitación mayor','C1':'Reconstrucción o sobrecapa estructural límite','C2':'Reconstrucción total'}[s.id] }}</td>
+        <td>{{ {'A1':'Deterioro dominante','A2':'Deterioro dominante','B1':'Bordillo ≥ 7.6 cm: sobrecapa delgada; < 7.6 cm: fresado y reposición','B2':'Bordillo: sobrecapa estructural o fresado y sobrecapa','C1':'% de daño estructural y drenaje','C2':'Reconstrucción'}[s.id] }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <p class="nota">Los cortes 85, 71, 56, 41 y 26 son de la tesis y unifican los ejemplos del MS-16, 4.ª ed. 2009 (Fig. 1.4, p. 13; Tabla 1.1, p. 14; Fig. 3.1, p. 33). El manual presenta esos esquemas como ejemplos que cada agencia debe calibrar y revisar al menos una vez al año (Sec. 1.5.2, p. 14).</p>
+
+  <h3>Cantidades y beneficio</h3>
+  <p>Las cantidades de cada falla se extrapolan al tramo con el factor (área del tramo − área de muestras adicionales) / área de muestras aleatorias; las muestras adicionales se suman sin extrapolar.</p>
+  <p>El beneficio se mide como el <b>área de condición recuperada por encima del PCI mínimo aceptable</b> ({{ cal.parametros.pci_minimo_aceptable.valor|num }}, límite de condición mala del MS-16, 4.ª ed. 2009, Sec. 3.3.2). Cada tramo sigue una curva de deterioro PCI(t) = 100 − α·t<sup>β</sup>, con β = {{ cal.parametros.curva_deterioro.beta|num }} (el deterioro se acelera con la edad) y α calculado con la edad y el PCI del tramo; si no hay edad, se supone que un pavimento nuevo llega al mínimo en {{ cal.parametros.curva_deterioro.anios_hasta_pci_minimo|num }} años. La obra devuelve el tramo a la «edad efectiva» que corresponde a su PCI después, y el beneficio es el área entre la curva con obra y la curva sin obra mientras están sobre el mínimo, en PCI·año por m². Se multiplica por el área y por el peso del tránsito. La relación beneficio/costo divide ese valor entre el costo total del tramo.</p>
+  <p>Este método premia la preservación: un tratamiento barato sobre un tramo aún bueno recupera años en la parte alta de la curva, donde cada año vale mucha condición. Una reconstrucción recupera más años, pero cuesta mucho más por m².</p>
+  <p class="nota">Huella de la entrada (SHA-256): <code>{{ a.proyecto.huella_entrada }}</code>. La misma entrada produce siempre las mismas cifras.</p>
+</section>
+
+{# ============================ 3. DATOS ============================ #}
+<section class="capitulo salto">
+  <h2><span class="n">3</span> Datos de entrada y calibración</h2>
+  <h3>Tramos evaluados</h3>
+  <table class="tabla compacta">
+    <thead><tr><th>Tramo</th><th class="r">Long. (m)</th><th class="r">Ancho (m)</th><th class="r">Área (m²)</th><th class="r">PCI</th><th>Vía</th><th>Bordillo</th><th>Tránsito</th><th>Construido / últ. obra</th><th>Drenaje</th></tr></thead>
+    <tbody>
+    {% for t in tramos %}{% set c = t.contexto_usado %}{% set asum = c.get('asumidos', []) %}
+      <tr>
+        <td><b>{{ t.id }}</b> {{ t.nombre }}</td><td class="r">{{ t.longitud_m|num }}</td><td class="r">{{ (t.area_m2 / t.longitud_m)|num }}</td><td class="r">{{ t.area_m2|num(0) }}</td><td class="r">{{ t.pci|num(1) }}</td>
+        <td>{{ c.tipo_via }}{% if 'tipo_via' in asum %}<sup>*</sup>{% endif %}</td>
+        <td>{% if c.tipo_via == 'rural' %}no aplica{% elif c.get('altura_bordillo_cm') is not none %}{{ c.altura_bordillo_cm|num }} cm{% else %}limitado<sup>*</sup>{% endif %}</td>
+        <td>{{ c.clase_trafico }}{% if c.get('esal_millones') is not none %} ({{ c.esal_millones|num }} M ESAL){% endif %}{% if 'clase_trafico' in asum %}<sup>*</sup>{% endif %}</td>
+        <td>{{ c.get('anio_construccion') or '—' }} / {{ c.get('anio_ultima_intervencion') or '—' }}</td>
+        <td>{{ c.get('drenaje') or '—' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <p class="nota"><sup>*</sup> Dato no indicado por el inspector; el agente asumió el caso conservador y lo declara en el tramo.</p>
+
+  <h3>Equipo y servicios disponibles (calibración del inspector)</h3>
+  <div class="equipo">
+    {% for g, lista in equipo %}
+    <div class="eq-grupo"><p class="eq-t">{{ g }}</p>
+      <ul>{% for x in lista %}<li class="{{ 'si' if x.ok else 'no' }}"><span class="marca">{{ '✓' if x.ok else '✗' }}</span> {{ x.nombre }}</li>{% endfor %}</ul>
+    </div>
+    {% endfor %}
+  </div>
+
+  <h3>Costos unitarios usados</h3>
+  <table class="tabla compacta">
+    <thead><tr><th>Actividad</th><th>Unidad</th><th class="r">Costo unitario ({{ moneda }})</th><th>Origen</th><th>Fuente</th></tr></thead>
+    <tbody>
+    {% for c in costos %}<tr><td>{{ c.nombre }}</td><td>{{ c.unidad|unidad }}</td><td class="r">{{ c.valor|dinero }}</td><td><span class="et {{ c.origen }}">{{ c.origen }}</span></td><td>{{ c.get('fuente') or ('Sin fuente: valor de prueba' if c.origen == 'ejemplo' else '—') }}</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  <p class="nota">Imprevistos: {{ cal.parametros.imprevistos_pct.valor|num }} % sobre el subtotal de cada tramo. Modo de priorización: {{ MODOS[cal.modo_priorizacion] }}.</p>
+</section>
+
+{# ============================ 4. TRAMOS ============================ #}
+<section class="capitulo salto">
+  <h2><span class="n">4</span> Resultados por tramo</h2>
+  <p>Cada ficha presenta el diagnóstico, la regla aplicada, la solución recomendada, los trabajos previos obligatorios y su presupuesto.</p>
+</section>
+
+{% for t in tramos %}
+{% set tx = textos.get(t.id, {}) %}
+{% set tr = t.tratamiento %}
+{% set c = t.contexto_usado %}
+<section class="tramo">
+  <header class="tramo-cab f{{ t.franja }}">
+    <div>
+      <p class="tramo-id">4.{{ loop.index }} · Tramo {{ t.id }}</p>
+      <h3>{{ t.nombre }}</h3>
+      <p class="tramo-sub">{{ t.area_m2|num(0) }} m² · {{ t.longitud_m|num }} m · vía {{ c.tipo_via }} · tránsito {{ c.clase_trafico }}</p>
+    </div>
+    <div class="tramo-pci"><span class="pci-v">{{ t.pci|num(1) }}</span><span class="pci-k">PCI</span></div>
+  </header>
+
+  <div class="gauge">
+    {% for s in segmentos %}<div class="g f{{ s.franja }}" style="width: {{ s.ancho }}%"></div>{% endfor %}
+    <div class="marcador" style="left: {{ t.pci }}%"></div>
+    <div class="marcador despues" style="left: {{ tr.pci_despues }}%"></div>
+  </div>
+  <p class="gauge-ley"><span class="m1"></span> PCI actual {{ t.pci|num(1) }} <span class="m2"></span> PCI esperado tras la obra {{ tr.pci_despues|num(1) }} · nivel <b>{{ t.nivel_id }} {{ t.nivel }}</b> · {{ t.categoria }}</p>
+
+  <div class="decision">
+    <div class="dec-princ">
+      <p class="dec-k">Solución recomendada</p>
+      <p class="dec-v">{{ items[tr.seleccionado].nombre if tr.seleccionado else 'Sin solución ejecutable con el equipo disponible' }}</p>
+      <p class="dec-en">{{ items[tr.seleccionado].nombre_en if tr.seleccionado else 'Se presupuesta: ' ~ items[tr.ideal].nombre }}</p>
+      {% if tr.interino %}<p class="et critica">Solución interina</p>{% endif %}
+      {% if tr.seleccionado and tr.seleccionado != tr.ideal %}<p class="et advertencia">Alternativa a: {{ items[tr.ideal].nombre }}</p>{% endif %}
+    </div>
+    <div class="dec-datos">
+      <div><span>Costo total</span><b>{{ t.costos.total|dinero }} {{ moneda }}</b></div>
+      <div><span>Costo por m²</span><b>{{ t.costos.costo_m2|dinero }}</b></div>
+      <div><span>Años de condición recuperados</span><b>{{ t.beneficio_detalle.anios_recuperados|num(1) }} años</b></div>
+      <div><span>Beneficio/costo</span><b>{{ t.relacion_bc|num(3) }}</b></div>
+      <div><span>Prioridad</span><b>{% if t.prioridad.posicion %}{{ t.prioridad.posicion }}.º · {% endif %}{{ ESTADO[t.prioridad.estado] }}</b></div>
+    </div>
+  </div>
+
+  <h4>Diagnóstico</h4>
+  <p>{{ tx.get('diagnostico', '') }}</p>
+  <table class="tabla">
+    <thead><tr><th>Falla (ASTM D6433)</th><th>Sev.</th><th>Criterio de la severidad</th><th class="r">En muestras</th><th class="r">Densidad</th><th class="r">Estimado en el tramo</th></tr></thead>
+    <tbody>
+    {% for f in t.fallas %}
+      <tr class="{{ 'estr' if f.estructural and f.severidad in 'MH' else '' }}">
+        <td><b>{{ f.tipo }}</b> {{ f.nombre }}<br><span class="en">{{ f.nombre_en }}</span></td>
+        <td><span class="sev s{{ f.severidad }}">{{ f.severidad }}</span></td>
+        <td class="pequeno">{{ f.descripcion_severidad }}</td>
+        <td class="r">{{ f.cantidad_muestras|num }} {{ f.unidad|unidad }}</td>
+        <td class="r">{{ f.densidad_pct|num }} %</td>
+        <td class="r">{{ f.cantidad_estimada_tramo|num }} {{ f.unidad|unidad }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6">No se registraron fallas.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <p class="nota">Muestras: {{ t.muestras|length }} ({{ t.muestras|selectattr('adicional')|list|length }} adicionales) · factor de extrapolación {{ t.factor_extrapolacion|num(3) }} · área con daño estructural M/H: {{ t.pct_area_estructural|num }} %{% if t.deterioro_dominante %} · deterioro dominante: {{ t.deterioro_dominante }}{% endif %}. Las filas sombreadas son fallas estructurales de severidad media o alta.</p>
+
+  <h4>Justificación técnica</h4>
+  <p>{{ tx.get('justificacion', '') }}</p>
+  {% if tr.descartados %}
+  <table class="tabla compacta">
+    <thead><tr><th>Opción evaluada y descartada</th><th>Razón</th></tr></thead>
+    <tbody>{% for d in tr.descartados %}<tr><td>{{ items[d.id].nombre }} <span class="en">({{ items[d.id].nombre_en }})</span></td><td>{{ d.razon|capitalize }}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% endif %}
+  {% if tx.get('nota_equipo') %}<div class="caja advertencia"><p class="caja-t">Equipo disponible</p><p>{{ tx.nota_equipo }}</p></div>{% endif %}
+
+  <h4>Trabajos previos obligatorios</h4>
+  <p>{{ tx.get('trabajos_previos', '') }}</p>
+
+  <h4>Presupuesto del tramo</h4>
+  <table class="tabla">
+    <thead><tr><th>Partida</th><th>Cálculo de la cantidad</th><th class="r">Cantidad</th><th class="r">P. unit.</th><th class="r">Costo ({{ moneda }})</th></tr></thead>
+    <tbody>
+    {% if t.trabajos_previos %}<tr class="grupo"><td colspan="5">Trabajos previos</td></tr>{% endif %}
+    {% for p in t.trabajos_previos %}
+      <tr><td>{{ p.nombre }}{% if p.seguridad %} <span class="et critica">seguridad</span>{% endif %}{% if not p.disponible %} <span class="et advertencia">subcontratar</span>{% endif %}</td>
+        <td class="pequeno">{{ p.motivo }}</td><td class="r">{{ p.cantidad|num }} {{ p.unidad|unidad }}</td>
+        <td class="r">{{ p.costo_unitario|dinero }}{% if p.origen_costo == 'ejemplo' %}<sup>e</sup>{% endif %}</td><td class="r">{{ p.costo|dinero }}</td></tr>
+    {% endfor %}
+    <tr class="grupo"><td colspan="5">Tratamiento</td></tr>
+    {% for p in t.partidas_tratamiento %}
+      <tr><td>{{ p.nombre }}</td><td class="pequeno">{{ p.motivo }}</td><td class="r">{{ p.cantidad|num }} {{ p.unidad|unidad }}</td>
+        <td class="r">{{ p.costo_unitario|dinero }}{% if p.origen_costo == 'ejemplo' %}<sup>e</sup>{% endif %}</td><td class="r">{{ p.costo|dinero }}</td></tr>
+    {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr><td colspan="4">Subtotal (previos {{ t.costos.previos|dinero }} + tratamiento {{ t.costos.tratamiento|dinero }})</td><td class="r">{{ t.costos.subtotal|dinero }}</td></tr>
+      <tr><td colspan="4">Imprevistos ({{ cal.parametros.imprevistos_pct.valor|num }} %)</td><td class="r">{{ t.costos.imprevistos|dinero }}</td></tr>
+      <tr class="total"><td colspan="4">Total del tramo</td><td class="r">{{ t.costos.total|dinero }}</td></tr>
+    </tfoot>
+  </table>
+  <p class="nota"><sup>e</sup> costo de ejemplo sin fuente. Si la obra se difiere, las reparaciones de seguridad del tramo cuestan {{ t.prioridad.costo_interino_si_diferido|dinero }} {{ moneda }} (con imprevistos).</p>
+
+  <h4>Si no se interviene</h4>
+  <p>{{ tx.get('consecuencia_si_se_difiere', '') }}</p>
+
+  {% if t.alertas %}
+  <h4>Alertas del tramo</h4>
+  <ul class="alertas">{% for al in t.alertas %}<li class="{{ al.nivel }}"><span class="et {{ al.nivel }}">{{ NIVEL_ALERTA[al.nivel] }}</span> <code>{{ al.codigo }}</code> {{ al.mensaje }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <p class="refs"><b>Referencias:</b> {{ t.referencias|join(' · ') }}</p>
+</section>
+{% endfor %}
+
+{# ============================ 5. PRIORIZACIÓN ============================ #}
+<section class="capitulo salto">
+  <h2><span class="n">5</span> Priorización y presupuesto</h2>
+  <p>{{ n.priorizacion }}</p>
+  <table class="tabla">
+    <thead><tr><th>#</th><th>Tramo</th><th class="r">PCI</th><th>Nivel</th><th>Solución</th><th class="r">Costo total</th><th class="r">B/C</th><th>Estado</th><th class="r">Asignado</th><th class="r">Acumulado</th></tr></thead>
+    <tbody>
+    {% for r in ranking %}{% set t = r.t %}
+      <tr class="est-{{ t.prioridad.estado }}">
+        <td>{{ t.prioridad.posicion if t.prioridad.posicion else '—' }}</td><td><b>{{ t.id }}</b> {{ t.nombre }}</td><td class="r">{{ t.pci|num(1) }}</td>
+        <td><span class="chip f{{ t.franja }}">{{ t.nivel_id }}</span></td>
+        <td>{{ items[t.tratamiento.seleccionado or t.tratamiento.ideal].nombre }}{% if t.tratamiento.interino %}*{% endif %}</td>
+        <td class="r">{{ t.costos.total|dinero }}</td><td class="r">{{ t.relacion_bc|num(3) }}</td>
+        <td><span class="et e-{{ t.prioridad.estado }}">{{ ESTADO[t.prioridad.estado] }}</span></td>
+        <td class="r">{{ r.aporte|dinero }}</td><td class="r">{{ r.acumulado|dinero }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr><td colspan="5">Total necesario</td><td class="r">{{ red.costo_total_necesario|dinero }}</td><td colspan="2">Financiado</td><td class="r" colspan="2">{{ red.costo_financiado|dinero }}</td></tr>
+      {% if cal.presupuesto is not none %}<tr class="total"><td colspan="5">Presupuesto disponible</td><td class="r">{{ cal.presupuesto|dinero }}</td><td colspan="2">Faltante</td><td class="r" colspan="2">{{ red.faltante|dinero }}</td></tr>{% endif %}
+      {% if red.get('saldo_sin_asignar', 0) > 0 %}<tr><td colspan="5">Saldo sin asignar (ninguna obra pendiente cabe completa)</td><td class="r">{{ red.saldo_sin_asignar|dinero }}</td><td colspan="4"></td></tr>{% endif %}
+    </tfoot>
+  </table>
+  <p class="nota">* Solución interina. «Solo seguridad»: se financian únicamente las reparaciones de seguridad del tramo. Montos en {{ moneda }}.</p>
+
+  {% if red.get('comparacion_modos') and cal.presupuesto is not none %}
+  {% set cm = red.comparacion_modos %}
+  <h3>Comparación de modos con el mismo presupuesto</h3>
+  <table class="tabla compacta comparacion">
+    <thead><tr><th></th><th>{{ MODOS[cal.modo_priorizacion] }} (elegido)</th><th>{{ MODOS[cm.modo] }}</th></tr></thead>
+    <tbody>
+      <tr><td>Obras completas financiadas</td><td>{{ tramos|selectattr('prioridad.estado','equalto','financiado')|map(attribute='nombre')|join(', ') or 'Ninguna' }}</td>
+        <td>{% set lista = [] %}{% for i in cm.tramos_financiados %}{% for t in tramos if t.id == i %}{% set _ = lista.append(t.nombre) %}{% endfor %}{% endfor %}{{ lista|join(', ') or 'Ninguna' }}</td></tr>
+      <tr><td>PCI ponderado después</td><td>{{ red.pci_ponderado_despues|num(1) }}</td><td>{{ cm.pci_ponderado_despues|num(1) }}</td></tr>
+      <tr><td>Beneficio total (PCI·año·m², ponderado por tránsito)</td><td>{{ (tramos|selectattr('prioridad.estado','equalto','financiado')|map(attribute='beneficio')|sum)|num(0) }}</td><td>{{ cm.beneficio_total|num(0) }}</td></tr>
+    </tbody>
+  </table>
+  {% endif %}
+</section>
+
+{# ============================ 6. ALERTAS ============================ #}
+<section class="capitulo salto">
+  <h2><span class="n">6</span> Alertas</h2>
+  <table class="tabla">
+    <thead><tr><th>Nivel</th><th>Ámbito</th><th>Código</th><th>Descripción y acción</th></tr></thead>
+    <tbody>
+    {% for al in alertas %}
+      <tr class="{{ al.nivel }}"><td><span class="et {{ al.nivel }}">{{ NIVEL_ALERTA[al.nivel] }}</span></td><td>{{ al.tramo }}</td><td><code>{{ al.codigo }}</code></td>
+        <td>{{ textos_alerta.get((al.codigo, al.get('tramo_id')), al.mensaje) }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{# ============================ 7. CONCLUSIONES ============================ #}
+<section class="capitulo salto">
+  <h2><span class="n">7</span> Conclusiones, recomendaciones y limitaciones</h2>
+  <h3>Conclusiones</h3>
+  <ul class="lista">{% for x in n.conclusiones %}<li>{{ x }}</li>{% endfor %}</ul>
+  <h3>Recomendaciones</h3>
+  <ol class="lista">{% for x in n.recomendaciones %}<li>{{ x }}</li>{% endfor %}</ol>
+  <h3>Limitaciones</h3>
+  <ul class="lista">{% for x in n.limitaciones %}<li>{{ x }}</li>{% endfor %}</ul>
+</section>
+
+{# ============================ 8. REFERENCIAS ============================ #}
+<section class="capitulo">
+  <h2><span class="n">8</span> Referencias</h2>
+  <h3>Remisiones usadas en este informe</h3>
+  <ul class="lista">{% for r in referencias %}<li>{{ r }}</li>{% endfor %}</ul>
+  <h3>Bibliografía</h3>
+  <ul class="biblio">{% for r in bibliografia %}<li>{{ r }}</li>{% endfor %}</ul>
+</section>
+
+{# ============================ 9. FIRMA ============================ #}
+<section class="capitulo salto firma">
+  <h2><span class="n">9</span> Revisión y firma</h2>
+  <p>Declaro haber revisado las recomendaciones, cantidades y costos de este informe, generado por el agente de recomendaciones de AsphaltPCI Pro a partir de la evaluación PCI indicada, y asumo la responsabilidad técnica de su uso.</p>
+  <table class="tabla-firma">
+    <tr><th>Elaborado por (inspector)</th><td>{{ a.proyecto.inspector }}</td><th>Fecha</th><td></td></tr>
+    <tr><th>Revisado por (ingeniero responsable)</th><td></td><th>Idoneidad JTIA n.º</th><td></td></tr>
+    <tr class="alto"><th>Firma</th><td colspan="3"></td></tr>
+    <tr><th>Observaciones</th><td colspan="3" class="alto"></td></tr>
+  </table>
+</section>
+
+{# ============================ ANEXOS ============================ #}
+<section class="capitulo salto anexo">
+  <h2>Anexo A. Fallas registradas por unidad de muestra</h2>
+  {% for t in tramos %}
+  <h3>{{ t.id }} · {{ t.nombre }}</h3>
+  <table class="tabla compacta">
+    <thead><tr><th>Muestra</th><th class="r">Área (m²)</th><th class="r">PCI</th><th>Tipo</th><th>Falla</th><th>Sev.</th><th class="r">Cantidad</th></tr></thead>
+    <tbody>
+    {% for m in t.muestras %}
+      {% for f in m.fallas %}
+      <tr>{% if loop.first %}<td rowspan="{{ m.fallas|length }}">{{ m.id }}{% if m.get('adicional') %} <span class="et info">adicional</span>{% endif %}</td><td class="r" rowspan="{{ m.fallas|length }}">{{ m.area_m2|num }}</td><td class="r" rowspan="{{ m.fallas|length }}">{{ m.get('pci')|num(1) }}</td>{% endif %}
+        <td>{{ f.tipo }}</td><td>{{ fcat[f.tipo].nombre }}</td><td><span class="sev s{{ f.severidad }}">{{ f.severidad }}</span></td><td class="r">{{ f.cantidad|num }} {{ fcat[f.tipo].unidad|unidad }}</td></tr>
+      {% else %}
+      <tr><td>{{ m.id }}</td><td class="r">{{ m.area_m2|num }}</td><td class="r">{{ m.get('pci')|num(1) }}</td><td colspan="4">Sin fallas registradas</td></tr>
+      {% endfor %}
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endfor %}
+</section>
+
+<section class="capitulo salto anexo">
+  <h2>Anexo B. Glosario inglés–español</h2>
+  <table class="tabla compacta">
+    <thead><tr><th>Término en inglés</th><th>En español</th><th>Significado</th></tr></thead>
+    <tbody>{% for g in n.glosario %}<tr><td><i>{{ g.termino_en }}</i></td><td>{{ g.termino_es }}</td><td>{{ g.definicion }}</td></tr>{% endfor %}</tbody>
+  </table>
+</section>
+
+<section class="capitulo salto anexo">
+  <h2>Anexo C. Parámetros y supuestos</h2>
+  <h3>Parámetros del motor</h3>
+  <table class="tabla compacta">
+    <thead><tr><th>Parámetro</th><th>Valor</th><th>Origen</th><th>Fuente o nota</th></tr></thead>
+    <tbody>{% for p in parametros %}<tr><td><code>{{ p.clave }}</code></td><td>{{ p.valor }}</td><td>{% if p.origen %}<span class="et {{ 'calibrado' if p.origen in ('norma','calibrado') else 'ejemplo' }}">{{ p.origen }}</span>{% endif %}</td><td class="pequeno">{{ p.fuente }}</td></tr>{% endfor %}</tbody>
+  </table>
+  <h3>Supuestos por tramo</h3>
+  {% for t in tramos if t.supuestos %}
+  <p><b>{{ t.id }} · {{ t.nombre }}:</b></p>
+  <ul class="lista">{% for s in t.supuestos %}<li>{{ s }}</li>{% endfor %}</ul>
+  {% else %}
+  <p>No se asumió ningún dato.</p>
+  {% endfor %}
+</section>
+
+</body>
+</html>

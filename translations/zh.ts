@@ -371,7 +371,7 @@ export const zh = {
         title: "建议",
         subtitle: "校准智能体，补充缺失数据，并生成干预建议。",
         openFromResults: "前往建议",
-        health: { checking: "正在检查智能体…", online: "智能体在线", offline: "智能体离线", offlineHelp: "无法连接智能体。您可以下载 entrada.json，交由智能体处理，然后导入结果。" },
+        health: { checking: "正在检查智能体…（若处于休眠状态，最多可能需要一分钟）", online: "智能体在线", offline: "智能体离线", offlineHelp: "无法连接智能体。您可以下载 entrada.json，交由智能体处理，然后导入结果。" },
         status: { ok: "完整", warn: "有警告", error: "有错误" },
         save: { saved: "已保存", saving: "正在保存…", error: "无法保存" },
         level: { A1: "预防性（高）", A2: "预防性", B1: "小修复", B2: "大修复", C1: "重建", C2: "重建" },
@@ -437,7 +437,7 @@ export const zh = {
         },
         bar: { assumed: "{n} 个待假设值", complete: "数据完整", lastResult: "查看上次结果", downloadInput: "下载 entrada.json", importResults: "导入结果", generate: "生成建议", rerun: "再次运行" },
         consulting: { working: "智能体正在处理…", elapsed: "已用 {s} 秒", cancel: "取消" },
-        error: { network: "无法连接智能体。请检查服务是否正在运行，或使用离线模式。", import: "文件无效（{fields}）。", hash: "结果与当前数据不匹配。请重新生成 entrada.json。", fix: "生成前请修正标记的区块。" },
+        error: { rateLimit: "连续请求过多。请等待一分钟后重试。", network: "无法连接智能体。请检查服务是否正在运行，或使用离线模式。", import: "文件无效（{fields}）。", hash: "结果与当前数据不匹配。请重新生成 entrada.json。", fix: "生成前请修正标记的区块。" },
         result: { edit: "编辑参数", download: "下载 JSON", runs: "运行记录", pci: "加权 PCI", needed: "所需费用", financed: "已资助", shortfall: "资金缺口", summary: "执行摘要", treatment: "处理措施", cost: "费用", interim: "临时", pdf: "下载 PDF", print: "打印", title: "结果" }
     },
   };

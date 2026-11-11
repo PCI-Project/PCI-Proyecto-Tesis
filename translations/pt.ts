@@ -371,7 +371,7 @@ export const pt = {
         title: "Recomendações",
         subtitle: "Calibre o agente, preencha os dados ausentes e gere recomendações de intervenção.",
         openFromResults: "Ir para Recomendações",
-        health: { checking: "Verificando o agente…", online: "Agente online", offline: "Agente offline", offlineHelp: "Não foi possível acessar o agente. Você pode baixar entrada.json, processá-lo com o agente e depois importar os resultados." },
+        health: { checking: "Verificando o agente… (se estava inativo, pode levar até um minuto)", online: "Agente online", offline: "Agente offline", offlineHelp: "Não foi possível acessar o agente. Você pode baixar entrada.json, processá-lo com o agente e depois importar os resultados." },
         status: { ok: "Completo", warn: "Com avisos", error: "Com erros" },
         save: { saved: "Salvo", saving: "Salvando…", error: "Não foi possível salvar" },
         level: { A1: "Preventivo (alto)", A2: "Preventivo", B1: "Reabilitação menor", B2: "Reabilitação maior", C1: "Reconstrução", C2: "Reconstrução" },
@@ -437,7 +437,7 @@ export const pt = {
         },
         bar: { assumed: "{n} dado(s) a presumir", complete: "Dados completos", lastResult: "Ver último resultado", downloadInput: "Baixar entrada.json", importResults: "Importar resultados", generate: "Gerar recomendações", rerun: "Executar novamente" },
         consulting: { working: "O agente está trabalhando…", elapsed: "{s} s decorridos", cancel: "Cancelar" },
-        error: { network: "Não foi possível acessar o agente. Verifique se está em execução ou use o modo offline.", import: "Os arquivos não são válidos ({fields}).", hash: "Os resultados não correspondem aos dados atuais. Gere entrada.json novamente.", fix: "Corrija os blocos indicados antes de gerar." },
+        error: { rateLimit: "Muitas consultas seguidas. Aguarde um minuto e tente novamente.", network: "Não foi possível acessar o agente. Verifique se está em execução ou use o modo offline.", import: "Os arquivos não são válidos ({fields}).", hash: "Os resultados não correspondem aos dados atuais. Gere entrada.json novamente.", fix: "Corrija os blocos indicados antes de gerar." },
         result: { edit: "Editar parâmetros", download: "Baixar JSON", runs: "Execuções", pci: "PCI ponderado", needed: "Custo necessário", financed: "Financiado", shortfall: "Déficit", summary: "Resumo executivo", treatment: "Tratamento", cost: "Custo", interim: "provisório", pdf: "Baixar PDF", print: "Imprimir", title: "Resultado" }
     },
   };

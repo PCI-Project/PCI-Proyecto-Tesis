@@ -1,12 +1,25 @@
 const base = (import.meta.env.VITE_AGENT_URL || 'http://localhost:8000').replace(/\/$/, '');
+// Un servicio gratuito dormido tarda hasta ~1 minuto en despertar: se espera ese tiempo (y se reintenta una vez)
+// antes de darlo por caído. Mientras tanto el panel muestra "Comprobando agente…".
+const WAKE_TIMEOUT_MS = 65000;
+const WAKE_RETRY_DELAY_MS = 4000;
+
 export async function agentHealth(): Promise<any> {
-  const signal = AbortSignal.timeout(3000);
-  const response = await fetch(`${base}/`, { signal });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return response.json();
+  let last: unknown;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const response = await fetch(`${base}/`, { signal: AbortSignal.timeout(WAKE_TIMEOUT_MS) });
+      if (response.ok) return response.json();
+      last = new Error(`HTTP ${response.status}`);
+    } catch (error) {
+      last = error;
+    }
+    if (attempt === 0) await new Promise(resolve => setTimeout(resolve, WAKE_RETRY_DELAY_MS));
+  }
+  throw last;
 }
 export async function agentCatalog(): Promise<any> {
-  const response = await fetch(`${base}/api/recommendations/catalogo`, { signal: AbortSignal.timeout(3000) });
+  const response = await fetch(`${base}/api/recommendations/catalogo`, { signal: AbortSignal.timeout(WAKE_TIMEOUT_MS) });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return response.json();
 }

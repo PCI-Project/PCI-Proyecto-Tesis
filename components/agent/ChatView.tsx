@@ -75,7 +75,7 @@ export const ChatView: React.FC<Props> = ({ run, online }) => {
       const detail = e?.status === 422 && Array.isArray(e.body?.errores) ? e.body.errores.join('; ') : '';
       add({
         role: 'assistant', error: true,
-        text: e?.name === 'AbortError' ? t('agent.chat.cancelled') : e?.status === 404 ? t('agent.chat.noEndpoint') : detail || t('agent.chat.error'),
+        text: e?.name === 'AbortError' ? t('agent.chat.cancelled') : e?.status === 404 ? t('agent.chat.noEndpoint') : e?.status === 429 ? t('agent.error.rateLimit') : detail || t('agent.chat.error'),
       });
     } finally {
       if (alive.current) setBusy(false);

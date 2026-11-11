@@ -1,0 +1,98 @@
+{
+  "_aviso": "Valores por defecto del agente. Los que dicen 'norma' vienen de la fuente indicada; los demás son supuestos de ingeniería sin norma y el inspector puede cambiarlos en el panel.",
+  "bordillo_min_cm": {
+    "valor": 7.6,
+    "origen": "norma",
+    "fuente": "MS-16 4.ª ed. 2009, Fig. 1.4 p. 13 y Tabla 1.1 p. 14 (3 in)"
+  },
+  "bordillo_desconocido": {
+    "valor": "limitado",
+    "origen": "supuesto",
+    "nota": "Sin dato se asume bordillo < 7.6 cm (caso conservador)"
+  },
+  "clase_trafico_por_esal": {
+    "origen": "norma",
+    "fuente": "MS-2 (2014), niveles de tránsito de diseño Superpave: < 0.3, 0.3–3, ≥ 3 millones de ESAL",
+    "bajo_max_millones": 0.3,
+    "medio_max_millones": 3.0
+  },
+  "peso_severidad": {
+    "L": 1,
+    "M": 2,
+    "H": 3,
+    "U": 1,
+    "origen": "supuesto"
+  },
+  "factor_grieta_bloque_m_por_m2": {
+    "valor": 1.33,
+    "origen": "supuesto",
+    "nota": "Bloques de 1.5 m de lado: 2/1.5 m de grieta por m²"
+  },
+  "ancho_franja_grieta_m": {
+    "valor": 0.3,
+    "origen": "supuesto",
+    "nota": "Franja a parchear en grietas H; ASTM menciona ~100 mm fracturados a cada lado"
+  },
+  "ancho_franja_borde_m": {
+    "valor": 0.5,
+    "origen": "supuesto",
+    "nota": "ASTM: la grieta de borde está a 0.3–0.5 m del borde"
+  },
+  "ancho_deformacion_m": {
+    "valor": 1.0,
+    "origen": "supuesto",
+    "nota": "Ancho afectado por abultamiento o hundimiento medido en metros lineales"
+  },
+  "area_por_bache_m2": {
+    "L": 0.15,
+    "M": 0.35,
+    "H": 0.6,
+    "origen": "supuesto",
+    "nota": "Incluye el recorte rectangular alrededor del bache"
+  },
+  "sobreancho_parcheo": {
+    "valor": 1.2,
+    "origen": "supuesto",
+    "nota": "Multiplica el área de parcheo para cortar en sano (0.3 m más por lado aprox.)"
+  },
+  "umbral_estructural_pct": {
+    "valor": 20,
+    "origen": "supuesto",
+    "nota": "En C1, si el área con daño estructural M/H supera este % del tramo se asume estructura perdida"
+  },
+  "tasa_deterioro_alerta_pts_anio": {
+    "valor": 4,
+    "origen": "supuesto",
+    "nota": "Alerta si (100 − PCI) / años desde la construcción o la última intervención supera este valor"
+  },
+  "peso_trafico": {
+    "bajo": 1.0,
+    "medio": 1.5,
+    "alto": 2.0,
+    "desconocido": 1.0,
+    "origen": "supuesto"
+  },
+  "imprevistos_pct": {
+    "valor": 10,
+    "origen": "supuesto"
+  },
+  "densidad_minima_dominante_pct": {
+    "valor": 0.5,
+    "origen": "supuesto",
+    "nota": "Por debajo, un grupo no se considera dominante"
+  },
+  "pci_minimo_aceptable": {
+    "valor": 40,
+    "origen": "supuesto",
+    "fuente": "Límite regular/malo del MS-16 4.ª ed. 2009, Sec. 3.3.2 p. 34 (malo < 40)",
+    "nota": "El beneficio solo cuenta la condición por encima de este PCI"
+  },
+  "curva_deterioro": {
+    "beta": 1.5,
+    "anios_hasta_pci_minimo": 20,
+    "anios_hasta_pci_minimo_min": 5,
+    "anios_hasta_pci_minimo_max": 40,
+    "origen": "supuesto",
+    "nota": "PCI(t) = 100 − α·t^β. β > 1: el deterioro se acelera con la edad. α sale de la edad y el PCI de cada tramo; sin edad, de los años por defecto hasta el PCI mínimo; se acota entre 5 y 40 años"
+  }
+}

@@ -371,7 +371,7 @@ export const fr = {
         title: "Recommandations",
         subtitle: "Étalonnez l'agent, complétez les données manquantes et générez des recommandations d'intervention.",
         openFromResults: "Accéder aux recommandations",
-        health: { checking: "Vérification de l'agent…", online: "Agent en ligne", offline: "Agent hors ligne", offlineHelp: "L'agent est inaccessible. Vous pouvez télécharger entrada.json, le traiter avec l'agent puis importer les résultats." },
+        health: { checking: "Vérification de l'agent… (s'il était en veille, cela peut prendre jusqu'à une minute)", online: "Agent en ligne", offline: "Agent hors ligne", offlineHelp: "L'agent est inaccessible. Vous pouvez télécharger entrada.json, le traiter avec l'agent puis importer les résultats." },
         status: { ok: "Complet", warn: "Avec avertissements", error: "Avec erreurs" },
         save: { saved: "Enregistré", saving: "Enregistrement…", error: "Échec de l'enregistrement" },
         level: { A1: "Préventif (élevé)", A2: "Préventif", B1: "Réhabilitation mineure", B2: "Réhabilitation majeure", C1: "Reconstruction", C2: "Reconstruction" },
@@ -437,7 +437,7 @@ export const fr = {
         },
         bar: { assumed: "{n} valeur(s) à supposer", complete: "Données complètes", lastResult: "Voir le dernier résultat", downloadInput: "Télécharger entrada.json", importResults: "Importer les résultats", generate: "Générer les recommandations", rerun: "Relancer" },
         consulting: { working: "L'agent travaille…", elapsed: "{s} s écoulées", cancel: "Annuler" },
-        error: { network: "Impossible de joindre l'agent. Vérifiez qu'il fonctionne ou utilisez le mode hors ligne.", import: "Les fichiers ne sont pas valides ({fields}).", hash: "Les résultats ne correspondent pas aux données actuelles. Générez à nouveau entrada.json.", fix: "Corrigez les blocs signalés avant de générer." },
+        error: { rateLimit: "Trop de requêtes à la suite. Attendez une minute et réessayez.", network: "Impossible de joindre l'agent. Vérifiez qu'il fonctionne ou utilisez le mode hors ligne.", import: "Les fichiers ne sont pas valides ({fields}).", hash: "Les résultats ne correspondent pas aux données actuelles. Générez à nouveau entrada.json.", fix: "Corrigez les blocs signalés avant de générer." },
         result: { edit: "Modifier les paramètres", download: "Télécharger JSON", runs: "Exécutions", pci: "PCI pondéré", needed: "Coût nécessaire", financed: "Financé", shortfall: "Déficit", summary: "Résumé exécutif", treatment: "Traitement", cost: "Coût", interim: "provisoire", pdf: "Télécharger PDF", print: "Imprimer", title: "Résultat" }
     },
   };

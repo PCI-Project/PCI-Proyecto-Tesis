@@ -439,7 +439,7 @@ export const es = {
         title: "Recomendaciones",
         subtitle: "Calibra el agente, completa los datos que faltan y genera las recomendaciones de intervención.",
         openFromResults: "Ir a Recomendaciones",
-        health: { checking: "Comprobando agente…", online: "Agente en línea", offline: "Agente sin conexión", offlineHelp: "No se alcanza el agente. Puedes descargar entrada.json, procesarlo con el agente y luego importar los resultados." },
+        health: { checking: "Comprobando agente… (si estaba dormido, puede tardar hasta un minuto)", online: "Agente en línea", offline: "Agente sin conexión", offlineHelp: "No se alcanza el agente. Puedes descargar entrada.json, procesarlo con el agente y luego importar los resultados." },
         status: { ok: "Completo", warn: "Con avisos", error: "Con errores" },
         save: { saved: "Guardado", saving: "Guardando…", error: "No se pudo guardar" },
         level: { A1: "Preventivo (alto)", A2: "Preventivo", B1: "Rehabilitación menor", B2: "Rehabilitación mayor", C1: "Reconstrucción", C2: "Reconstrucción" },
@@ -505,7 +505,7 @@ export const es = {
         },
         bar: { assumed: "{n} dato(s) por suponer", complete: "Datos completos", lastResult: "Ver último resultado", downloadInput: "Descargar entrada.json", importResults: "Importar resultados", generate: "Generar recomendaciones", rerun: "Volver a consultar" },
         consulting: { working: "El agente está trabajando…", elapsed: "{s} s transcurridos", cancel: "Cancelar" },
-        error: { network: "No se pudo contactar con el agente. Revisa que esté en marcha o usa el modo sin conexión.", import: "Los archivos no son válidos ({fields}).", hash: "Los resultados no corresponden a los datos actuales. Genera de nuevo entrada.json.", fix: "Corrige los bloques marcados antes de generar." },
+        error: { rateLimit: "Demasiadas consultas seguidas. Espera un minuto e inténtalo de nuevo.", network: "No se pudo contactar con el agente. Revisa que esté en marcha o usa el modo sin conexión.", import: "Los archivos no son válidos ({fields}).", hash: "Los resultados no corresponden a los datos actuales. Genera de nuevo entrada.json.", fix: "Corrige los bloques marcados antes de generar." },
         result: { edit: "Editar parámetros", download: "Descargar JSON", runs: "Consultas", pci: "PCI ponderado", needed: "Costo necesario", financed: "Financiado", shortfall: "Faltante", summary: "Resumen ejecutivo", treatment: "Tratamiento", cost: "Costo", interim: "interino", pdf: "Descargar PDF", print: "Imprimir", title: "Resultado" }
     },
   };
