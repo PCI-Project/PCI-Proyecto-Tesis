@@ -16,6 +16,23 @@ export const de = {
         nutzenn_kosten: "Nutzen/Kosten",
         priorität: "Priorität",
         beobachtungen: "Beobachtungen",
+        title: "Wartungsempfehlungen (gewichteter PCI: {weightedPCI})",
+        loading: "Empfehlungen werden erstellt…",
+        loadingDescription: "Die Projektabschnitte werden analysiert.",
+        error: "Empfehlungen konnten nicht geladen werden",
+        retry: "Erneut versuchen",
+        selectProjectDesc: "Wählen Sie ein Projekt, um seine Empfehlungen zu sehen.",
+        noRecommendations: "Keine Empfehlungen",
+        noRecommendationsDescription: "Für die {count} Abschnitte des Projekts wurden keine Empfehlungen erstellt.",
+        serviceOffline: "Empfehlungsdienst nicht verfügbar",
+        serviceOfflineDescription: "Es werden lokale Daten auf Basis des berechneten PCI angezeigt.",
+        serviceVersion: "Dienstversion: {version}",
+        serviceOnline: "Empfehlungsdienst online (Version {version})"
+    },
+    prioridad: {
+        alta: "Hoch",
+        media: "Mittel",
+        baja: "Niedrig"
     },
     rating: {
         excelente: "Ausgezeichnet",
@@ -145,6 +162,7 @@ export const de = {
         selectSectionTitle: "Abschnitt zur Anzeige von Berechnungen auswählen",
     },
     results: {
+        section: "Abschnitt",
         title: "4. Projektergebnisse",
         exportButton: "Bericht exportieren",
         weightedPCI: "Gewichteter Projekt-PCI",
@@ -222,6 +240,7 @@ export const de = {
         close: "Schließen",
     },
     app: {
+        selectProject: "Projekt auswählen",
         calculating: "Berechnung läuft",
         unknownView: "Unbekannte Ansicht",
     },

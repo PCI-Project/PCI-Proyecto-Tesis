@@ -261,7 +261,7 @@ export const RecommendationsView: React.FC<{ project: Project }> = ({
               <p className="text-5xl font-bold my-2">{ (project.weightedPCI ?? 0).toFixed(2) }</p>
             </div>
             <div className={`inline-block px-4 py-1.5 rounded-full font-semibold text-lg bg-black/20`}>
-              {t(getPCIRating(project.weightedPCI ?? 0).labelKey)}
+              {t(`rating.${getPCIRating(project.weightedPCI ?? 0).labelKey}`)}
             </div>
           </div>
         </div>

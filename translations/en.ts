@@ -15,7 +15,24 @@ export const en = {
         costo: "Cost",
         beneficio_costo: "Benefit/Cost",
         prioridad: "Priority",
-        observaciones: "Observations"
+        observaciones: "Observations",
+        title: "Maintenance recommendations (weighted PCI: {weightedPCI})",
+        loading: "Generating recommendations…",
+        loadingDescription: "Analyzing the project sections.",
+        error: "Could not load recommendations",
+        retry: "Retry",
+        selectProjectDesc: "Select a project to see its recommendations.",
+        noRecommendations: "No recommendations",
+        noRecommendationsDescription: "No recommendations were generated for the project's {count} sections.",
+        serviceOffline: "Recommendation service unavailable",
+        serviceOfflineDescription: "Showing local data based on the calculated PCI.",
+        serviceVersion: "Service version: {version}",
+        serviceOnline: "Recommendation service online (version {version})"
+    },
+    prioridad: {
+        alta: "High",
+        media: "Medium",
+        baja: "Low"
     },
     rating: {
         excelente: "Excellent",
@@ -156,6 +173,7 @@ export const en = {
         selectSectionTitle: "Select section to view calculations",
     },
     results: {
+        section: "Section",
         title: "4. Project Results",
         exportButton: "Export Report",
         weightedPCI: "Project Weighted PCI",
@@ -256,6 +274,7 @@ export const en = {
         close: "Close",
     },
     app: {
+        selectProject: "Select a project",
         calculating: "Calculating",
         unknownView: "Unknown view",
     },

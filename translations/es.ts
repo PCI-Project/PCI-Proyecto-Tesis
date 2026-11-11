@@ -16,6 +16,23 @@ export const es = {
         beneficio_costo: "Beneficio/Costo",
         prioridad: "Prioridad",
         observaciones: "Observaciones",
+        title: "Recomendaciones de mantenimiento (PCI ponderado: {weightedPCI})",
+        loading: "Generando recomendaciones…",
+        loadingDescription: "Analizando los tramos del proyecto.",
+        error: "No se pudieron cargar las recomendaciones",
+        retry: "Reintentar",
+        selectProjectDesc: "Selecciona un proyecto para ver sus recomendaciones.",
+        noRecommendations: "Sin recomendaciones",
+        noRecommendationsDescription: "No se generaron recomendaciones para los {count} tramos del proyecto.",
+        serviceOffline: "Servicio de recomendaciones no disponible",
+        serviceOfflineDescription: "Se muestran datos locales basados en el PCI calculado.",
+        serviceVersion: "Versión del servicio: {version}",
+        serviceOnline: "Servicio de recomendaciones en línea (versión {version})"
+    },
+    prioridad: {
+        alta: "Alta",
+        media: "Media",
+        baja: "Baja"
     },
     rating: {
         excelente: "Excelente",
@@ -156,6 +173,7 @@ export const es = {
         selectSectionTitle: "Seleccionar tramo para ver los cálculos",
     },
     results: {
+        section: "Tramo",
         title: "4. Resultados del Proyecto",
         exportButton: "Exportar Informe",
         weightedPCI: "PCI Ponderado del Proyecto",
@@ -260,6 +278,7 @@ export const es = {
         close: "Cerrar",
     },
     app: {
+        selectProject: "Selecciona un proyecto",
         calculating: "Calculando",
         unknownView: "Vista desconocida",
     },

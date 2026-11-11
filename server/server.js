@@ -37,6 +37,11 @@ app.use(cors({
 })); // URLs permitidas para el frontend (local, red y GitHub Pages)
 app.use(express.json());
 
+// Comprobación de estado (pública): la usa el panel de recomendaciones
+app.get('/api', (req, res) => {
+  res.json({ status: 'online', version: process.env.npm_package_version || '1.0.0' });
+});
+
 app.use('/api/auth', Authroute);
 app.use('/api/projects', Projectroute);
 
