@@ -1,0 +1,31 @@
+{
+  "_aviso": "VALORES DE EJEMPLO PARA PRUEBAS. No son costos oficiales del MOP ni de ninguna empresa y no tienen fuente. El inspector debe reemplazarlos con su tabla (panel > Costos unitarios). El informe marca como 'ejemplo' cada costo que no fue calibrado.",
+  "moneda": "USD",
+  "fecha_referencia": "2026-11",
+  "costos": {
+    "monitoreo": { "valor": 0, "unidad": "global" },
+    "sellado_grietas": { "valor": 2.5, "unidad": "m" },
+    "fog_seal": { "valor": 1.2, "unidad": "m2" },
+    "rejuvenecedor": { "valor": 1.5, "unidad": "m2" },
+    "sand_seal": { "valor": 2.0, "unidad": "m2" },
+    "chip_seal": { "valor": 4.5, "unidad": "m2" },
+    "slurry_seal": { "valor": 4.0, "unidad": "m2" },
+    "micropavimento": { "valor": 6.0, "unidad": "m2" },
+    "thin_overlay": { "valor": 12.0, "unidad": "m2" },
+    "mill_and_replace": { "valor": 16.0, "unidad": "m2" },
+    "sobrecapa_estructural": { "valor": 22.0, "unidad": "m2" },
+    "fresado_sobrecapa_estructural": { "valor": 28.0, "unidad": "m2" },
+    "fdr": { "valor": 30.0, "unidad": "m2" },
+    "reconstruccion": { "valor": 65.0, "unidad": "m2" },
+    "limpieza_superficie": { "valor": 0.3, "unidad": "m2" },
+    "riego_liga": { "valor": 0.6, "unidad": "m2" },
+    "parcheo_profundidad_parcial": { "valor": 35.0, "unidad": "m2" },
+    "parcheo_profundidad_total": { "valor": 60.0, "unidad": "m2" },
+    "parcheo_superficial": { "valor": 25.0, "unidad": "m2" },
+    "fresado_local": { "valor": 20.0, "unidad": "m2" },
+    "arenado_exudacion": { "valor": 1.0, "unidad": "m2" },
+    "relleno_roderas": { "valor": 8.0, "unidad": "m2" },
+    "nivelacion_hombros": { "valor": 8.0, "unidad": "m" },
+    "conformacion_hombros": { "valor": 10.0, "unidad": "m" }
+  }
+}

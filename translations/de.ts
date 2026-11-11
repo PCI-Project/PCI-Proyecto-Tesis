@@ -371,7 +371,7 @@ export const de = {
         title: "Empfehlungen",
         subtitle: "Kalibrieren Sie den Agenten, ergänzen Sie fehlende Daten und erstellen Sie Maßnahmenempfehlungen.",
         openFromResults: "Zu Empfehlungen wechseln",
-        health: { checking: "Agent wird geprüft…", online: "Agent online", offline: "Agent offline", offlineHelp: "Der Agent ist nicht erreichbar. Sie können entrada.json herunterladen, mit dem Agenten verarbeiten und anschließend die Ergebnisse importieren." },
+        health: { checking: "Agent wird geprüft… (war er inaktiv, kann es bis zu einer Minute dauern)", online: "Agent online", offline: "Agent offline", offlineHelp: "Der Agent ist nicht erreichbar. Sie können entrada.json herunterladen, mit dem Agenten verarbeiten und anschließend die Ergebnisse importieren." },
         status: { ok: "Vollständig", warn: "Mit Warnungen", error: "Mit Fehlern" },
         save: { saved: "Gespeichert", saving: "Wird gespeichert…", error: "Speichern fehlgeschlagen" },
         level: { A1: "Präventiv (hoch)", A2: "Präventiv", B1: "Kleinere Rehabilitation", B2: "Umfangreiche Rehabilitation", C1: "Wiederaufbau", C2: "Wiederaufbau" },
@@ -437,7 +437,7 @@ export const de = {
         },
         bar: { assumed: "{n} anzunehmende Werte", complete: "Daten vollständig", lastResult: "Letztes Ergebnis anzeigen", downloadInput: "entrada.json herunterladen", importResults: "Ergebnisse importieren", generate: "Empfehlungen erstellen", rerun: "Erneut ausführen" },
         consulting: { working: "Der Agent arbeitet…", elapsed: "{s} s vergangen", cancel: "Abbrechen" },
-        error: { network: "Der Agent ist nicht erreichbar. Prüfen Sie, ob er läuft, oder verwenden Sie den Offline-Modus.", import: "Die Dateien sind ungültig ({fields}).", hash: "Die Ergebnisse stimmen nicht mit den aktuellen Daten überein. Erstellen Sie entrada.json erneut.", fix: "Korrigieren Sie die markierten Blöcke, bevor Sie fortfahren." },
+        error: { rateLimit: "Zu viele Anfragen hintereinander. Warten Sie eine Minute und versuchen Sie es erneut.", network: "Der Agent ist nicht erreichbar. Prüfen Sie, ob er läuft, oder verwenden Sie den Offline-Modus.", import: "Die Dateien sind ungültig ({fields}).", hash: "Die Ergebnisse stimmen nicht mit den aktuellen Daten überein. Erstellen Sie entrada.json erneut.", fix: "Korrigieren Sie die markierten Blöcke, bevor Sie fortfahren." },
         result: { edit: "Parameter bearbeiten", download: "JSON herunterladen", runs: "Läufe", pci: "Gewichteter PCI", needed: "Benötigte Kosten", financed: "Finanziert", shortfall: "Fehlbetrag", summary: "Zusammenfassung", treatment: "Behandlung", cost: "Kosten", interim: "vorläufig", pdf: "PDF herunterladen", print: "Drucken", title: "Ergebnis" }
     },
   };

@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Diseño de la sección Recomendaciones · AsphaltPCI Pro</title>
+<style>
+:root{--teal:#36C8C8;--teal-d:#289696;--opal:#9BC1BC;--accent:#F4F1BB;--accent-t:#504B1E;--danger:#ED6A5A;--base:#E6EBE0;--surface:#F7F9F4;--tx:#1D232A;--mut:#6B7280;--bd:#D1D5DB;--bdm:#E5E7EB;--A:#2e7d32;--B:#a35f00;--C:#b3261e;--ok:#289696;--warn:#B7791F;--warn-bg:#FDF4DC;--err:#C0453A;--err-bg:#FCE7E4;--doc:#0b3c5d}
+@page{size:A4;margin:14mm 14mm 16mm}
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;font:9.4pt/1.45 Inter,"Segoe UI",Arial,sans-serif;color:var(--tx);background:#fff}
+h1,h2,h3,h4{margin:0;color:var(--doc);line-height:1.2}
+h2{font-size:15pt;margin:0 0 8pt;padding-bottom:4pt;border-bottom:2px solid var(--doc)}
+h2 .n{display:inline-block;background:var(--doc);color:#fff;border-radius:4pt;padding:0 6pt;margin-right:6pt}
+h3{font-size:11pt;margin:12pt 0 4pt;color:#1d5a82}
+h4{font-size:9.6pt;margin:9pt 0 3pt;color:#1d5a82;text-transform:uppercase;letter-spacing:.04em}
+p{margin:0 0 5pt}
+ul,ol{margin:0 0 6pt;padding-left:15pt} li{margin-bottom:2pt}
+code{font:7.8pt Consolas,"Courier New",monospace;background:#f1f4f6;padding:0 2pt;border-radius:2pt}
+pre{font:7.4pt/1.35 Consolas,"Courier New",monospace;background:#f4f6f8;border:1px solid #dde3e8;border-radius:3pt;padding:6pt 8pt;white-space:pre-wrap;margin:4pt 0 8pt;break-inside:avoid}
+.salto{break-before:page}
+.nota{font-size:7.8pt;color:var(--mut)}
+table.t{width:100%;border-collapse:collapse;font-size:8pt;margin:4pt 0 8pt}
+table.t th{background:var(--doc);color:#fff;text-align:left;font-weight:500;padding:3pt 5pt}
+table.t td{border-bottom:1px solid #e3e8ec;padding:2.5pt 5pt;vertical-align:top}
+table.t th code,h2 code{background:rgba(255,255,255,.18);color:inherit}
+table.t tr{break-inside:avoid}
+thead{display:table-header-group}
+.caja{border-left:4px solid var(--doc);background:#eef3f7;padding:6pt 9pt;margin:6pt 0;border-radius:2pt;break-inside:avoid}
+.caja.w{border-color:var(--warn);background:var(--warn-bg)}
+.caja b.t{display:block;text-transform:uppercase;font-size:8pt;letter-spacing:.05em;margin-bottom:2pt}
+.portada{min-height:255mm;display:flex;flex-direction:column;break-after:page}
+.banda{background:var(--doc);color:#fff;border-radius:3pt;padding:20mm 14mm 14mm}
+.banda h1{color:#fff;font-size:23pt;font-weight:600;margin:6pt 0 8pt}
+.banda .s{opacity:.8;text-transform:uppercase;letter-spacing:.12em;font-size:8.5pt}
+.banda .p{color:#cfe3f1;font-size:13pt}
+.ficha{margin-top:12mm;width:100%;border-collapse:collapse;font-size:9.6pt}
+.ficha th{text-align:left;color:var(--mut);font-weight:500;width:48mm;padding:4pt 0;border-bottom:1px solid #e3e8ec}
+.ficha td{padding:4pt 0;border-bottom:1px solid #e3e8ec}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:10pt}
+
+/* ===== Maquetas: imitan la app (Tailwind con los tokens de index.html) ===== */
+.fig{margin:6pt 0 4pt;break-inside:avoid}
+.fig-cap{font-size:7.6pt;color:var(--mut);margin-top:2pt}
+.scr{background:var(--base);border:1px solid #c9d1c3;border-radius:8pt;padding:8pt;font-size:7.6pt;line-height:1.35;color:var(--tx);overflow:hidden}
+.scr *{box-sizing:border-box}
+.hdr{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-radius:6pt;padding:5pt 8pt;margin-bottom:6pt;box-shadow:0 1pt 3pt rgba(0,0,0,.08)}
+.hdr b{font-size:9pt} .hdr .m{color:var(--mut)}
+.steps{display:flex;gap:3pt;margin-bottom:6pt}
+.st{flex:1;display:flex;align-items:center;gap:3pt;background:var(--surface);border-radius:5pt;padding:3pt 4pt;font-size:6.6pt;color:var(--mut);border:1px solid transparent}
+.st .c{flex:none;width:11pt;height:11pt;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:6.4pt;background:var(--bdm);color:var(--mut)}
+.st.ok .c{background:var(--teal);color:#fff} .st.w .c{background:var(--warn);color:#fff} .st.e .c{background:var(--danger);color:#fff}
+.st.act{border-color:var(--teal);color:var(--tx);font-weight:600;background:#fff}
+.lay{display:grid;grid-template-columns:2.2fr 1fr;gap:6pt}
+.card{background:var(--surface);border-radius:7pt;padding:7pt 8pt;box-shadow:0 2pt 5pt rgba(0,0,0,.07);margin-bottom:6pt}
+.card h5{margin:0 0 4pt;font-size:8.4pt;color:var(--tx)}
+.mut{color:var(--mut)}
+.btn{display:inline-block;padding:3pt 8pt;border-radius:6pt;font-weight:700;font-size:6.8pt;background:var(--teal);color:#fff;box-shadow:0 2pt 4pt rgba(54,200,200,.35)}
+.btn.s{background:var(--opal);box-shadow:none} .btn.g{background:transparent;color:var(--mut);box-shadow:none;border:1px solid var(--bd)}
+.btn.d{background:var(--danger)}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:4pt}
+.in{display:inline-block;min-width:34pt;padding:1.5pt 5pt;border:1px solid var(--bd);border-radius:5pt;background:#fff;font-family:Consolas,monospace;font-size:7pt}
+.in.w{border-color:var(--warn);background:var(--warn-bg)}
+.rad{display:inline-block;width:7pt;height:7pt;border-radius:50%;border:1.5px solid var(--mut);vertical-align:-1pt;margin-right:2pt}
+.rad.on{border-color:var(--teal);background:radial-gradient(var(--teal) 45%,#fff 50%)}
+.chk{display:inline-block;width:7.5pt;height:7.5pt;border-radius:2pt;border:1.5px solid var(--mut);vertical-align:-1pt;margin-right:3pt;text-align:center;line-height:6pt;font-size:6pt;color:#fff}
+.chk.on{background:var(--teal);border-color:var(--teal)}
+.seg{display:inline-flex;border:1px solid var(--bd);border-radius:5pt;overflow:hidden}
+.seg span{padding:1.5pt 6pt;font-size:6.8pt} .seg span.on{background:var(--teal);color:#fff;font-weight:600}
+.row{display:grid;grid-template-columns:24mm 1fr;gap:4pt;align-items:center;padding:2.5pt 0;border-bottom:1px dashed var(--bdm)}
+.row .k{color:var(--mut)}
+.hint{font-size:6.6pt;color:var(--mut)} .hint.w{color:var(--warn);font-weight:600}
+.mt{width:100%;border-collapse:collapse;font-size:6.9pt}
+.mt th{text-align:left;color:var(--mut);font-weight:600;border-bottom:1px solid var(--bd);padding:2pt 3pt}
+.mt td{padding:2pt 3pt;border-bottom:1px solid var(--bdm)} .mt .r{text-align:right}
+.dot{display:inline-block;width:6pt;height:6pt;border-radius:50%;vertical-align:0}
+.dot.ok{background:var(--teal)} .dot.w{background:var(--warn)} .dot.e{background:var(--danger)}
+.chip{display:inline-block;padding:0 3pt;border-radius:2pt;color:#fff;font-weight:700;font-size:6.4pt}
+.chip.A{background:var(--A)} .chip.B{background:var(--B)} .chip.C{background:var(--C)}
+.tag{display:inline-block;font-size:5.9pt;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:0 3pt;border-radius:2pt;border:1px solid}
+.tag.ej{color:var(--warn);background:var(--warn-bg)} .tag.cal{color:var(--ok);background:#E3F5F5} .tag.cr{color:var(--err);background:var(--err-bg)} .tag.inf{color:#25577b;background:#e6eff6}
+.ban{border-radius:5pt;padding:3pt 6pt;font-size:6.9pt;margin-bottom:5pt}
+.ban.w{background:var(--warn-bg);color:#6b4a0f;border:1px solid #efd9a3}
+.ban.e{background:var(--err-bg);color:#7a2b23;border:1px solid #f3c2bb}
+.ban.i{background:#E3F5F5;color:#1f5f5f;border:1px solid #bfe7e7}
+.side h6{margin:0 0 3pt;font-size:7.4pt}
+.side li{font-size:6.8pt;margin-bottom:2pt}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:4pt}
+.kp{background:#fff;border:1px solid var(--bdm);border-radius:5pt;padding:3pt 5pt}
+.kp .k{display:block;font-size:5.9pt;text-transform:uppercase;color:var(--mut);letter-spacing:.04em}
+.kp .v{display:block;font-size:9pt;font-weight:700}
+.bar{display:flex;height:8pt;border-radius:4pt;overflow:hidden;margin:3pt 0}
+.bar div{height:100%}
+.prog{height:5pt;border-radius:3pt;background:var(--bdm);overflow:hidden;margin:3pt 0} .prog div{height:100%;background:var(--teal)}
+.mobile{width:62mm;margin:0 auto}
+/* ===== v3: maquetas de la sección Recomendaciones ===== */
+.acc{background:var(--surface);border-radius:7pt;margin-bottom:4pt;border:1px solid var(--bdm);overflow:hidden}
+.acc.open{border-color:var(--teal);box-shadow:0 2pt 5pt rgba(0,0,0,.07)}
+.acc-h{display:flex;align-items:center;gap:5pt;padding:4.5pt 8pt}
+.acc-h .num{flex:none;width:12pt;height:12pt;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:6.6pt;background:var(--bdm);color:var(--mut)}
+.acc-h .num.ok{background:var(--teal);color:#fff}.acc-h .num.w{background:var(--warn);color:#fff}.acc-h .num.e{background:var(--danger);color:#fff}
+.acc-h b{font-size:8.2pt}
+.acc-h .sum{color:var(--mut);font-size:6.8pt;flex:1}
+.acc-h .chev{color:var(--mut);font-size:7pt}
+.acc-b{padding:3pt 9pt 7pt;border-top:1px solid var(--bdm);background:#fff}
+.tabs{display:flex;gap:3pt;flex-wrap:wrap;margin:3pt 0 5pt}
+.tab{padding:2pt 7pt;border-radius:5pt;border:1px solid var(--bd);font-size:6.8pt;background:#fff}
+.tab.on{border-color:var(--teal);background:var(--teal);color:#fff;font-weight:700}
+.abar{display:flex;justify-content:space-between;align-items:center;gap:6pt;background:var(--surface);border:1px solid var(--bd);border-radius:7pt;padding:5pt 8pt;box-shadow:0 -2pt 6pt rgba(0,0,0,.1);margin-top:5pt}
+.chipset{display:flex;flex-wrap:wrap;gap:3pt;margin:3pt 0}
+.pchip{display:inline-flex;gap:3pt;align-items:center;border:1px solid var(--bd);border-radius:10pt;padding:1pt 6pt;background:#fff;font-size:6.8pt}
+.pchip b{font-weight:700}
+.pchip.w{border-color:var(--warn);background:var(--warn-bg)}
+.pchip.e{border-color:var(--danger);background:var(--err-bg)}
+.menu{background:var(--surface);border-radius:6pt;padding:6pt}
+.menu .it{padding:3pt 6pt;border-radius:5pt;font-weight:600;font-size:7pt;margin-bottom:2pt}
+.menu .it.on{background:var(--teal);color:#fff}
+.menu .lb{font-size:5.8pt;color:var(--mut);margin:3pt 0 2pt;text-transform:uppercase;font-weight:700;letter-spacing:.04em}
+.nuevo{display:inline-block;background:var(--danger);color:#fff;font-size:5.4pt;padding:0 3pt;border-radius:2pt;margin-left:3pt;font-weight:700;vertical-align:1pt}
+.dlt{font-weight:700}.dlt.up{color:var(--ok)}.dlt.dn{color:var(--err)}
+.hl{outline:1.4pt dashed var(--danger);outline-offset:1.5pt}
+.cmp{font-size:6.8pt;color:var(--mut)}
+.dim{opacity:.55}
+.titulo-app{display:flex;justify-content:space-between;align-items:flex-start;gap:6pt;margin-bottom:4pt}
+.titulo-app h4{margin:0;font-size:11pt;color:var(--teal-d);text-transform:none;letter-spacing:0}
+.estado{display:inline-flex;align-items:center;gap:3pt;font-size:6.8pt}
+.pill{display:inline-block;border-radius:8pt;padding:0 5pt;font-size:6.4pt;font-weight:700}
+.pill.ok{background:#E3F5F5;color:#1f5f5f}.pill.w{background:var(--warn-bg);color:#6b4a0f}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:6pt}
+</style>
+</head>
+<body>
+
+<body>
+
+<section class="portada">
+  <div class="banda">
+    <p class="s">AsphaltPCI Pro · Especificación de diseño</p>
+    <h1>Sección «Recomendaciones» de la app</h1>
+    <p class="p">Panel del agente: calibrar, completar datos, generar y ajustar. Diseño para implementar en la app web (React 19 + TypeScript)</p>
+  </div>
+  <table class="ficha">
+    <tr><th>Versión</th><td>3.0 · 2026-11-04. Reemplaza a la 2.0: el panel deja de ser un asistente aparte de 7 pasos y pasa a ser una sección de la app, a continuación de Resultados, con una sola pantalla de configuración y una pantalla de resultado con «Editar parámetros»</td></tr>
+    <tr><th>Destinatario</th><td>Codex (sesión de implementación); revisión por Claude</td></tr>
+    <tr><th>Interfaz de referencia</th><td>La app que corre en <code>localhost:5000</code>: la copia local <code>repositorios/Asphalt-pci_mapa</code> (menú lateral con los pasos del proyecto, pantalla Resultados, componentes <code>components/ui</code>, tokens de <code>index.html</code>, almacenamiento en <code>services/localApi.ts</code>). Los números de línea citados corresponden a esa copia</td></tr>
+    <tr><th>Repositorio en GitHub</th><td><code>PCI-Project/PCI-Proyecto-Tesis</code>: mismos componentes, pero guarda por <code>axios</code> en un backend Express + MongoDB. El diseño funciona con los dos almacenamientos (sección 6)</td></tr>
+    <tr><th>Agente (ya hecho)</th><td>Paquete <code>agente-recomendaciones</code>: motor, redactor con Ollama y servicio FastAPI que devuelve solo datos (<code>INTEGRACION.md</code>)</td></tr>
+    <tr><th>Documentos de apoyo</th><td><code>docs/01-contrato-entrada-salida.md</code>, <code>schemas/*.json</code>, <code>catalogo/*.json</code>, <code>ejemplos/entrada_ejemplo.json</code> y <code>docs/panel/informe-referencia.pdf</code> (cómo debe verse el informe) en el paquete del agente</td></tr>
+  </table>
+  <div class="caja w" style="margin-top:auto"><b class="t">Alcance de la tarea</b>Una sección nueva de la app, <b>Recomendaciones</b> (paso 5, después de Resultados), con: configuración de lo que el agente necesita (datos que faltan, equipo disponible, costos, presupuesto y forma de priorizar), el botón que pone a trabajar al agente, y la pantalla de <b>resumen e informe</b> dibujados en la web con exportación a PDF y la opción <b>Editar parámetros</b> para ajustar la consulta y volver a generarla. Incluye los cambios mínimos de guardado (sección 6). El agente solo devuelve datos; no se modifica su lógica.</div>
+</section>
+
+<!-- ======================================================= -->
+<section>
+  <h2><span class="n">0</span>Instrucciones para la implementación</h2>
+  <h3>Qué construir</h3>
+  <p>Una sección nueva de la app, <b>Recomendaciones</b>, que aparece como <b>paso 5</b> del proyecto, justo después de Resultados (vista <code>AGENT</code>). Es <b>una sola pantalla con dos modos</b>:</p>
+  <ul>
+    <li><b>Configurar:</b> el inspector calibra las opciones (equipo disponible, costos, presupuesto, forma de priorizar), completa los datos que la evaluación PCI no tiene (tipo de vía, bordillo, tránsito, edad del pavimento, drenaje…) y pone a trabajar al agente con un botón.</li>
+    <li><b>Resultado:</b> con la respuesta <code>{analisis, narrativa}</code> del agente, la web dibuja <b>un resumen en pantalla y el informe completo</b> (exportable a PDF). Un botón <b>Editar parámetros</b> devuelve al modo Configurar con todo lo ingresado, para ajustar la consulta y volver a generarla; el resultado anterior se conserva y se puede comparar.</li>
+  </ul>
+  <p>El agente no conversa: recibe <code>entrada.json</code> (según <code>schemas/entrada.schema.json</code>) y devuelve datos. El informe y el resumen los arma la web.</p>
+  <h3>Reglas de trabajo</h3>
+  <ol>
+    <li><b>Dónde:</b> en la copia local <code>repositorios/Asphalt-pci_mapa</code> (la que se ve en <code>localhost:5000</code>), en una rama <code>feature/recomendaciones</code>. Esa copia tiene cambios de Dk sin guardar (<code>public/manifest.json</code> y las traducciones <code>de, en, es, fr</code>): <b>no los incluyas</b> en tus commits ni los reviertas. <b>No hacer commit, push, PR ni merge</b> sin confirmación de Dk: Claude revisa el diff y el navegador primero. Dk la arranca con <code>iniciar-aplicacion.cmd</code> (<code>vite --port 5000</code>); no detengas ese proceso.</li>
+    <li>No modificar la lógica del agente. Reemplazar <code>agent/</code> del repositorio de GitHub por el paquete del agente es una tarea aparte (6.5); la sección solo consume su API.</li>
+    <li><b>Sin dependencias nuevas.</b> Usar React, Tailwind (CDN con los tokens de <code>index.html</code>), jsPDF + autoTable (ya cargados por CDN en <code>index.html</code>, como en <code>services/exportService.ts</code>) y los componentes de <code>components/ui</code> (<code>Card</code>, <code>Button</code>, <code>Input</code>, <code>InfoTip</code>, <code>Modal</code>, <code>Tooltip</code>). Las llamadas al servicio del agente usan <code>fetch</code> (la copia local no tiene <code>axios</code> en <code>package.json</code>; el proyecto se guarda con <code>services/localApi.ts</code>).</li>
+    <li>Todos los textos de la interfaz por <code>t()</code>, con claves nuevas en <code>translations/es.ts</code> y <code>translations/en.ts</code>: <code>stepper.step5</code> y el bloque <code>agent.*</code>. Los demás idiomas caen al inglés (<code>hooks/useTranslations.ts</code>). Los textos del informe que vienen en <code>narrativa</code> se muestran tal cual, en español.</li>
+    <li>Tema claro y oscuro: solo clases de tokens (<code>bg-bg-surface</code>, <code>text-text-base</code>, <code>border-border-base</code>, <code>bg-primary</code>, <code>text-danger</code>…), nunca colores fijos, salvo los de franja A/B/C definidos en 2.2.</li>
+    <li>El frontend no tiene pruebas automáticas. Verificar con <code>npx tsc --noEmit</code> y <code>npm run build</code>. Las funciones puras (<code>buildAgentInput</code>, validaciones, nivel por PCI, comparación de consultas, armado del PDF) van en <code>services/agent/</code>, sin React, para poder probarlas después.</li>
+    <li><b>Guardado:</b> el proyecto se guarda con <code>API.put('/projects/:id')</code>, como las muestras, pero <code>App.tsx</code> copia campo por campo (<code>mapProjectToMongoPayload</code>, <code>mapMongoProjectToProject</code>) y <code>saveProjectToStorage</code> ignora un guardado si hay otro en curso. Hay que añadir los campos nuevos a esos mapeos y guardar solo en los momentos de 3.1 (sección 6.3). Sin esto, la configuración se pierde al recargar.</li>
+  </ol>
+  <h3>Orden sugerido</h3>
+  <ol>
+    <li>Tipos y catálogo (<code>types.ts</code>, <code>services/agent/catalog.ts</code>).</li>
+    <li>Funciones puras: nivel por PCI, validaciones, <code>buildAgentInput</code>, <code>compareRuns</code>, lectura de <code>analisis.json</code>.</li>
+    <li>Navegación: paso 5 en <code>AppHeader.tsx</code>, caso <code>AGENT</code> en <code>App.tsx</code>, botón en Resultados.</li>
+    <li>Guardado: mapeos de <code>App.tsx</code> y, si se usa el backend de GitHub, <code>Project.js</code> y <code>server.js</code> (sección 6).</li>
+    <li>Modo Configurar: bloque por bloque (3.3 a 3.7) y barra de acción (3.8).</li>
+    <li>Cliente del servicio y modo sin servicio.</li>
+    <li>Modo Resultado: resumen, parámetros de la consulta, ajuste rápido, comparación e historial (3.9, 3.10) e informe y PDF (sección 4).</li>
+    <li>Traducciones, tema oscuro y vista móvil.</li>
+  </ol>
+  <h3>Resultado esperado</h3>
+  <p>Con un proyecto de la app, el inspector abre «5. Recomendaciones» desde el menú o desde el botón de Resultados, completa los bloques y pulsa <i>Generar recomendaciones</i>. El servicio (<code>uvicorn servicio.main:app --port 8000</code>) responde y la pantalla pasa al modo Resultado, con el resumen y el informe completo. <i>Editar parámetros</i> vuelve a la configuración; al volver a generar se ve qué cambió respecto a la consulta anterior. Sin servicio, descarga <code>entrada.json</code>, ejecuta <code>python -m agente todo entrada.json -d salida</code> e importa <code>analisis.json</code> y <code>narrativa.json</code>.</p>
+</section>
+
+<section class="salto">
+  <h2><span class="n">1</span>Lugar en la app y flujo</h2>
+  <pre>DASHBOARD → 1 Detalles (SETUP) → 2 Datos de Fallas (DATA_ENTRY) → 3 Cálculo (CALCULATION_DETAILS)
+          → 4 Resultados (RESULTS) → 5 Recomendaciones (AGENT)          ← nuevo
+
+AGENT:   Configurar ──[Generar recomendaciones]──> Consultando ──> Resultado
+              ^                                         │ error: vuelve a Configurar con el aviso
+              └────────────[Editar parámetros]──────────┘   (el resultado anterior se conserva)
+
+Datos:  Project + section.context + project.agentConfig ──buildAgentInput()──> entrada.json
+        entrada.json ──POST {VITE_AGENT_URL}/api/recommendations──> { analisis, narrativa }   (con servicio)
+        entrada.json ──descargar──> python -m agente todo ──> importar analisis + narrativa      (sin servicio)
+        { analisis, narrativa } ──> AgentRun en project.agentRuns ──> resumen + informe en la web ──> PDF (jsPDF)</pre>
+
+  <div class="dos">
+    <div class="fig">
+      <div class="scr">
+        <div class="menu">
+          <b style="color:var(--teal-d);font-size:8pt">Menú</b>
+          <div class="lb">Pasos del proyecto</div>
+          <div class="it">1. Detalles</div><div class="it">2. Datos de Fallas</div><div class="it">3. Cálculo</div><div class="it">4. Resultados</div>
+          <div class="it on hl">5. Recomendaciones <span class="nuevo">NUEVO</span></div>
+          <div class="lb" style="margin-top:5pt">Cuenta</div>
+          <div class="it">Panel</div><div class="it">Perfil</div>
+        </div>
+      </div>
+      <p class="fig-cap">Figura 1a. Menú lateral (<code>AppHeader.tsx</code>): el paso 5 se añade a <code>STEP_DEFINITIONS</code>.</p>
+    </div>
+    <div class="fig">
+      <div class="scr">
+        <div class="card" style="margin:0">
+          <div class="titulo-app"><div><h4>Resultados</h4><span class="mut">Calles de Santiago</span></div><span><span class="btn s">Exportar</span> <span class="btn hl">Ir a Recomendaciones</span></span></div>
+          <div style="background:#c9a24a;color:#fff;border-radius:6pt;text-align:center;padding:4pt"><span style="font-size:6.4pt;text-transform:uppercase">PCI ponderado</span><br><b style="font-size:16pt">60.00</b><br><span class="pill" style="background:rgba(0,0,0,.2);color:#fff">Regular</span></div>
+          <p class="hint" style="margin-top:3pt">Mapa de tramos y tabla por tramo…</p>
+        </div>
+      </div>
+      <p class="fig-cap">Figura 1b. Resultados: botón primario junto a «Exportar» (<code>ResultsDisplay.tsx</code>, cabecera de la tarjeta).</p>
+    </div>
+  </div>
+
+  <ul>
+    <li><b>La app no tiene barra de pasos horizontal</b> (<code>components/ProjectStepper.tsx</code> está vacío): los pasos están en el menú lateral de <code>AppHeader.tsx</code>. Añadir <code>{ view: 'AGENT', labelKey: 'stepper.step5', icon: AgentIcon }</code> a <code>STEP_DEFINITIONS</code> y <code>'AGENT'</code> al final de <code>VIEW_ORDER</code> (en <code>AppHeader.tsx</code> y en <code>App.tsx</code>). Textos: «5. Recomendaciones» / «5. Recommendations». El icono sigue el patrón de los demás (SVG de 20 px, <code>fill="currentColor"</code>).</li>
+    <li><b><code>App.tsx</code>:</b> caso <code>'AGENT'</code> en el <code>switch</code> de <code>renderContent</code> (después de <code>RESULTS</code>); en <code>handleNavigate</code> la condición <code>view === 'CALCULATION_DETAILS' || view === 'RESULTS'</code> pasa a incluir <code>'AGENT'</code> (necesita el PCI calculado); en la carga del proyecto, <code>needsResultsCalc</code> también cuando <code>targetView === 'AGENT'</code>.</li>
+    <li><b>Entrada desde Resultados:</b> botón primario <i>Ir a Recomendaciones</i> (prop <code>onOpenAgent</code> que llama a <code>onNavigate('AGENT')</code>). Si algún tramo no tiene PCI, se deshabilita con un <code>InfoTip</code> que lo explica.</li>
+    <li><b>Última vista:</b> como el resto de pasos, si el usuario sale estando en Recomendaciones, el proyecto se reabre ahí (<code>lastView = 'AGENT'</code>; en el backend de GitHub <code>lastView</code> es un <code>String</code> libre, no hace falta cambiarlo).</li>
+    <li>Si el PCI de algún tramo falta, la pantalla muestra un aviso bloqueante con botón <i>Ir a Cálculo</i> en lugar de los bloques.</li>
+    <li>Si el proyecto cambia después de generar (se edita una muestra), el modo Resultado muestra el aviso <i>«Los datos cambiaron desde esta consulta»</i> (la huella de la entrada ya no coincide) con el botón <i>Volver a consultar</i>.</li>
+  </ul>
+
+  <h3>1.1 Tipos nuevos en <code>types.ts</code></h3>
+<pre>export type ProjectView = 'SETUP' | 'DATA_ENTRY' | 'CALCULATION_DETAILS' | 'RESULTS' | 'AGENT';
+// MongoProject.lastView (misma unión escrita a mano en types.ts): añadir 'AGENT'
+
+export type RoadType = 'urbana' | 'rural';
+export type TrafficClass = 'bajo' | 'medio' | 'alto';
+export type Drainage = 'bueno' | 'regular' | 'malo';
+
+export interface SectionContext {          // Section.context?: SectionContext
+  roadType: RoadType | null;
+  curbHeightCm: number | null;              // solo urbana
+  trafficInput: 'esal' | 'clase';           // pestaña elegida
+  esalMillions: number | null;
+  trafficClass: TrafficClass | null;
+  aadt: number | null;                      // TPDA, informativo
+  yearBuilt: number | null;
+  lastInterventionYear: number | null;
+  lastInterventionType: string | null;      // ID del catálogo u 'otra'
+  drainage: Drainage | null;
+  functionalClass: string | null;
+  notes: string | null;
+}
+
+export interface UnitCost { valor: number; unidad: 'm2' | 'm' | 'global'; fuente?: string; }
+
+export interface AgentConfig {              // Project.agentConfig?: AgentConfig (borrador vigente)
+  availableTreatments: string[];            // IDs del catálogo
+  unitCosts: Record&lt;string, UnitCost&gt;;      // solo los que el inspector cambió
+  currency: string;                         // 'USD'
+  budget: number | null;                    // null = sin tope
+  priorityMode: 'costo_beneficio' | 'peor_primero';
+  contingencyPct: number;                   // va a parametros.imprevistos_pct
+  pciThresholds?: Partial&lt;Record&lt;'A1' | 'A2' | 'B1' | 'B2' | 'C1', number&gt;&gt;;
+  parameters?: Record&lt;string, unknown&gt;;    // avanzados, misma clave que parametros_defecto.json
+  updatedAt: string;
+}
+
+export interface AgentRun {                 // Project.agentRuns?: AgentRun[] (máx. 5, el más nuevo primero; ~65 kB c/u)
+  id: string;
+  number: number;                           // 1, 2, 3… consecutivo por proyecto (se muestra como «v3»)
+  createdAt: string;
+  inputHash: string;                        // sha256 de entrada.json canónico
+  config: AgentConfig;                      // parámetros usados (para «Restaurar parámetros» y los chips)
+  contexts: Record&lt;string, SectionContext | null&gt;;   // contexto de cada tramo (clave = Section.id) en ese momento
+  input: unknown;                           // entrada.json
+  analysis: unknown;                        // analisis.json
+  narrative: unknown;                       // narrativa.json (textos del informe)
+  narrativeSource: 'modelo' | 'automatica' | 'importado';
+  agentVersion: string;                     // "version" de la respuesta
+  status: 'listo' | 'error';
+  error?: string;
+}</pre>
+  <p class="nota">Los datos nuevos son opcionales: los proyectos guardados antes de este cambio deben abrir sin migración. <code>Section.context</code> viaja dentro de <code>Project.sections</code>, que la app ya copia completo.</p>
+</section>
+
+<section class="salto">
+  <h2><span class="n">2</span>Sistema visual</h2>
+  <p>La sección usa el mismo lenguaje que Resultados: una <code>Card</code> grande con la cabecera de título y botones, y dentro, bloques con borde. No se introduce ningún estilo nuevo.</p>
+  <h3>2.1 Tokens de la app (ya definidos en <code>index.html</code>)</h3>
+  <table class="t">
+    <thead><tr><th>Uso en la sección</th><th>Clase Tailwind</th><th>Valor claro</th></tr></thead>
+    <tbody>
+      <tr><td>Fondo de la vista</td><td><code>bg-bg-base</code></td><td>#E6EBE0</td></tr>
+      <tr><td>Tarjeta principal y bloques</td><td><code>bg-bg-surface</code> + <code>Card</code></td><td>#F7F9F4</td></tr>
+      <tr><td>Acción principal, estado completo, bloque abierto</td><td><code>bg-primary</code>, <code>ring-primary</code>, <code>border-primary</code></td><td>#36C8C8</td></tr>
+      <tr><td>Acción secundaria</td><td><code>Button variant="secondary"</code></td><td>#9BC1BC</td></tr>
+      <tr><td>Estado bloqueante, crítico</td><td><code>text-danger</code>, <code>bg-danger/10</code></td><td>#ED6A5A</td></tr>
+      <tr><td>Estado «se asumirá» (ámbar)</td><td><code>bg-amber-100 text-amber-800 border-amber-300</code> · oscuro: <code>dark:bg-amber-900/30 dark:text-amber-200</code></td><td>—</td></tr>
+      <tr><td>Texto secundario</td><td><code>text-text-muted</code></td><td>#6B7280</td></tr>
+      <tr><td>Bordes</td><td><code>border-border-base</code> / <code>border-border-muted</code></td><td>#D1D5DB / #E5E7EB</td></tr>
+      <tr><td>Cifras</td><td><code>font-mono tabular-nums</code></td><td>—</td></tr>
+    </tbody>
+  </table>
+  <h3>2.2 Colores de franja (mismos del informe)</h3>
+  <p><span class="chip A">A</span> Mantenimiento preventivo <code>#2e7d32</code> · <span class="chip B">B</span> Rehabilitación menor y mayor <code>#a35f00</code> · <span class="chip C">C</span> Reconstrucción <code>#b3261e</code>. Siempre con el texto del nivel al lado, nunca solo color.</p>
+  <h3>2.3 Qué componente de la app reutilizar para cada pieza</h3>
+  <table class="t">
+    <thead><tr><th>Pieza de la sección</th><th>Reutilizar de la app</th></tr></thead>
+    <tbody>
+      <tr><td>Título y botones de la cabecera</td><td>Cabecera de <code>ResultsDisplay</code>: <code>h2 text-2xl font-bold text-primary</code>, nombre del proyecto en <code>text-text-muted</code>, botones en <code>flex flex-wrap gap-2</code></td></tr>
+      <tr><td>Bloque expandible</td><td>Patrón de <code>SectionRow</code> (<code>isExpanded</code>, <code>ChevronDownIcon</code> que gira, contenido con <code>animate-simple-fade-in</code>) dentro de <code>border border-border-muted rounded-xl bg-bg-surface</code>. Componente propio <code>AccordionBlock</code></td></tr>
+      <tr><td>Tablas</td><td><code>overflow-x-auto border border-border-muted rounded-lg</code>; <code>thead</code> con <code>bg-secondary/20 text-secondary-dark</code>; filas <code>odd:bg-secondary/5</code> y <code>hover:bg-primary/5</code></td></tr>
+      <tr><td>Campos</td><td><code>Input</code> con <code>label</code> e <code>info</code> (<code>InfoTip</code>); <code>select</code> nativo con las clases de <code>ProjectForm</code>; casillas <code>h-5 w-5 rounded text-primary focus:ring-primary</code></td></tr>
+      <tr><td>Aviso informativo</td><td><code>bg-secondary/10 p-4 rounded-lg border border-secondary/20</code> (como «parámetros de muestreo» en <code>ProjectForm</code>)</td></tr>
+      <tr><td>Ventanas (ver JSON, copiar contexto, importar)</td><td><code>Modal</code> de <code>components/ui</code>, con los botones al pie como en <code>ExportModal</code></td></tr>
+      <tr><td>Indicadores del resumen</td><td><code>Card</code> con borde y cifra grande; el color del PCI usa <code>getPCIRating</code> de <code>constants.ts</code> como en Resultados</td></tr>
+    </tbody>
+  </table>
+  <h3>2.4 Estados de cada bloque</h3>
+  <table class="t">
+    <thead><tr><th>Estado</th><th>Señal en el encabezado del bloque</th><th>Regla</th></tr></thead>
+    <tbody>
+      <tr><td>Completo</td><td><span class="dot ok"></span> círculo turquesa con ✓</td><td>Sin faltantes</td></tr>
+      <tr><td>Se asumirán datos</td><td><span class="dot w"></span> círculo ámbar con !</td><td>Faltan datos opcionales: deja generar; el agente asume el caso conservador y lo declara</td></tr>
+      <tr><td>Bloquea</td><td><span class="dot e"></span> círculo terracota con ×</td><td>Error que impide generar: el botón <i>Generar</i> queda deshabilitado y la barra de acción dice por qué</td></tr>
+      <tr><td>Cambiado</td><td>punto turquesa pequeño y texto «cambiado»</td><td>Solo en modo Editar: el valor difiere del de la consulta mostrada (3.10)</td></tr>
+    </tbody>
+  </table>
+  <h3>2.5 Composición</h3>
+  <ul>
+    <li><b>Escritorio (≥ 1024 px):</b> dentro de <code>main</code> (<code>container max-w-7xl</code>), una <code>Card</code> con cabecera y, debajo, los cinco bloques en columna única a todo el ancho. Una columna lateral no cabe: el contenido es de tablas y casillas. La <b>barra de acción</b> queda fija al pie del área de desplazamiento (<code>sticky bottom-0</code> dentro de <code>main</code>, que es el contenedor con <code>overflow-y-auto</code>).</li>
+    <li><b>Cabecera de la app:</b> se oculta al bajar y reaparece al subir (ya implementado en <code>AppHeader</code>); no hace falta tratarlo.</li>
+    <li><b>Móvil (&lt; 768 px):</b> los bloques se apilan igual; los encabezados miden al menos 44 px; las tablas pasan a lista de tarjetas; la barra de acción muestra solo el botón principal y un contador de avisos (sección 8).</li>
+    <li>El borrador se guarda en los momentos de 3.1; no en cada tecla.</li>
+  </ul>
+</section>
+
+<section class="salto">
+  <h2><span class="n">3</span>La pantalla «Recomendaciones»</h2>
+
+  <h3>3.1 Estructura y estados</h3>
+  <p>Una sola pantalla con una <code>Card</code> principal. Tiene tres estados que cambian el contenido bajo la cabecera; no hay navegación interna entre páginas.</p>
+  <table class="t">
+    <thead><tr><th>Estado</th><th>Cuándo</th><th>Qué se ve</th></tr></thead>
+    <tbody>
+      <tr><td><b>Configurar</b></td><td>Es el estado inicial si el proyecto no tiene consultas; también tras <i>Editar parámetros</i> y tras un error</td><td>Los cinco bloques (3.3 a 3.7) y la barra de acción (3.8)</td></tr>
+      <tr><td><b>Consultando</b></td><td>Entre <i>Generar recomendaciones</i> y la respuesta</td><td>Los bloques quedan visibles y bloqueados (<code>pointer-events-none opacity-70</code>); la barra de acción muestra el progreso y <i>Cancelar</i></td></tr>
+      <tr><td><b>Resultado</b></td><td>Con una consulta lista (recién generada o la más reciente guardada)</td><td>Parámetros de la consulta, resumen e informe, comparación e historial (3.9)</td></tr>
+    </tbody>
+  </table>
+  <p>Al abrir la sección: sin consultas guardadas → Configurar; con consultas → Resultado de la más reciente (con aviso si los datos cambiaron). <i>Editar parámetros</i> lleva de Resultado a Configurar y <i>Ver resultado</i> regresa sin generar (3.10).</p>
+  <div class="fig">
+    <div class="scr">
+      <div class="hdr"><span>☰ &nbsp;<b style="color:var(--teal-d)">AsphaltPCI</b> <b>PRO</b></span><span class="m">&nbsp;</span></div>
+      <div class="card" style="margin:0">
+        <div class="titulo-app"><div><h4>Recomendaciones</h4><span class="mut">Calles de Santiago · inspector J. Delgado</span></div><span><span class="estado"><span class="dot ok"></span> Agente en línea · v1.3 &nbsp;</span><span class="btn g">Ver JSON</span></span></div>
+        <div class="acc"><div class="acc-h"><span class="num ok">✓</span><b>1 · Datos recibidos</b><span class="sum">4 tramos · 23 muestras · 64 fallas · PCI ponderado 60.0 · 1 aviso de muestreo</span><span class="chev">▸</span></div></div>
+        <div class="acc open"><div class="acc-h"><span class="num w">!</span><b>2 · Datos que faltan</b><span class="sum">2 de 4 tramos incompletos</span><span class="chev">▾</span></div>
+          <div class="acc-b"><div class="tabs"><span class="tab"><span class="dot ok"></span> Calle 10ma</span><span class="tab"><span class="dot ok"></span> Av. Central</span><span class="tab on">Vía a La Mata</span><span class="tab"><span class="dot w"></span> Calle 2da</span></div><span class="mut">Formulario del tramo seleccionado (figura 3)</span></div></div>
+        <div class="acc"><div class="acc-h"><span class="num w">!</span><b>3 · Equipo disponible</b><span class="sum">18 de 23 tratamientos · 1 tramo sin opción para su nivel</span><span class="chev">▸</span></div></div>
+        <div class="acc"><div class="acc-h"><span class="num w">!</span><b>4 · Costos unitarios</b><span class="sum">21 de 23 son de ejemplo · USD</span><span class="chev">▸</span></div></div>
+        <div class="acc"><div class="acc-h"><span class="num ok">✓</span><b>5 · Presupuesto y prioridad</b><span class="sum">120 000 USD · mayor beneficio por dólar · imprevistos 10 %</span><span class="chev">▸</span></div></div>
+      </div>
+      <div class="abar"><span class="chipset" style="margin:0"><span class="pchip w">2 datos se asumirán</span><span class="pchip w">1 tramo con interina</span><span class="pchip w">21 costos de ejemplo</span></span><span><span class="btn g">Ver JSON</span> <span class="btn">Generar recomendaciones</span></span></div>
+    </div>
+    <p class="fig-cap">Figura 2. Estado Configurar. Cada bloque cerrado resume su contenido en una línea; la barra de acción queda fija al pie.</p>
+  </div>
+  <ul>
+    <li><b>Bloques:</b> acordeón; se pueden abrir varios a la vez. Al entrar por primera vez, abierto el bloque 2 y cerrados los demás; si algún bloque está en rojo, se abre ese. Botón <i>Expandir todo / Contraer todo</i> en la cabecera de la tarjeta.</li>
+    <li><b>Línea de resumen</b> de cada bloque cerrado: dato clave actual, para revisar sin abrir. Es función pura de la configuración (<code>summarizeBlock(n, ctx)</code>).</li>
+    <li><b>Saltos:</b> los contadores de la barra de acción y los chips de 3.9 abren el bloque correspondiente y hacen <code>scrollIntoView</code>, con el foco en el título del bloque.</li>
+    <li><b>Cuándo se guarda el borrador</b> (<code>project.agentConfig</code> y <code>section.context</code>): al cerrar un bloque, al cambiar de tramo en el bloque 2, al pulsar <i>Generar</i>, al recibir el resultado y al salir de la vista. <b>No en cada tecla</b>: <code>saveProjectToStorage</code> ignora un guardado si hay otro en curso, así que el panel usa una cola (si hay uno en curso, marca «pendiente» y repite al terminar). El estado vivo está en <code>useState</code> del <code>AgentPanel</code>; el proyecto solo recibe copias.</li>
+    <li><b>Valores iniciales:</b> si el proyecto no tiene <code>agentConfig</code>, se toman las preferencias del usuario (7.1) y, si no hay, el catálogo y los valores por defecto del agente.</li>
+  </ul>
+
+  <h3>3.2 Cabecera y estado del agente</h3>
+  <ul>
+    <li>Título «Recomendaciones» y nombre del proyecto, como en Resultados. A la derecha, el estado del agente y <i>Ver JSON</i>.</li>
+    <li>Al abrir la sección se hace <code>GET {VITE_AGENT_URL}/</code> con 3 s de espera. Con respuesta: «Agente en línea · v{version}» y, si <code>redactor</code> es <code>automatico</code>, el texto «textos automáticos». Sin respuesta: «Sin servicio» con <i>Reintentar</i> y el botón principal cambia a las opciones de 3.8.</li>
+    <li>Los modos Configurar y Resultado comparten la cabecera.</li>
+  </ul>
+</section>
+
+<section class="salto">
+  <h3>3.3 Bloque 1 · Datos recibidos (solo lectura)</h3>
+  <p>Comprueba que el cálculo del PCI esté completo y muestra el nivel que le toca a cada tramo con los umbrales vigentes (que se pueden cambiar en el bloque 5). Cerrado por defecto salvo que tenga un aviso en rojo.</p>
+  <div class="fig">
+    <div class="scr">
+      <div class="acc open"><div class="acc-h"><span class="num ok">✓</span><b>1 · Datos recibidos</b><span class="sum">4 tramos · 23 muestras · 64 fallas · PCI ponderado 60.0</span><span class="chev">▾</span></div>
+        <div class="acc-b">
+          <p class="mut" style="margin:2pt 0">Inspector J. Delgado · inspección 2026-10-20</p>
+          <table class="mt"><tr><th>Tramo</th><th class="r">Área m²</th><th class="r">PCI</th><th>Nivel</th><th class="r">Muestras</th><th class="r">Fallas</th><th>Estado</th></tr>
+          <tr><td>Calle 10ma</td><td class="r">2 880</td><td class="r">62.4</td><td><span class="chip B">B1</span> Rehab. menor</td><td class="r">5 / 13</td><td class="r">14</td><td><span class="dot ok"></span></td></tr>
+          <tr><td>Av. Central</td><td class="r">5 400</td><td class="r">88.1</td><td><span class="chip A">A1</span> Mant. preventivo</td><td class="r">6 / 24</td><td class="r">8</td><td><span class="dot ok"></span></td></tr>
+          <tr><td>Vía a La Mata</td><td class="r">9 000</td><td class="r">47.0</td><td><span class="chip B">B2</span> Rehab. mayor</td><td class="r">8 / 40</td><td class="r">20</td><td><span class="dot w"></span></td></tr>
+          <tr><td>Calle 2da</td><td class="r">1 600</td><td class="r">33.5</td><td><span class="chip C">C1</span> Reconstrucción</td><td class="r">4 / 7</td><td class="r">12</td><td><span class="dot ok"></span></td></tr></table>
+          <div class="bar"><div style="width:29%;background:var(--A)"></div><div style="width:63%;background:var(--B)"></div><div style="width:8%;background:var(--C)"></div></div>
+          <div class="ban w" style="margin-top:2pt">Vía a La Mata: muestreo insuficiente según ASTM D6433 (faltan 2 unidades de muestra). Puedes seguir; el informe lo advertirá.</div>
+        </div></div>
+    </div>
+    <p class="fig-cap">Figura 3a. Bloque 1 abierto. La barra de color es el área por franja (A, B, C).</p>
+  </div>
+  <table class="t">
+    <thead><tr><th>Comprobación</th><th>Nivel</th><th>Mensaje</th></tr></thead>
+    <tbody>
+      <tr><td>Tramo sin <code>pci</code></td><td>Bloquea</td><td>«Calcula el PCI de {tramo} antes de generar recomendaciones» (con botón <i>Ir a Cálculo</i>)</td></tr>
+      <tr><td>Tramo sin muestras, o muestra con área ≤ 0</td><td>Bloquea</td><td>«{tramo}: muestra {id} sin área»</td></tr>
+      <tr><td>Pavimento distinto de flexible</td><td>Bloquea</td><td>«El agente solo cubre pavimento flexible»</td></tr>
+      <tr><td><code>samplesSufficient === false</code></td><td>Aviso</td><td>Muestreo insuficiente (ver figura)</td></tr>
+      <tr><td>Muestra sin fallas</td><td>Información</td><td>«La muestra {id} no tiene fallas registradas» (puede ser correcto)</td></tr>
+      <tr><td>|PCI del tramo − promedio ponderado de sus muestras| &gt; 5</td><td>Aviso</td><td>«El PCI del tramo difiere del promedio de sus muestras»</td></tr>
+    </tbody>
+  </table>
+  <p>Nivel por PCI (función pura <code>levelForPci(pci, thresholds)</code>): A1 ≥ 85, A2 ≥ 71, B1 ≥ 56, B2 ≥ 41, C1 ≥ 26, si no C2. Nombres: A = Mantenimiento preventivo, B1 = Rehabilitación menor, B2 = Rehabilitación mayor, C = Reconstrucción.</p>
+
+  <h3>3.4 Bloque 2 · Datos que faltan (contexto de cada tramo)</h3>
+  <p>Lo que la evaluación PCI no tiene y que el agente necesita para completar la matriz: tipo de vía, bordillo, tránsito, edad del pavimento, drenaje. Una pestaña por tramo (con su punto de estado) y un formulario debajo. Botón <i>Copiar este contexto a…</i> (modal con casillas: todos o algunos tramos; copia todo menos las observaciones). La lista «Se asumirá» está al pie del bloque.</p>
+  <div class="fig">
+    <div class="scr">
+      <div class="acc open"><div class="acc-h"><span class="num w">!</span><b>2 · Datos que faltan</b><span class="sum">2 de 4 tramos incompletos</span><span class="chev">▾</span></div>
+        <div class="acc-b">
+          <div class="tabs"><span class="tab"><span class="dot ok"></span> Calle 10ma</span><span class="tab"><span class="dot ok"></span> Av. Central</span><span class="tab on">Vía a La Mata</span><span class="tab"><span class="dot w"></span> Calle 2da</span></div>
+          <p style="margin:0 0 2pt"><b>Vía a La Mata</b> · PCI 47.0 · <span class="chip B">B2</span> Rehabilitación mayor</p>
+          <div class="row"><span class="k">Tipo de vía</span><span><span class="seg"><span>Urbana con bordillo</span><span class="on">Rural sin bordillo</span></span> <span class="hint">rural: sin regla de bordillo, se agregan hombros</span></span></div>
+          <div class="row"><span class="k">Bordillo</span><span class="hint">No aplica en vía rural</span></div>
+          <div class="row"><span class="k">Tránsito</span><span><span class="seg"><span class="on">ESAL</span><span>Clase</span></span> <span class="in w">— millones</span> <span class="hint w">Sin dato: se tratará como tránsito medio</span></span></div>
+          <div class="row"><span class="k">TPDA</span><span><span class="in">     </span> <span class="hint">informativo</span></span></div>
+          <div class="row"><span class="k">Construido</span><span><span class="in">2012</span> &nbsp; Última intervención <span class="in">    </span> <span class="in">— ▾</span></span></div>
+          <div class="row"><span class="k">Drenaje</span><span><span class="rad"></span>Bueno <span class="rad on"></span>Regular <span class="rad"></span>Malo</span></div>
+          <div class="row"><span class="k">Clasificación</span><span><span class="in">Rural secundaria ▾</span></span></div>
+          <div class="row" style="border:0"><span class="k">Observaciones</span><span><span class="in" style="width:100%">Cunetas de tierra con sedimento</span></span></div>
+          <div class="foot"><span class="btn g">Copiar este contexto a…</span><span class="pchip w">Se asumirá: Vía a La Mata, tránsito medio · Calle 2da, bordillo &lt; 7.6 cm (fresado)</span></div>
+        </div></div>
+    </div>
+    <p class="fig-cap">Figura 3b. Bloque 2. Los campos vacíos que el agente asumirá se marcan en ámbar con el supuesto exacto.</p>
+  </div>
+  <table class="t">
+    <thead><tr><th>Campo</th><th>Control</th><th>Validación</th><th>Si queda vacío</th><th>Para qué lo usa el agente</th></tr></thead>
+    <tbody>
+      <tr><td>Tipo de vía</td><td>Control segmentado de 2 opciones</td><td>—</td><td>Ámbar: «se asumirá urbana con bordillo»</td><td>Rural quita la regla del bordillo y agrega conformación de hombros</td></tr>
+      <tr><td>Altura libre de bordillo (cm)</td><td>Número, paso 0.5, con dibujo del corte calzada-bordillo en un <code>InfoTip</code></td><td>0–40; solo visible si urbana</td><td>Ámbar: «se asumirá &lt; 7.6 cm: se fresará en vez de sobrecapa»</td><td>≥ 7.6 cm (3 in) permite sobrecapa; menor obliga a fresar (MS-16, Fig. 1.4, Tabla 1.1)</td></tr>
+      <tr><td>Tránsito</td><td>Pestañas <i>ESAL</i> (millones, número ≥ 0) o <i>Clase</i> (bajo, medio, alto)</td><td>ESAL 0–200</td><td>Ámbar: «se tratará como medio»</td><td>&lt; 0.3 M bajo, &lt; 3 M medio, resto alto (MS-2); restringe chip seal, slurry, sand seal; pondera el beneficio</td></tr>
+      <tr><td>TPDA</td><td>Número entero</td><td>≥ 0</td><td>Nada</td><td>Solo se copia al informe (no hay norma para convertirlo en clase)</td></tr>
+      <tr><td>Año de construcción (edad del pavimento)</td><td>Año</td><td>1950 ≤ año ≤ año actual</td><td>Información: «la curva de deterioro usará el valor por defecto»</td><td>Edad para la curva de deterioro y la alerta de deterioro acelerado</td></tr>
+      <tr><td>Última intervención</td><td>Año + lista del catálogo u «otra»</td><td>≥ año de construcción</td><td>Nada</td><td>Si existe, la edad se cuenta desde aquí</td></tr>
+      <tr><td>Drenaje</td><td>Radios: bueno, regular, malo</td><td>—</td><td>Nada</td><td>Malo fuerza reconstrucción en C1 y genera alerta</td></tr>
+      <tr><td>Clasificación funcional</td><td>Lista: arterial, colectora, local, rural primaria, rural secundaria</td><td>—</td><td>Nada</td><td>Informativo</td></tr>
+      <tr><td>Observaciones</td><td>Texto multilínea</td><td>≤ 500 caracteres</td><td>Nada</td><td>Informativo</td></tr>
+    </tbody>
+  </table>
+  <p>El estado del bloque es ámbar si algún tramo tiene tipo de vía, bordillo (urbana) o tránsito vacíos; <b>nunca bloquea</b>. El punto de cada pestaña refleja a su tramo. La línea de resumen dice cuántos tramos están incompletos.</p>
+</section>
+
+<section class="salto">
+  <h3>3.5 Bloque 3 · Equipo disponible (calibración del inspector)</h3>
+  <p>El inspector marca qué puede ejecutar con su cuadrilla o contratista. El agente nunca recomienda algo sin marcar sin avisarlo: toma la siguiente opción de su lista y, si ninguna sirve, propone una solución interina marcada como crítica.</p>
+  <div class="fig">
+    <div class="scr">
+      <div class="acc open"><div class="acc-h"><span class="num w">!</span><b>3 · Equipo disponible</b><span class="sum">18 de 23 tratamientos · 1 tramo sin opción para su nivel</span><span class="chev">▾</span></div>
+        <div class="acc-b">
+          <p style="margin:2pt 0"><span class="btn s">Cuadrilla municipal básica</span> <span class="btn s">Contratista completo</span> <span class="btn g">Igual que mi último proyecto</span></p>
+          <div class="grid3">
+            <div><b>Paliativos y reparaciones locales</b><br><span class="chk on">✓</span>Sellado de grietas<br><span class="chk on">✓</span>Parcheo profundidad parcial<br><span class="chk on">✓</span>Parcheo profundidad total<br><span class="chk on">✓</span>Parcheo superficial<br><span class="chk on">✓</span>Fresado localizado<br><span class="chk on">✓</span>Arenado de exudación<br><span class="chk"></span>Relleno de roderas<br><span class="chk on">✓</span>Nivelación de hombros<br><span class="chk on">✓</span>Conformación de hombros<br><span class="chk on">✓</span>Limpieza y barrido<br><span class="chk on">✓</span>Riego de liga</div>
+            <div><b>Mantenimiento preventivo</b><br><span class="chk on">✓</span>Riego de niebla <span class="mut">(fog seal)</span><br><span class="chk on">✓</span>Rejuvenecedor<br><span class="chk"></span>Sello de arena <span class="mut">(sand seal)</span><br><span class="chk on">✓</span>Gravilla <span class="mut">(chip seal)</span><br><span class="chk on">✓</span>Lechada <span class="mut">(slurry seal)</span><br><span class="chk on">✓</span>Micropavimento<br><br><b>Rehabilitación menor</b><br><span class="chk on">✓</span>Sobrecapa delgada<br><span class="chk on">✓</span>Fresado y reposición</div>
+            <div><b>Rehabilitación mayor</b><br><span class="chk"></span>Sobrecapa estructural<br><span class="chk"></span>Fresado y sobrecapa estructural<br><span class="chk"></span>Recuperación prof. total (FDR)<br><br><b>Reconstrucción</b><br><span class="chk on">✓</span>Reconstrucción completa<br><br><span class="hint">ⓘ en cada casilla: equipo necesario</span></div>
+          </div>
+          <div class="ban e" style="margin-top:4pt">Efecto en los tramos · Vía a La Mata (Rehabilitación mayor): ninguna opción marcada. Se propondrá <b>fresado y reposición como solución interina</b>.</div>
+          <div class="ban w">Sin relleno de roderas: se presupuestará para subcontratar donde haga falta.</div>
+        </div></div>
+    </div>
+    <p class="fig-cap">Figura 4. Bloque 3. El efecto de cada casilla se recalcula al instante y se muestra al pie del bloque.</p>
+  </div>
+  <ul>
+    <li>Cuatro grupos de casillas (los de la figura) con el nombre en español y el inglés en <code>text-text-muted</code> pequeño. Un <code>InfoTip</code> por casilla con la lista <code>equipo</code> del catálogo.</li>
+    <li><b>Atajos:</b> <i>Cuadrilla municipal básica</i> = todos los paliativos + fog seal + slurry seal; <i>Contratista completo</i> = todo; <i>Igual que mi último proyecto</i> = preferencia guardada del usuario (7.1).</li>
+    <li><b>Efecto en los tramos</b> (función pura): para cada tramo, según su nivel, ver si alguna opción del nivel está marcada. Opciones por nivel: A1/A2 cualquier tratamiento preventivo o el sellado; B1 <code>thin_overlay</code>, <code>mill_and_replace</code>; B2 <code>sobrecapa_estructural</code>, <code>fresado_sobrecapa_estructural</code>, <code>fdr</code>; C1 <code>reconstruccion</code>, <code>fdr</code>, <code>sobrecapa_estructural</code>, <code>fresado_sobrecapa_estructural</code>; C2 <code>reconstruccion</code>, <code>fdr</code>. Si no hay ninguna: aviso rojo con la interina (B1: sin interina; B2: <code>mill_and_replace</code> o <code>thin_overlay</code>; el resto, tomarlo de <code>niveles[].interinas</code> del catálogo). El estado del bloque es ámbar si algún tramo queda sin opción; la fuente de verdad son <code>niveles[].opciones</code> e <code>interinas</code> del catálogo.</li>
+    <li>Bloquea solo si no hay ninguna casilla marcada.</li>
+  </ul>
+
+  <h3>3.6 Bloque 4 · Costos unitarios</h3>
+  <p>Cargados por defecto con costos estándar de ejemplo. El inspector los puede calibrar uno a uno, importar la tabla de su empresa o dejarlos como están (el informe los marca como «ejemplo»).</p>
+  <div class="fig">
+    <div class="scr">
+      <div class="acc open"><div class="acc-h"><span class="num w">!</span><b>4 · Costos unitarios</b><span class="sum">21 de 23 son de ejemplo · USD</span><span class="chev">▾</span></div>
+        <div class="acc-b">
+          <div class="ban w" style="margin-top:3pt">Hay 21 costos de ejemplo. El presupuesto del informe será preliminar.</div>
+          <p><span class="btn s">Importar CSV</span> <span class="btn g">Descargar plantilla</span> <span class="btn g">Guardar como mis costos</span> <span class="btn g">Restablecer</span></p>
+          <table class="mt"><tr><th>Actividad</th><th>Unidad</th><th class="r">Ejemplo</th><th class="r">Propio</th><th>Fuente</th><th>Origen</th></tr>
+          <tr><td>Fresado y reposición</td><td>m²</td><td class="r">16.00</td><td class="r"><span class="in">18.40</span></td><td><span class="in">Tabla empresa 2026</span></td><td><span class="tag cal">calibrado</span></td></tr>
+          <tr><td>Parcheo a profundidad total</td><td>m²</td><td class="r">60.00</td><td class="r"><span class="in">55.00</span></td><td><span class="in">Cotización 09-2026</span></td><td><span class="tag cal">calibrado</span></td></tr>
+          <tr><td>Sellado de grietas</td><td>m</td><td class="r">2.50</td><td class="r"><span class="in">    </span></td><td><span class="in">    </span></td><td><span class="tag ej">ejemplo</span></td></tr>
+          <tr><td>Micropavimento</td><td>m²</td><td class="r">6.00</td><td class="r"><span class="in">    </span></td><td><span class="in">    </span></td><td><span class="tag ej">ejemplo</span></td></tr></table>
+          <p class="hint">Importar: columnas <code>id,valor,unidad,fuente</code>. Antes de aplicar se muestran filas reconocidas, desconocidas y con unidad distinta.</p>
+        </div></div>
+    </div>
+    <p class="fig-cap">Figura 5. Bloque 4.</p>
+  </div>
+  <ul>
+    <li>Filas: las actividades marcadas en el bloque 3 más todos los paliativos (siempre se presupuestan, aunque haya que subcontratarlos). Orden: paliativos, preventivo, rehabilitación, reconstrucción.</li>
+    <li><i>Propio</i>: número ≥ 0 con 2 decimales; vacío = usa el de ejemplo. Al escribir, la etiqueta pasa de <span class="tag ej">ejemplo</span> a <span class="tag cal">calibrado</span>. <i>Fuente</i>: texto libre de 80 caracteres.</li>
+    <li>La unidad es la del catálogo y no se edita. Si un CSV trae otra unidad para un ID, esa fila se rechaza en la vista previa (modal).</li>
+    <li><b>Importar CSV</b> sin librerías: separador coma o punto y coma, decimales con punto o coma, cabecera obligatoria, UTF-8. Excel queda fuera (guardar como CSV).</li>
+    <li>El banner ámbar cuenta los costos de ejemplo que se usarán. No bloquea.</li>
+    <li>En la entrada solo van los costos con <i>Propio</i> lleno, en <code>calibracion.costos_unitarios</code>.</li>
+  </ul>
+</section>
+
+<section class="salto">
+  <h3>3.7 Bloque 5 · Presupuesto y forma de priorizar</h3>
+  <div class="fig">
+    <div class="scr">
+      <div class="acc open"><div class="acc-h"><span class="num ok">✓</span><b>5 · Presupuesto y prioridad</b><span class="sum">120 000 USD · mayor beneficio por dólar · imprevistos 10 %</span><span class="chev">▾</span></div>
+        <div class="acc-b">
+          <div class="row"><span class="k">Monto</span><span><span class="in">120 000.00</span> USD &nbsp; <span class="chk"></span>Sin tope (solo valorar y ordenar)</span></div>
+          <div class="row"><span class="k">Imprevistos</span><span><span class="in">10</span> %</span></div>
+          <h5 style="margin:5pt 0 2pt;font-size:8pt">¿Cómo repartir el presupuesto?</h5>
+          <p><span class="rad on"></span><b>Mayor beneficio por dólar</b> (recomendado)<br><span class="hint">Ordena por beneficio/costo: protege primero los tramos que aún están bien y conserva más condición en el tiempo con el mismo dinero.</span></p>
+          <p><span class="rad"></span><b>Reparar primero lo más dañado</b><br><span class="hint">Ordena del PCI más bajo al más alto. Atiende lo urgente y sube más el PCI inmediato, pero suele dejar que los tramos buenos se deterioren.</span></p>
+          <div class="ban i">En ambos casos se financian primero las reparaciones de seguridad (baches, piel de cocodrilo alta, desniveles altos). El informe compara los dos modos.</div>
+          <p class="mut" style="margin:2pt 0">▸ Opciones avanzadas: umbrales de PCI · curva de deterioro · factores de conversión</p>
+          <div class="bar"><div style="width:26%;background:var(--C)"></div><div style="width:15%;background:var(--C);opacity:.75"></div><div style="width:15%;background:var(--B)"></div><div style="width:15%;background:var(--B);opacity:.75"></div><div style="width:14%;background:var(--A);opacity:.8"></div><div style="width:15%;background:var(--A)"></div></div>
+          <p class="hint">0 · 26 · 41 · 56 · 71 · 85 · 100 &nbsp;&nbsp; A1 <span class="in">85</span> A2 <span class="in">71</span> B1 <span class="in">56</span> B2 <span class="in">41</span> C1 <span class="in">26</span> <span class="btn g">Restablecer</span></p>
+        </div></div>
+    </div>
+    <p class="fig-cap">Figura 6. Bloque 5, con las opciones avanzadas desplegadas (cerradas por defecto).</p>
+  </div>
+  <table class="t">
+    <thead><tr><th>Campo</th><th>Regla</th><th>Va a la entrada como</th></tr></thead>
+    <tbody>
+      <tr><td>Monto</td><td>Número &gt; 0 con separador de miles; obligatorio salvo «Sin tope»</td><td><code>calibracion.presupuesto</code> (o <code>null</code>)</td></tr>
+      <tr><td>Moneda</td><td>Fija «USD» en esta versión (texto, no selector)</td><td><code>calibracion.moneda</code></td></tr>
+      <tr><td>Imprevistos</td><td>0–30 %, por defecto 10</td><td><code>calibracion.parametros.imprevistos_pct = {valor}</code></td></tr>
+      <tr><td>Modo</td><td>Radio; por defecto <code>costo_beneficio</code></td><td><code>calibracion.modo_priorizacion</code></td></tr>
+      <tr><td>Umbrales (avanzado)</td><td>Enteros, estrictamente decrecientes: 100 &gt; A1 &gt; A2 &gt; B1 &gt; B2 &gt; C1 &gt; 0. Barra 0–100 en vivo; botón <i>Restablecer</i>. Si no se cumplen: bloquea con el motivo</td><td><code>calibracion.umbrales_pci</code> (solo si cambian)</td></tr>
+      <tr><td>Curva de deterioro (avanzado)</td><td>β 1.0–3.0 (defecto 1.5); años hasta el mínimo 5–40 (defecto 20); PCI mínimo 20–60 (defecto 40)</td><td><code>parametros.curva_deterioro</code>, <code>parametros.pci_minimo_aceptable</code></td></tr>
+      <tr><td>Factores (avanzado)</td><td>Área por bache L/M/H, sobreancho de parcheo, metros de grieta por m² de bloque, umbral estructural %; cada uno con su origen (norma o supuesto) al lado</td><td><code>parametros.*</code> (solo si cambian)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.8 Barra de acción: revisar y generar</h3>
+  <p>Fija al pie del área de desplazamiento en el modo Configurar. A la izquierda, los avisos que el agente declarará (cada chip abre su bloque); a la derecha, las acciones.</p>
+  <table class="t">
+    <thead><tr><th>Elemento</th><th>Contenido y comportamiento</th></tr></thead>
+    <tbody>
+      <tr><td>Chips de aviso (ámbar)</td><td>«{n} datos se asumirán» → bloque 2 · «{n} tramos con solución interina» → bloque 3 · «{n} costos de ejemplo» → bloque 4 · «muestreo insuficiente en {n} tramos» → bloque 1</td></tr>
+      <tr><td>Chip de bloqueo (rojo)</td><td>«No se puede generar: {motivo}» → bloque que lo causa. Mientras exista, <i>Generar</i> está deshabilitado</td></tr>
+      <tr><td><i>Ver JSON</i></td><td><code>Modal</code> con el <code>entrada.json</code> formateado (<code>font-mono</code>) y botón copiar / descargar</td></tr>
+      <tr><td><b><i>Generar recomendaciones</i></b></td><td>Valida, guarda el borrador y llama al agente (ver abajo)</td></tr>
+    </tbody>
+  </table>
+  <div class="fig">
+    <div class="scr">
+      <div class="cols2">
+        <div><b style="font-size:7.4pt">Consultando</b>
+          <div class="abar" style="margin-top:3pt;flex-direction:column;align-items:stretch"><div class="prog"><div style="width:55%"></div></div><div class="foot" style="margin:0"><span class="hint">El agente está trabajando… (puede tardar unos minutos con el modelo de lenguaje)</span><span class="btn g">Cancelar</span></div></div>
+          <p class="hint" style="margin-top:4pt">Los bloques quedan visibles pero bloqueados mientras dura la consulta.</p></div>
+        <div><b style="font-size:7.4pt">Agente sin servicio</b>
+          <div class="abar" style="margin-top:3pt;flex-direction:column;align-items:stretch"><span class="hint">No hay respuesta en localhost:8000. Descarga la entrada y ejecuta en la carpeta del agente:</span><pre style="font-size:6pt;margin:2pt 0">python -m agente todo entrada.json -d salida</pre><span><span class="btn">Descargar entrada.json</span> <span class="btn s">Importar resultado…</span> <span class="btn g">Reintentar</span></span></div></div>
+      </div>
+      <div class="ban e" style="margin-top:5pt"><b>El agente rechazó la entrada (422):</b> tramos[2].contexto.esal_millones debe ser ≥ 0 <span class="mut">→ ir al bloque 2, Vía a La Mata</span> · calibracion.presupuesto debe ser mayor que 0 <span class="mut">→ ir al bloque 5</span></div>
+    </div>
+    <p class="fig-cap">Figura 7. Estados de la barra de acción y aviso de error.</p>
+  </div>
+  <ul>
+    <li><b>Generar:</b> <code>POST {VITE_AGENT_URL}/api/recommendations</code> con la entrada. La llamada es síncrona y puede tardar varios minutos si el redactor es un modelo de lenguaje (espera máxima 6 min, <i>Cancelar</i> con <code>AbortController</code>). Con <b>200</b> se crea el <code>AgentRun</code> (número = el mayor + 1), se guarda el proyecto, y la pantalla pasa al estado Resultado con el desplazamiento arriba. Con <b>422</b> se vuelve a Configurar con el aviso rojo de la figura; cada error se enlaza al bloque según su ruta (<code>tramos[i].contexto.*</code> → 2 con el tramo <code>i</code>; <code>tratamientos_disponibles</code> → 3; <code>costos_unitarios</code> → 4; <code>presupuesto</code>, <code>modo_priorizacion</code>, <code>umbrales_pci</code>, <code>parametros</code> → 5). Con error de red o 500: mensaje con <i>Reintentar</i> y las opciones de modo sin servicio.</li>
+    <li><b>Sin servicio:</b> <i>Importar resultado…</i> abre un <code>Modal</code> que pide <code>analisis.json</code> y <code>narrativa.json</code> (los dos que deja <code>python -m agente todo</code>), los valida por su forma (campos obligatorios de los esquemas) y comprueba que <code>analisis.proyecto.huella_entrada</code> coincida con la huella de la entrada actual; si no coincide, avisa «el resultado es de otros datos» y deja continuar bajo confirmación. El <code>AgentRun</code> queda con <code>narrativeSource: 'importado'</code>.</li>
+    <li>Cada generación o importación crea un <code>AgentRun</code> (máximo 5; al pasar, se borra el más antiguo con confirmación).</li>
+  </ul>
+</section>
+
+<section class="salto">
+  <h3>3.9 Estado Resultado: resumen e informe en pantalla</h3>
+  <p>Con una consulta lista, el contenido de la tarjeta cambia a: (1) <b>los parámetros de la consulta</b> como chips, con <i>Editar parámetros</i> y un <i>Ajuste rápido</i>; (2) el <b>resumen</b> y el <b>informe</b> en dos pestañas; (3) la comparación con la consulta anterior y el historial. La web no recalcula nada: todas las cifras salen de <code>analisis</code> y todos los textos de <code>narrativa</code>.</p>
+  <div class="fig">
+    <div class="scr">
+      <div class="card" style="margin:0">
+        <div class="titulo-app"><div><h4>Recomendaciones</h4><span class="mut">Calles de Santiago · consulta <b>v3</b> · 2026-11-04 10:42 · <span class="tag inf">textos automáticos</span></span></div><span><span class="btn s">Editar parámetros</span> <span class="btn">Descargar PDF</span> <span class="btn g">Imprimir</span> <span class="btn g">JSON</span></span></div>
+        <div class="card" style="background:#fff;margin-bottom:4pt;padding:4pt 7pt"><span class="hint" style="font-weight:700;text-transform:uppercase">Parámetros de esta consulta · clic en uno para editarlo</span>
+          <div class="chipset"><span class="pchip">Equipo <b>18 de 23</b></span><span class="pchip">Presupuesto <b>120 000 USD</b></span><span class="pchip">Modo <b>mayor beneficio por dólar</b></span><span class="pchip">Imprevistos <b>10 %</b></span><span class="pchip">Costos propios <b>2 de 23</b></span><span class="pchip w">Datos asumidos <b>2</b></span><span class="pchip w">Interinas <b>1</b></span></div>
+          <span class="hint">▸ Ajuste rápido &nbsp; Presupuesto <span class="in">120 000</span> USD &nbsp; <span class="rad on"></span>Mayor beneficio <span class="rad"></span>Más dañado primero &nbsp; <span class="btn s">Volver a consultar</span></span>
+        </div>
+        <div class="ban w">Cambiaste parámetros después de esta consulta (presupuesto 150 000). El resultado de abajo es el anterior. <b>Volver a consultar</b></div>
+        <p style="margin:0 0 3pt"><span class="seg"><span class="on">Resumen</span><span>Informe</span></span> &nbsp; <span class="cmp">frente a v2: PCI red después <span class="dlt up">63.4 (+0.8)</span> · financiado <span class="dlt up">68 868 (+12 340)</span> · faltante <span class="dlt up">349 714 (−12 340)</span></span></p>
+        <div class="grid3" style="grid-template-columns:repeat(6,1fr)">
+          <div class="kp"><span class="k">PCI red</span><span class="v">60.0 → 63.4</span></div><div class="kp"><span class="k">Necesario</span><span class="v">418 582.78</span></div><div class="kp"><span class="k">Presupuesto</span><span class="v">120 000.00</span></div><div class="kp"><span class="k">Financiado</span><span class="v">68 868.31</span></div><div class="kp"><span class="k">Faltante</span><span class="v" style="color:var(--err)">349 714.47</span></div><div class="kp"><span class="k">Sin asignar</span><span class="v">51 131.69</span></div>
+        </div>
+        <p class="hint" style="margin-top:3pt">Se evaluaron 4 tramos de pavimento flexible con un área total de 18 880 m² y un PCI ponderado de 60.0… <b>(narrativa.resumen_ejecutivo)</b></p>
+        <table class="mt" style="margin-top:3pt"><tr><th>#</th><th>Tramo</th><th class="r">PCI</th><th>Nivel</th><th>Solución</th><th class="r">Costo</th><th class="r">B/C</th><th>Estado</th><th></th></tr>
+        <tr><td>1</td><td>Av. Central</td><td class="r">88.1</td><td><span class="chip A">A1</span></td><td>Micropavimento <span class="tag ej">alternativa</span></td><td class="r">37 884.00</td><td class="r">78.74</td><td><span class="tag cal">financiado</span></td><td>▸</td></tr>
+        <tr><td>2</td><td>Calle 10ma</td><td class="r">62.4</td><td><span class="chip B">B1</span></td><td>Fresado y reposición</td><td class="r">64 418.53</td><td class="r">20.02</td><td><span class="tag ej">solo seguridad</span></td><td>▸</td></tr>
+        <tr><td>3</td><td>Calle 2da</td><td class="r">33.5</td><td><span class="chip C">C1</span></td><td>Reconstrucción</td><td class="r">114 400.00</td><td class="r">10.81</td><td><span class="tag ej">solo seguridad</span></td><td>▸</td></tr>
+        <tr><td>4</td><td>Vía a La Mata</td><td class="r">47.0</td><td><span class="chip B">B2</span></td><td>Fresado y reposición <span class="tag cr">interina</span></td><td class="r">201 880.25</td><td class="r">4.01</td><td><span class="tag ej">solo seguridad</span></td><td>▾</td></tr>
+        <tr><td colspan="9" style="background:#fff"><b>Trabajos previos:</b> parcheo a profundidad total 204.5 m² (11 247.50, seguridad) · nivelación de hombros 160 m (1 280.00, seguridad) · <b>Años recuperados:</b> 4.6 · <b>Descartados:</b> sobrecapa estructural, FDR, fresado y sobrecapa (sin equipo)</td></tr></table>
+        <p style="margin-top:3pt"><span class="tag cr">1 alerta crítica ▸</span> <span class="tag ej">9 advertencias ▸</span> <span class="tag inf">5 supuestos ▸</span> &nbsp; <span class="hint">Consultas: v1 (02-11) · v2 (03-11) · <b>v3</b></span></p>
+      </div>
+    </div>
+    <p class="fig-cap">Figura 8. Estado Resultado, pestaña Resumen, con las cifras reales del ejemplo del agente. La franja ámbar «Cambiaste parámetros…» solo aparece si la configuración actual difiere de la consulta.</p>
+  </div>
+  <table class="t">
+    <thead><tr><th>Elemento</th><th>De dónde sale y cómo se comporta</th></tr></thead>
+    <tbody>
+      <tr><td>Chips «Parámetros de esta consulta»</td><td>Se arman con <code>run.config</code> y <code>run.contexts</code> (no con el borrador actual): equipo (n de 23), presupuesto o «sin tope», modo, imprevistos, costos propios, datos asumidos (suma de <code>tramos[].contexto_usado.asumidos</code>), tramos con interina. Cada chip es un botón: abre el estado Configurar con ese bloque abierto (3.10)</td></tr>
+      <tr><td>Ajuste rápido</td><td>Plegado por defecto. Presupuesto y modo de priorizar, los dos parámetros que más se prueban. Escribe en el borrador y <i>Volver a consultar</i> genera de inmediato, sin pasar por Configurar. Usa las mismas validaciones del bloque 5</td></tr>
+      <tr><td>Franja «Cambiaste parámetros»</td><td>Se muestra si la huella de <code>buildAgentInput(project, borrador)</code> es distinta de <code>run.inputHash</code> (por cambios en el borrador o en las muestras del proyecto)</td></tr>
+      <tr><td>Comparación con la consulta anterior</td><td>Función pura <code>compareRuns(nueva, anterior)</code> sobre <code>analisis.red</code> y <code>analisis.tramos</code>: diferencia de PCI de la red después, necesario, financiado, faltante y sin asignar, con color (verde mejora, terracota empeora); y la lista de tramos cuya solución o estado cambió («Vía a La Mata: sobrecapa → fresado y reposición»). Solo aparece si hay una consulta anterior</td></tr>
+      <tr><td>PCI red antes → después</td><td><code>analisis.red.pci_ponderado</code>, <code>pci_ponderado_despues</code></td></tr>
+      <tr><td>Necesario, financiado, faltante, sin asignar</td><td><code>analisis.red.costo_total_necesario</code>, <code>costo_financiado</code>, <code>faltante</code>, <code>saldo_sin_asignar</code>; presupuesto en <code>analisis.calibracion_usada.presupuesto</code></td></tr>
+      <tr><td>Texto bajo los indicadores</td><td><code>narrativa.resumen_ejecutivo</code></td></tr>
+      <tr><td>Filas en orden</td><td><code>analisis.red.orden_ejecucion</code> → <code>tramos[id]</code>: <code>prioridad.posicion</code>, <code>pci</code>, <code>nivel_id</code>, <code>tratamiento.nombre</code> (o <code>nombre_ideal</code> si <code>seleccionado</code> es null), <code>tratamiento.interino</code>, <code>costos.total</code>, <code>relacion_bc</code>, <code>prioridad.estado</code></td></tr>
+      <tr><td>Etiqueta «alternativa» / «interina»</td><td><code>seleccionado ≠ ideal</code> / <code>interino</code></td></tr>
+      <tr><td>Fila expandida</td><td><code>trabajos_previos[]</code> (nombre, cantidad, unidad, costo, seguridad), <code>beneficio_detalle.anios_recuperados</code>, <code>tratamiento.descartados[]</code> (nombre, razón)</td></tr>
+      <tr><td>Estados</td><td><code>financiado</code> turquesa, <code>solo_seguridad</code> ámbar, <code>diferido</code> terracota, <code>sin_presupuesto</code> gris</td></tr>
+      <tr><td>Contadores</td><td><code>tramos[].alertas[]</code> + <code>alertas_globales[]</code> por <code>nivel</code>; <code>tramos[].supuestos[]</code></td></tr>
+      <tr><td>Pestaña Informe</td><td>El documento completo (sección 4), dibujado con <code>AgentReport</code></td></tr>
+      <tr><td>Botones</td><td><i>Descargar PDF</i> con jsPDF (4.3). <i>Imprimir</i> usa <code>window.print()</code> con una hoja de estilo que oculta todo menos el informe. <i>JSON</i> baja la respuesta completa</td></tr>
+      <tr><td>Historial</td><td>Lista «Consultas: v1 · v2 · v3» al pie del resumen; al elegir una anterior se muestra en solo lectura con la franja «Estás viendo la v2» y dos botones: <i>Restaurar sus parámetros</i> (copia <code>run.config</code> y <code>run.contexts</code> al borrador y abre Configurar) y <i>Volver a la más reciente</i></td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.10 Editar parámetros</h3>
+  <p><i>Editar parámetros</i> (y cualquier chip) lleva del estado Resultado al estado Configurar, <b>sin perder nada</b>: los bloques se abren con los valores de la consulta, listos para cambiarlos.</p>
+  <div class="fig">
+    <div class="scr">
+      <div class="card" style="margin:0">
+        <div class="titulo-app"><div><h4>Recomendaciones</h4><span class="mut">Calles de Santiago</span></div><span class="btn g">Ver resultado v3</span></div>
+        <div class="ban i">Estás ajustando la consulta <b>v3</b> (04-11 10:42). El resultado anterior se conserva hasta que generes otro.</div>
+        <div class="acc"><div class="acc-h"><span class="num ok">✓</span><b>2 · Datos que faltan</b><span class="sum">todos los tramos completos</span><span class="chev">▸</span></div></div>
+        <div class="acc open"><div class="acc-h"><span class="num ok">✓</span><b>5 · Presupuesto y prioridad</b><span class="sum">150 000 USD · mayor beneficio por dólar · imprevistos 10 %</span><span class="chev">▾</span></div>
+          <div class="acc-b"><div class="row"><span class="k">Monto</span><span><span class="in">150 000.00</span> USD <span class="pill ok">cambiado</span> <span class="hint">antes: 120 000.00</span></span></div><div class="row" style="border:0"><span class="k">Modo</span><span><span class="rad on"></span>Mayor beneficio por dólar <span class="rad"></span>Más dañado primero</span></div></div></div>
+      </div>
+      <div class="abar"><span class="chipset" style="margin:0"><span class="pchip">1 parámetro cambiado</span></span><span><span class="btn g">Ver JSON</span> <span class="btn">Volver a consultar</span></span></div>
+    </div>
+    <p class="fig-cap">Figura 9. Estado Configurar al editar una consulta. Los campos modificados se marcan «cambiado» con el valor anterior.</p>
+  </div>
+  <ul>
+    <li><b>Qué cambia respecto a la primera vez:</b> la cabecera trae <i>Ver resultado v{n}</i> (vuelve al Resultado sin generar) y un aviso azul; la barra de acción dice <i>Volver a consultar</i> y cuenta los parámetros cambiados.</li>
+    <li><b>«Cambiado»:</b> cada campo cuyo valor difiere de <code>run.config</code> o <code>run.contexts</code> lleva la etiqueta y el valor anterior en <code>text-text-muted</code>. Un bloque con algún campo cambiado lo indica en su línea de resumen.</li>
+    <li>Si la huella de la entrada nueva es igual a la de la consulta, <i>Volver a consultar</i> sigue habilitado, con la nota «Sin cambios: las cifras serán idénticas; solo pueden variar los textos si el redactor es un modelo de lenguaje».</li>
+    <li>Al terminar la nueva consulta se crea la v{n+1}; la anterior pasa al historial. Con 5 consultas, se pide confirmación para borrar la más antigua.</li>
+    <li>Los chips del estado Resultado abren el mismo estado con el bloque correspondiente abierto y el foco en él. «Datos asumidos» → bloque 2; «Interinas» y «Equipo» → bloque 3; «Costos propios» → bloque 4; presupuesto, modo e imprevistos → bloque 5.</li>
+  </ul>
+</section>
+
+<section class="salto">
+  <h2><span class="n">4</span>Informe en la web</h2>
+  <p>El informe se dibuja con componentes React a partir de la respuesta del agente. Debe contener lo mismo que <code>docs/panel/informe-referencia.pdf</code> (generado por el agente en Python con el ejemplo), que sirve como modelo visual y de contenido. Componente raíz: <code>components/agent/report/AgentReport.tsx</code>, con props <code>{ project, run }</code>.</p>
+  <h3>4.1 Secciones y su origen</h3>
+  <table class="t">
+    <thead><tr><th>Sección</th><th>Contenido</th><th>Datos</th></tr></thead>
+    <tbody>
+      <tr><td>Portada</td><td>Título «Informe de recomendaciones de mantenimiento y rehabilitación vial», proyecto, entidad, ubicación, inspector, fechas, código, versión del agente, origen de los textos, aviso de apoyo a la decisión</td><td><code>analisis.proyecto</code> (<code>huella_entrada</code>[0:8] = código), <code>run.createdAt</code>, <code>run.agentVersion</code>, <code>run.narrativeSource</code></td></tr>
+      <tr><td>1 Resumen ejecutivo</td><td>6 indicadores, texto, barra de área por nivel con tabla, caja de alertas críticas</td><td><code>analisis.red</code>, <code>narrativa.resumen_ejecutivo</code>, <code>tramos[].nivel_id/area_m2</code></td></tr>
+      <tr><td>2 Alcance y metodología</td><td>Texto fijo (traducible) con los 6 pasos del agente, barra de niveles con los umbrales usados, explicación del beneficio, huella</td><td><code>calibracion_usada.umbrales_pci</code>, <code>parametros.pci_minimo_aceptable</code>, <code>parametros.curva_deterioro</code></td></tr>
+      <tr><td>3 Datos y calibración</td><td>Tabla de tramos con contexto (asterisco en los asumidos), equipo disponible marcado ✓/✗, costos usados con etiqueta ejemplo/calibrado</td><td><code>tramos[].contexto_usado</code> (incluye <code>asumidos[]</code>), <code>calibracion_usada.tratamientos_disponibles</code>, <code>calibracion_usada.costos</code></td></tr>
+      <tr><td>4 Ficha por tramo</td><td>Cabecera con color de franja y PCI; barra de PCI con marcas antes y después; solución recomendada y 5 datos (costo, costo/m², años recuperados, B/C, prioridad); diagnóstico con tabla de fallas; justificación; descartados; nota de equipo; trabajos previos; tabla de presupuesto con «Cálculo de la cantidad»; subtotal, imprevistos y total; si no se interviene; alertas; referencias</td><td><code>tramos[i]</code> completo y <code>narrativa.tramos[tramo_id]</code> (<code>diagnostico</code>, <code>justificacion</code>, <code>trabajos_previos</code>, <code>consecuencia_si_se_difiere</code>, <code>nota_equipo</code>)</td></tr>
+      <tr><td>5 Priorización</td><td>Texto; tabla con asignado y acumulado; filas de total, presupuesto, faltante y saldo sin asignar; tabla de comparación de modos</td><td><code>narrativa.priorizacion</code>, <code>red.orden_ejecucion</code>, <code>red.comparacion_modos</code>. Asignado: total si <code>financiado</code>, <code>costo_interino_si_diferido</code> si <code>solo_seguridad</code>, 0 si no</td></tr>
+      <tr><td>6 Alertas</td><td>Tabla ordenada crítica → advertencia → información</td><td>Texto de <code>narrativa.alertas[]</code> por <code>(codigo, tramo_id)</code>; si falta, <code>alerta.mensaje</code></td></tr>
+      <tr><td>7 Conclusiones</td><td>Tres listas</td><td><code>narrativa.conclusiones</code>, <code>recomendaciones</code>, <code>limitaciones</code></td></tr>
+      <tr><td>8 Referencias</td><td>Remisiones usadas y bibliografía fija</td><td>Unión de <code>tramos[].referencias</code>; bibliografía en <code>services/agent/reportText.ts</code> (copiar de la sección 8 de la referencia)</td></tr>
+      <tr><td>9 Revisión y firma</td><td>Declaración y tabla: elaborado por, revisado por, idoneidad JTIA n.º, firma, fecha, observaciones (en blanco)</td><td><code>analisis.proyecto.inspector</code></td></tr>
+      <tr><td>Anexos A, B, C</td><td>Fallas por unidad de muestra; glosario; parámetros con su origen y supuestos por tramo</td><td><code>tramos[].muestras</code>, <code>narrativa.glosario</code>, <code>calibracion_usada.parametros</code>, <code>tramos[].supuestos</code></td></tr>
+    </tbody>
+  </table>
+  <h3>4.2 Pantalla e impresión</h3>
+  <ul>
+    <li>En pantalla: hoja blanca de ancho A4 centrada sobre <code>bg-bg-base</code>, índice lateral fijo para saltar entre secciones y tramos (en móvil, menú desplegable).</li>
+    <li>El informe usa siempre fondo blanco y texto oscuro, también en tema oscuro, porque es un documento.</li>
+    <li><code>@media print</code>: ocultar cabecera, menú, barra de parámetros y botones; <code>break-before: page</code> en cada sección numerada y cada ficha de tramo; <code>thead</code> repetido; <code>tr { break-inside: avoid }</code>; <code>print-color-adjust: exact</code>.</li>
+    <li>Formato de números: separador de miles con espacio y 2 decimales para dinero (<code>1 234.56</code>), 1 decimal para PCI, <code>m²</code> para áreas.</li>
+  </ul>
+  <h3>4.3 PDF con jsPDF (<code>services/agent/agentReportPdf.ts</code>)</h3>
+  <ul>
+    <li>Seguir el patrón de <code>generatePdfReport</code> en <code>services/exportService.ts</code> (<code>window.jspdf.jsPDF</code> + <code>doc.autoTable</code>), A4 vertical, márgenes de 16 mm, fuente Helvetica.</li>
+    <li>Mismas secciones y en el mismo orden que 4.1: textos con <code>doc.splitTextToSize</code>, tablas con <code>autoTable</code> (encabezado azul <code>#0b3c5d</code> y texto blanco, filas alternas), salto de página antes de cada sección y de cada ficha de tramo.</li>
+    <li>Barras de PCI y de niveles con <code>doc.rect</code> relleno en los colores de franja; marcas del PCI actual (relleno) y esperado (contorno).</li>
+    <li>Pie en cada página: proyecto, «Informe {código}», «Página X de Y» (segunda pasada con <code>doc.getNumberOfPages()</code>).</li>
+    <li>Nombre del archivo: <code>{proyecto}_recomendaciones_v{n}.pdf</code>.</li>
+  </ul>
+</section>
+
+<section class="salto">
+  <h2><span class="n">5</span>Armado de <code>entrada.json</code></h2>
+  <p>Función pura <code>buildAgentInput(project: Project, config: AgentConfig): AgentInput</code> en <code>services/agent/buildAgentInput.ts</code>. El resultado debe validar contra <code>schemas/entrada.schema.json</code> (versión <code>"1.0"</code>, <code>additionalProperties: false</code>: no mandar campos de más).</p>
+  <table class="t">
+    <thead><tr><th>Entrada</th><th>Origen en la app</th><th>Nota</th></tr></thead>
+    <tbody>
+      <tr><td><code>proyecto.id / nombre / inspector / fecha_inspeccion</code></td><td><code>Project.id / name / inspector / inspectionDate</code></td><td>Fecha en <code>YYYY-MM-DD</code></td></tr>
+      <tr><td><code>proyecto.descripcion</code>, <code>entidad</code></td><td><code>Project.descripcion</code>; <code>MongoUser.company</code></td><td>Omitir si vacíos</td></tr>
+      <tr><td><code>tramos[].id / nombre / longitud_m / ancho_m / area_m2 / pci</code></td><td><code>Section.id / name / length / width / area / pci</code></td><td></td></tr>
+      <tr><td><code>tramos[].ubicacion</code></td><td><code>Section.location</code></td><td>Omitir si vacío</td></tr>
+      <tr><td><code>tramos[].total_unidades_muestra / muestreo_suficiente</code></td><td><code>Section.totalSampleUnits / samplesSufficient</code></td><td></td></tr>
+      <tr><td><code>tramos[].contexto.*</code></td><td><code>Section.context</code></td><td><code>roadType→tipo_via</code>, <code>curbHeightCm→altura_bordillo_cm</code>, <code>esalMillions→esal_millones</code> (solo si pestaña ESAL), <code>trafficClass→clase_trafico</code> (solo si pestaña Clase), <code>aadt→tpda</code>, <code>yearBuilt→anio_construccion</code>, <code>lastInterventionYear→anio_ultima_intervencion</code>, <code>lastInterventionType→ultima_intervencion</code>, <code>drainage→drenaje</code>, <code>functionalClass→clasificacion_funcional</code>, <code>notes→observaciones</code>. Vacíos como <code>null</code></td></tr>
+      <tr><td><code>muestras[].id / area_m2 / adicional</code></td><td><code>Sample.id / area / isAdditional</code></td><td></td></tr>
+      <tr><td><code>muestras[].pci</code></td><td><code>Sample.calculationDetails?.pci</code></td><td>Omitir si no existe</td></tr>
+      <tr><td><code>fallas[].tipo / severidad / cantidad</code></td><td><code>Distress.type / severity / quantity</code></td><td>Una fila por <code>Distress</code>, con la severidad tal como la guarda la app; omitir cantidades ≤ 0</td></tr>
+      <tr><td><code>fallas[].valor_deducido</code></td><td><code>calculationDetails.summaries[]</code> con el mismo <code>type</code> y <code>severity</code></td><td>Si hay varias filas del mismo tipo y severidad en la muestra, repartir el deducido en proporción a la cantidad, o mandarlo solo en la primera</td></tr>
+      <tr><td><code>calibracion.tratamientos_disponibles</code></td><td><code>config.availableTreatments</code></td><td></td></tr>
+      <tr><td><code>calibracion.costos_unitarios</code></td><td><code>config.unitCosts</code></td><td>Solo los calibrados</td></tr>
+      <tr><td><code>calibracion.moneda / presupuesto / modo_priorizacion</code></td><td><code>config.currency / budget / priorityMode</code></td><td></td></tr>
+      <tr><td><code>calibracion.umbrales_pci</code></td><td><code>config.pciThresholds</code></td><td>Omitir si no cambió</td></tr>
+      <tr><td><code>calibracion.parametros</code></td><td><code>config.parameters</code> + <code>{ imprevistos_pct: { valor: contingencyPct } }</code></td><td></td></tr>
+    </tbody>
+  </table>
+  <p><b>Huella:</b> <code>sha256</code> del JSON con claves ordenadas y sin espacios (<code>crypto.subtle.digest</code>); se guarda en el <code>AgentRun</code> y se compara con <code>analisis.proyecto.huella_entrada</code> al importar. Para que coincidan, serializar igual que Python: <code>json.dumps(entrada, sort_keys=True, separators=(',', ':'), ensure_ascii=False)</code>.</p>
+  <p>Ejemplo completo de entrada válida: <code>agente-recomendaciones/ejemplos/entrada_ejemplo.json</code>.</p>
+
+  <h2 style="margin-top:12pt"><span class="n">5.1</span>Conexión con el servicio del agente</h2>
+  <table class="t">
+    <thead><tr><th>Llamada</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td><code>GET {VITE_AGENT_URL}/</code></td><td>Comprobar si el agente está en línea (3 s de espera). Responde <code>{status, version, redactor}</code></td></tr>
+      <tr><td><code>GET {VITE_AGENT_URL}/api/recommendations/catalogo</code></td><td>Catálogo vigente: tratamientos (id, nombre, unidad, equipo, costo de ejemplo), fallas, niveles con <code>opciones</code> e <code>interinas</code>, parámetros. Se pide al abrir la sección; si falla, se usa la copia de <code>catalog.ts</code></td></tr>
+      <tr><td><code>POST {VITE_AGENT_URL}/api/recommendations</code> con <code>entrada.json</code></td><td>Síncrona. <b>200</b> <code>{success: true, version, analisis, narrativa, narrativa_origen}</code> · <b>422</b> <code>{success: false, errores: [...]}</code> · 500 error del agente</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li><code>services/agent/agentClient.ts</code> con <code>fetch</code> (<code>baseURL = import.meta.env.VITE_AGENT_URL || 'http://localhost:8000'</code>; la copia local no tiene <code>axios</code>), espera de 6 min en el POST y cancelación con <code>AbortController</code> al salir de la vista o con <i>Cancelar</i>. No mandar el token de la app: el agente no lo usa.</li>
+    <li>El agente corre en la máquina del inspector (usa Ollama local, como indica el README del repo). La web publicada en <code>https://asphaltpcipro.company</code> puede llamarlo en <code>http://localhost:8000</code>: el servicio ya responde con CORS para ese dominio y con <code>Access-Control-Allow-Private-Network</code>. Si el navegador lo bloquea, queda el modo sin servicio.</li>
+    <li>Documentar <code>VITE_AGENT_URL</code> en <code>.env.example</code> y en el README.</li>
+  </ul>
+</section>
+
+<section class="salto">
+  <h2><span class="n">6</span>Guardado y backend</h2>
+  <p>Los datos nuevos (<code>section.context</code>, <code>project.agentConfig</code>, <code>project.agentRuns</code>) tienen que sobrevivir a guardar y recargar. Hay tres lugares donde se pueden perder; los dos primeros aplican a la copia local (puerto 5000) y a GitHub, el tercero solo a GitHub.</p>
+
+  <h3>6.1 Mapeos de <code>App.tsx</code> (los dos casos)</h3>
+  <p><code>App.tsx</code> no pasa el proyecto completo al guardar: lo copia campo por campo, y un campo que no esté en la lista se pierde sin avisar.</p>
+<pre>// mapMongoProjectToProject (línea ~21): añadir
+agentConfig: mongoProject.agentConfig,
+agentRuns: mongoProject.agentRuns || [],
+
+// mapProjectToMongoPayload (línea ~34): añadir
+agentConfig: project.agentConfig,
+agentRuns: project.agentRuns || [],
+
+// types.ts: Project y MongoProject → agentConfig?: AgentConfig; agentRuns?: AgentRun[]
+// Section → context?: SectionContext   (viaja dentro de sections, que ya se copia completo)
+
+// saveProjectToStorage, rama PUT, objeto mergedProject (línea ~149): añadir
+agentConfig: projectToSave.agentConfig,
+agentRuns: projectToSave.agentRuns,</pre>
+  <p>Sin la última línea, el <code>mergedProject</code> vuelve a la lista con los valores del servidor y la pantalla muestra datos viejos justo después de guardar.</p>
+
+  <h3>6.2 Cuota del almacenamiento local (copia local, puerto 5000)</h3>
+  <p><code>services/localApi.ts</code> guarda todo en <code>localStorage</code> del navegador (unos 5 MB en total). <code>updateProject</code> acepta cualquier campo del cuerpo, así que no hace falta cambiarlo, pero cada <code>AgentRun</code> pesa unos 65 kB (análisis ~35 kB, narrativa ~25 kB, configuración y entrada el resto) y son hasta 5 por proyecto.</p>
+  <ul>
+    <li>Mantener como máximo 5 consultas por proyecto. Si el guardado falla con el 500 «No se pudo guardar en el almacenamiento local» (<code>QuotaExceededError</code>), el panel muestra el aviso y ofrece borrar la consulta más antigua y reintentar.</li>
+    <li>Al guardar una consulta, quitar de <code>AgentRun</code> el <code>input</code> si ya se puede reconstruir con <code>buildAgentInput(project, run.config)</code>; se conserva <code>inputHash</code>. Es opcional: solo si la cuota resulta un problema en las pruebas.</li>
+  </ul>
+
+  <h3>6.3 Momentos de guardado</h3>
+  <p><code>saveProjectToStorage</code> descarta la petición si ya hay un guardado del mismo proyecto en curso (<code>savingProjectIdRef</code>). Por eso el panel no guarda en cada tecla. Reglas:</p>
+  <ul>
+    <li>Estado vivo del formulario en <code>useState</code> del <code>AgentPanel</code>; el proyecto solo recibe copias en los momentos de 3.1.</li>
+    <li>Un <code>saveDraft()</code> con cola: si hay un guardado en curso, marca «pendiente» y repite al terminar con el estado más reciente.</li>
+    <li>El guardado final al salir de la vista se hace antes de <code>onNavigate</code> (esperando la promesa), no solo en el <code>cleanup</code> del efecto.</li>
+    <li>Un handler nuevo en <code>App.tsx</code>, <code>handleAgentSave(patch)</code>, mezcla <code>{ agentConfig, agentRuns, sections }</code> en <code>selectedProject</code> y llama a <code>saveProjectToStorage</code>, igual que <code>handleSampleUpdate</code>.</li>
+    <li>Los cambios de <code>section.context</code> usan el mismo handler y reemplazan solo el tramo editado.</li>
+  </ul>
+
+  <h3>6.4 Backend de GitHub (solo si se usa ese servidor)</h3>
+  <p><code>server/models/Project.js</code> declara cada campo del proyecto y de la sección, y Mongoose descarta en silencio los que no estén declarados (<code>PUT /api/projects/:id</code> usa <code>findOneAndUpdate</code>). <code>lastView</code> ya es un <code>String</code> libre: <code>'AGENT'</code> se acepta sin cambios.</p>
+<pre>// SectionSchema: añadir
+context: { type: mongoose.Schema.Types.Mixed },
+
+// ProjectSchema: añadir
+agentConfig: { type: mongoose.Schema.Types.Mixed },
+agentRuns:   { type: [mongoose.Schema.Types.Mixed], default: [] },</pre>
+  <p><code>server/server.js</code> usa <code>express.json()</code>, cuyo límite por defecto es 100 kB: el proyecto lo supera en la segunda consulta y el guardado falla con 413. Cambiar a <code>express.json({ limit: '5mb' })</code>.</p>
+
+  <h3>6.5 Reemplazo de <code>agent/</code> (tarea aparte, no de esta sección)</h3>
+  <p>El <code>agent/</code> del repositorio de GitHub (LangGraph + Ollama) devuelve texto libre con cortes de PCI distintos de los de la tesis, y no calcula costos, trabajos previos ni prioridad. El paquete <code>agente-recomendaciones</code> lo reemplaza conservando FastAPI, Ollama y la ruta <code>POST /api/recommendations</code>, pero con respuesta estructurada: <code>uvicorn servicio.main:app --port 8000</code>. Ver <code>INTEGRACION.md</code> del paquete. La copia local no tiene <code>agent/</code>: para probar la sección, Dk lo arranca desde el paquete.</p>
+</section>
+
+<section class="salto">
+  <h2><span class="n">7</span>Catálogo para la interfaz (<code>services/agent/catalog.ts</code>)</h2>
+  <p>Fuente principal: <code>GET /api/recommendations/catalogo</code>. Copia de respaldo en TypeScript (la misma estructura) para trabajar sin servicio: ID, nombre, nombre en inglés, grupo de interfaz, unidad, equipo, costo de ejemplo y opciones e interinas por nivel. Los nombres traducidos de la interfaz van a <code>translations</code> con clave <code>agent.treatments.{id}</code>.</p>
+  <table class="t">
+    <thead><tr><th>ID</th><th>Nombre</th><th>Grupo en el bloque 3</th><th>Unidad</th><th class="r">Ejemplo USD</th></tr></thead>
+    <tbody>
+      <tr><td><code>sellado_grietas</code></td><td>Sellado y relleno de grietas</td><td>Paliativos</td><td>m</td><td class="r">2.50</td></tr>
+      <tr><td><code>parcheo_profundidad_parcial</code></td><td>Parcheo a profundidad parcial</td><td>Paliativos</td><td>m²</td><td class="r">35.00</td></tr>
+      <tr><td><code>parcheo_profundidad_total</code></td><td>Parcheo a profundidad total</td><td>Paliativos</td><td>m²</td><td class="r">60.00</td></tr>
+      <tr><td><code>parcheo_superficial</code></td><td>Parcheo superficial / nivelación</td><td>Paliativos</td><td>m²</td><td class="r">25.00</td></tr>
+      <tr><td><code>fresado_local</code></td><td>Fresado localizado y reposición</td><td>Paliativos</td><td>m²</td><td class="r">20.00</td></tr>
+      <tr><td><code>arenado_exudacion</code></td><td>Arenado de la exudación</td><td>Paliativos</td><td>m²</td><td class="r">1.00</td></tr>
+      <tr><td><code>relleno_roderas</code></td><td>Relleno de roderas</td><td>Paliativos</td><td>m²</td><td class="r">8.00</td></tr>
+      <tr><td><code>nivelacion_hombros</code></td><td>Nivelación de hombros</td><td>Paliativos</td><td>m</td><td class="r">8.00</td></tr>
+      <tr><td><code>conformacion_hombros</code></td><td>Conformación de hombros</td><td>Paliativos</td><td>m</td><td class="r">10.00</td></tr>
+      <tr><td><code>limpieza_superficie</code></td><td>Barrido y limpieza</td><td>Paliativos</td><td>m²</td><td class="r">0.30</td></tr>
+      <tr><td><code>riego_liga</code></td><td>Riego de liga</td><td>Paliativos</td><td>m²</td><td class="r">0.60</td></tr>
+      <tr><td><code>fog_seal</code></td><td>Riego de niebla</td><td>Mantenimiento preventivo</td><td>m²</td><td class="r">1.20</td></tr>
+      <tr><td><code>rejuvenecedor</code></td><td>Rejuvenecedor</td><td>Mantenimiento preventivo</td><td>m²</td><td class="r">1.50</td></tr>
+      <tr><td><code>sand_seal</code></td><td>Sello de arena</td><td>Mantenimiento preventivo</td><td>m²</td><td class="r">2.00</td></tr>
+      <tr><td><code>chip_seal</code></td><td>Tratamiento superficial con gravilla</td><td>Mantenimiento preventivo</td><td>m²</td><td class="r">4.50</td></tr>
+      <tr><td><code>slurry_seal</code></td><td>Lechada asfáltica</td><td>Mantenimiento preventivo</td><td>m²</td><td class="r">4.00</td></tr>
+      <tr><td><code>micropavimento</code></td><td>Micropavimento</td><td>Mantenimiento preventivo</td><td>m²</td><td class="r">6.00</td></tr>
+      <tr><td><code>thin_overlay</code></td><td>Sobrecapa delgada (≤ 40 mm)</td><td>Rehabilitación menor</td><td>m²</td><td class="r">12.00</td></tr>
+      <tr><td><code>mill_and_replace</code></td><td>Fresado y reposición</td><td>Rehabilitación menor</td><td>m²</td><td class="r">16.00</td></tr>
+      <tr><td><code>sobrecapa_estructural</code></td><td>Sobrecapa estructural</td><td>Rehabilitación mayor</td><td>m²</td><td class="r">22.00</td></tr>
+      <tr><td><code>fresado_sobrecapa_estructural</code></td><td>Fresado y sobrecapa estructural</td><td>Rehabilitación mayor</td><td>m²</td><td class="r">28.00</td></tr>
+      <tr><td><code>fdr</code></td><td>Recuperación a profundidad total</td><td>Rehabilitación mayor</td><td>m²</td><td class="r">30.00</td></tr>
+      <tr><td><code>reconstruccion</code></td><td>Reconstrucción completa</td><td>Reconstrucción</td><td>m²</td><td class="r">65.00</td></tr>
+    </tbody>
+  </table>
+  <p class="nota"><code>monitoreo</code> no aparece en la interfaz: no requiere equipo. Los costos de ejemplo no tienen fuente; la interfaz siempre los marca como «ejemplo».</p>
+
+  <h3>7.1 Preferencias del usuario</h3>
+  <p>Clave <code>asphalt-pci-mapa.agent-defaults.v1</code> en <code>localStorage</code>, por usuario: <code>{ [userId]: { availableTreatments, unitCosts, priorityMode, contingencyPct } }</code>. Se escriben con <i>Guardar como mis costos</i> y al generar; se leen para proyectos nuevos y para el atajo <i>Igual que mi último proyecto</i>. Envolver lecturas y escrituras en <code>try/catch</code>.</p>
+</section>
+
+<section class="salto">
+  <h2><span class="n">8</span>Vista móvil y accesibilidad</h2>
+  <div class="dos">
+    <div class="fig">
+      <div class="scr mobile">
+        <div class="hdr"><span>☰ <b style="color:var(--teal-d)">AsphaltPCI</b></span><span class="m">&nbsp;</span></div>
+        <div class="titulo-app"><div><h4 style="font-size:9pt">Recomendaciones</h4><span class="mut">Calles de Santiago</span></div></div>
+        <div class="acc"><div class="acc-h"><span class="num ok">✓</span><b>1 · Datos</b><span class="chev">▸</span></div></div>
+        <div class="acc open"><div class="acc-h"><span class="num w">!</span><b>2 · Faltantes</b><span class="chev">▾</span></div>
+          <div class="acc-b"><div class="tabs" style="flex-wrap:nowrap;overflow:hidden"><span class="tab">10ma</span><span class="tab">Central</span><span class="tab">La Mata</span><span class="tab on">2da</span></div>
+            <p style="margin:2pt 0">Tipo de vía<br><span class="seg"><span class="on">Urbana</span><span>Rural</span></span></p>
+            <p style="margin:2pt 0">Bordillo (cm)<br><span class="in w">     </span><br><span class="hint w">Se asumirá &lt; 7.6 cm</span></p>
+            <p style="margin:2pt 0">Drenaje<br><span class="rad"></span>Bueno <span class="rad"></span>Regular <span class="rad on"></span>Malo</p></div></div>
+        <div class="acc"><div class="acc-h"><span class="num w">!</span><b>3 · Equipo</b><span class="chev">▸</span></div></div>
+        <div class="acc"><div class="acc-h"><span class="num w">!</span><b>4 · Costos</b><span class="chev">▸</span></div></div>
+        <div class="acc"><div class="acc-h"><span class="num ok">✓</span><b>5 · Presupuesto</b><span class="chev">▸</span></div></div>
+        <div class="abar" style="margin-top:4pt"><span class="pchip w">4 avisos ▴</span><span class="btn">Generar</span></div>
+      </div>
+      <p class="fig-cap">Figura 10. Configurar en móvil (375 px).</p>
+    </div>
+    <div>
+      <ul>
+        <li>Los bloques se apilan; cada encabezado es un botón de 44 px de alto como mínimo y muestra solo el número, el título corto y el estado; la línea de resumen pasa debajo del título.</li>
+        <li>Las pestañas de tramos se desplazan en horizontal; el tramo activo se centra.</li>
+        <li>Las tablas de los bloques 1 y 4 y del resumen pasan a lista de tarjetas (una fila = una tarjeta) por debajo de 768 px.</li>
+        <li>La barra de acción conserva el botón principal y un solo chip «{n} avisos» que abre una hoja inferior con la lista (cada aviso salta a su bloque).</li>
+        <li>El estado Resultado: los chips de parámetros en dos columnas; <i>Editar parámetros</i> y <i>Descargar PDF</i> en fila de ancho completo; el informe se ve a ancho completo y el PDF se descarga igual que en escritorio.</li>
+      </ul>
+      <h3>Accesibilidad</h3>
+      <ul>
+        <li>Cada encabezado de bloque es un <code>button</code> con <code>aria-expanded</code> y <code>aria-controls</code>; los estados llevan icono y texto, no solo color.</li>
+        <li>Cada control con <code>label</code> asociado; errores bloqueantes con <code>role="alert"</code>; avisos y resultado de la consulta con <code>role="status"</code>.</li>
+        <li>Al saltar a un bloque desde un chip, el foco va al título del bloque; al terminar la consulta, al título del resultado.</li>
+        <li>Navegable con teclado: Tab por los campos, Enter y Espacio en los encabezados, Escape cierra los modales.</li>
+        <li>Números con separador de miles y la unidad fuera del campo.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 style="margin-top:10pt"><span class="n">9</span>Archivos</h2>
+  <table class="t">
+    <thead><tr><th>Archivo</th><th>Contenido</th></tr></thead>
+    <tbody>
+      <tr><td><code>types.ts</code></td><td>Tipos de la sección 1.1; campos opcionales en <code>Section</code>, <code>Project</code> y <code>MongoProject</code>; <code>'AGENT'</code> en <code>ProjectView</code> y en <code>MongoProject.lastView</code></td></tr>
+      <tr><td><code>App.tsx</code></td><td><code>'AGENT'</code> en <code>VIEW_ORDER</code>, en la condición de cálculo de <code>handleNavigate</code>, en <code>needsResultsCalc</code> y en el <code>switch</code>; los mapeos y <code>mergedProject</code> de 6.1; <code>handleAgentSave</code> (6.3)</td></tr>
+      <tr><td><code>components/AppHeader.tsx</code></td><td>Paso 5 en <code>STEP_DEFINITIONS</code>, <code>'AGENT'</code> en <code>VIEW_ORDER</code>, icono nuevo</td></tr>
+      <tr><td><code>components/ResultsDisplay.tsx</code></td><td>Botón <i>Ir a Recomendaciones</i> junto a <i>Exportar</i> (prop <code>onOpenAgent</code>)</td></tr>
+      <tr><td><code>components/agent/AgentPanel.tsx</code></td><td>Contenedor: estados Configurar, Consultando y Resultado; borrador, cola de guardado y salto a bloques</td></tr>
+      <tr><td><code>components/agent/AgentHeader.tsx</code>, <code>AccordionBlock.tsx</code>, <code>ActionBar.tsx</code></td><td>Cabecera con estado del agente, bloque expandible, barra de acción</td></tr>
+      <tr><td><code>components/agent/blocks/ReceivedDataBlock.tsx</code>, <code>SectionContextBlock.tsx</code>, <code>EquipmentBlock.tsx</code>, <code>CostsBlock.tsx</code>, <code>BudgetBlock.tsx</code></td><td>Los cinco bloques de 3.3 a 3.7</td></tr>
+      <tr><td><code>components/agent/result/ResultView.tsx</code>, <code>ParamsStrip.tsx</code>, <code>QuickAdjust.tsx</code>, <code>RunCompare.tsx</code>, <code>RunHistory.tsx</code>, <code>SummaryTab.tsx</code></td><td>Estado Resultado (3.9)</td></tr>
+      <tr><td><code>components/agent/modals/CopyContextModal.tsx</code>, <code>JsonModal.tsx</code>, <code>CsvImportModal.tsx</code>, <code>ImportResultModal.tsx</code></td><td>Ventanas compartidas</td></tr>
+      <tr><td><code>components/agent/report/AgentReport.tsx</code> y una pieza por sección (<code>ReportCover</code>, <code>ReportSummary</code>, <code>ReportMethod</code>, <code>ReportData</code>, <code>ReportSection</code>, <code>ReportPriority</code>, <code>ReportAlerts</code>, <code>ReportClosing</code>, <code>ReportAnnexes</code>), <code>PciGauge.tsx</code></td><td>Informe en la web (sección 4)</td></tr>
+      <tr><td><code>services/agent/agentReportPdf.ts</code>, <code>reportText.ts</code>, <code>format.ts</code></td><td>PDF con jsPDF, textos fijos del informe (metodología, bibliografía, firma), formato de números</td></tr>
+      <tr><td><code>services/agent/catalog.ts</code>, <code>levels.ts</code></td><td>Catálogo de respaldo (sección 7); <code>levelForPci</code>, validación de umbrales, interina por nivel</td></tr>
+      <tr><td><code>services/agent/validation.ts</code></td><td>Estado de cada bloque (ok, aviso, bloquea), mensajes, <code>summarizeBlock</code> y efecto de las casillas en los tramos</td></tr>
+      <tr><td><code>services/agent/buildAgentInput.ts</code></td><td>Sección 5 y huella</td></tr>
+      <tr><td><code>services/agent/compareRuns.ts</code></td><td>Comparación entre dos consultas (3.9)</td></tr>
+      <tr><td><code>services/agent/csv.ts</code>, <code>agentClient.ts</code>, <code>defaults.ts</code></td><td>CSV de costos; cliente con <code>fetch</code> (5.1); preferencias del usuario (7.1)</td></tr>
+      <tr><td><code>translations/es.ts</code>, <code>translations/en.ts</code></td><td><code>stepper.step5</code> y bloque <code>agent</code> completo en ambos idiomas</td></tr>
+      <tr><td><code>.env.example</code>, <code>README.md</code></td><td>Documentar <code>VITE_AGENT_URL</code> (por defecto <code>http://localhost:8000</code>)</td></tr>
+      <tr><td><code>server/models/Project.js</code>, <code>server/server.js</code></td><td>Solo en el repositorio de GitHub (6.4)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="salto">
+  <h2><span class="n">10</span>Criterios de aceptación</h2>
+  <ol>
+    <li><code>npx tsc --noEmit</code> y <code>npm run build</code> sin errores nuevos.</li>
+    <li>El menú lateral muestra «5. Recomendaciones» después de «4. Resultados», en español e inglés; el botón <i>Ir a Recomendaciones</i> está en Resultados y se deshabilita con explicación si un tramo no tiene PCI.</li>
+    <li>Un proyecto antiguo (sin <code>agentConfig</code> ni <code>context</code>) abre en Resultados y en Recomendaciones sin errores.</li>
+    <li>La pantalla se ve como las figuras 2 a 9, en tema claro y oscuro, a 1280 px y a 375 px, usando los componentes y tokens de la app.</li>
+    <li>Los bloques son un acordeón con estado (completo, se asumirá, bloquea) y línea de resumen. El contexto vacío da ámbar y no bloquea; umbrales inválidos y ninguna casilla marcada en Equipo bloquean con el motivo en la barra de acción.</li>
+    <li>Los chips de la barra de acción abren y enfocan el bloque que corresponde; los efectos de las casillas (tramos sin opción, interinas) y el número de costos de ejemplo se actualizan al instante.</li>
+    <li><i>Copiar este contexto a…</i> copia todos los campos menos las observaciones a los tramos elegidos.</li>
+    <li>El CSV de costos se importa con vista previa (reconocidas, desconocidas, unidad distinta) y la plantilla descargada trae todos los IDs.</li>
+    <li>El <code>entrada.json</code> descargado valida contra <code>schemas/entrada.schema.json</code> y el agente lo procesa sin errores, tanto por <code>POST /api/recommendations</code> como con <code>python -m agente todo</code>.</li>
+    <li>Con el servicio en <code>localhost:8000</code>, <i>Generar recomendaciones</i> lleva al estado Resultado; con 422 se ven los errores enlazados a su bloque; sin servicio aparecen <i>Descargar entrada.json</i> e <i>Importar resultado…</i>, que con <code>analisis.json</code> + <code>narrativa.json</code> da el mismo estado Resultado.</li>
+    <li>El estado Resultado muestra los chips de parámetros, el resumen con las cifras de <code>analisis</code>, y la pestaña Informe con todas las secciones de 4.1 con las mismas cifras y textos que <code>informe-referencia.pdf</code> para la entrada de ejemplo.</li>
+    <li><b>Editar parámetros</b>, cada chip y el ajuste rápido funcionan: llevan al estado Configurar (o regeneran, en el ajuste rápido) con los valores de la consulta; los campos modificados aparecen «cambiados» con su valor anterior; <i>Volver a consultar</i> crea la consulta siguiente y la comparación con la anterior (PCI, financiado, faltante y tramos que cambiaron) es correcta.</li>
+    <li>Con la configuración distinta de la consulta mostrada, aparece la franja «Cambiaste parámetros…»; <i>Ver resultado v{n}</i> y el historial permiten volver a una consulta anterior sin llamar al agente, y <i>Restaurar sus parámetros</i> recupera su configuración.</li>
+    <li><i>Descargar PDF</i> produce un PDF A4 con las secciones de 4.1, saltos de página por sección y por tramo, y pie con «Página X de Y»; <i>Imprimir</i> muestra solo el informe.</li>
+    <li>Tras guardar y recargar la página, el contexto de los tramos, la configuración y el historial siguen ahí, tanto con <code>localApi</code> como (si se prueba) con el backend de GitHub con los cambios de 6.4. Con 5 consultas guardadas el proyecto se sigue guardando; si se llena la cuota local, el aviso ofrece borrar la más antigua.</li>
+    <li>Escribir rápido en los campos no pierde ni repite guardados (cola de 6.3).</li>
+    <li>Todo texto visible pasa por <code>t()</code> con claves <code>agent.*</code> en español e inglés.</li>
+    <li>Sin dependencias nuevas; en el repositorio de GitHub, cambios del backend limitados a 6.4; todo en la rama <code>feature/recomendaciones</code>, sin commit, push ni PR hasta que Dk lo confirme, y sin tocar los cambios sin guardar que ya tiene.</li>
+  </ol>
+
+  <h2 style="margin-top:10pt"><span class="n">11</span>Fuera de alcance</h2>
+  <ul>
+    <li>Reemplazar <code>agent/</code> por el paquete del agente y desplegarlo (6.5).</li>
+    <li>Importar costos desde Excel; otras monedas; traducir los textos del informe que genera el agente.</li>
+    <li>Pavimento rígido (el agente solo cubre flexible).</li>
+    <li>Editar las decisiones del agente a mano en la interfaz (cambiar la solución de un tramo): el camino para cambiar el resultado es <i>Editar parámetros</i> y volver a consultar.</li>
+    <li>Un chat con el agente: no conversa, solo recibe datos y devuelve el resultado.</li>
+    <li>Ejecutar obras por etapas para usar el saldo sin asignar (pendiente de decidir en la tesis).</li>
+  </ul>
+
+  <div class="caja"><b class="t">Al terminar, informar</b>Archivos creados y modificados, decisiones tomadas donde este documento no alcanzó, resultado de <code>tsc</code> y <code>npm run build</code>, y lo que no se pudo verificar (por ejemplo, el aspecto visual y el PDF, que revisará Claude en el navegador).</div>
+</section>
+
+</body>
+</html>

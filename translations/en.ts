@@ -405,7 +405,7 @@ export const en = {
         title: "Recommendations",
         subtitle: "Calibrate the agent, fill in the missing data and generate the intervention recommendations.",
         openFromResults: "Go to Recommendations",
-        health: { checking: "Checking agent…", online: "Agent online", offline: "Agent offline", offlineHelp: "The agent cannot be reached. You can download entrada.json, process it with the agent and then import the results." },
+        health: { checking: "Checking agent… (if it was asleep, this can take up to a minute)", online: "Agent online", offline: "Agent offline", offlineHelp: "The agent cannot be reached. You can download entrada.json, process it with the agent and then import the results." },
         status: { ok: "Complete", warn: "Has warnings", error: "Has errors" },
         save: { saved: "Saved", saving: "Saving…", error: "Could not save" },
         level: { A1: "Preventive (high)", A2: "Preventive", B1: "Minor rehabilitation", B2: "Major rehabilitation", C1: "Reconstruction", C2: "Reconstruction" },
@@ -471,7 +471,7 @@ export const en = {
         },
         bar: { assumed: "{n} value(s) to assume", complete: "Data complete", lastResult: "View last result", downloadInput: "Download entrada.json", importResults: "Import results", generate: "Generate recommendations", rerun: "Run again" },
         consulting: { working: "The agent is working…", elapsed: "{s} s elapsed", cancel: "Cancel" },
-        error: { network: "Could not reach the agent. Check that it is running or use offline mode.", import: "The files are not valid ({fields}).", hash: "The results do not match the current data. Generate entrada.json again.", fix: "Fix the marked blocks before generating." },
+        error: { rateLimit: "Too many requests in a row. Wait a minute and try again.", network: "Could not reach the agent. Check that it is running or use offline mode.", import: "The files are not valid ({fields}).", hash: "The results do not match the current data. Generate entrada.json again.", fix: "Fix the marked blocks before generating." },
         result: { edit: "Edit parameters", download: "Download JSON", runs: "Runs", pci: "Weighted PCI", needed: "Cost needed", financed: "Funded", shortfall: "Shortfall", summary: "Executive summary", treatment: "Treatment", cost: "Cost", interim: "interim", pdf: "Download PDF", print: "Print", title: "Result" }
     },
   };

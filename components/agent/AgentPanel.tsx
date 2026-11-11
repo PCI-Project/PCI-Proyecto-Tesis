@@ -141,6 +141,7 @@ export const AgentPanel: React.FC<Props> = ({ project, onSave, onNavigate }) => 
       await storeRun(input, hash, body.analisis, body.narrativa, body.narrativa_origen === 'modelo' ? 'modelo' : 'automatica', String(body.version ?? ''));
     } catch (err: any) {
       if (controller.signal.aborted && !err?.status) setFailure(null);
+      else if (err?.status === 429) setFailure(t('agent.error.rateLimit'));
       else if (err?.status === 422) setServerErrors((err.body?.errores ?? []).map((e: unknown) => (typeof e === 'string' ? e : JSON.stringify(e))));
       else { setFailure(t('agent.error.network')); setHealth('offline'); }
       setPhase('configure');

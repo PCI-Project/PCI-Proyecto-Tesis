@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "asphaltpci/agente/analisis/1.0",
+  "title": "Análisis del motor de reglas (salida determinista)",
+  "type": "object",
+  "required": ["version", "generado", "proyecto", "calibracion_usada", "tramos", "red", "alertas_globales"],
+  "properties": {
+    "version": { "const": "1.0" },
+    "modo": { "enum": ["completo", "diagnostico"], "description": "diagnostico = sin importes, beneficio, B/C ni prioridad (informe patológico)" },
+    "generado": { "type": "string", "format": "date-time" },
+    "proyecto": { "type": "object" },
+    "calibracion_usada": {
+      "type": "object",
+      "required": ["tratamientos_disponibles", "umbrales_pci", "parametros"],
+      "properties": {
+        "tratamientos_disponibles": { "type": "array", "items": { "type": "string" } },
+        "modo_priorizacion": { "enum": ["costo_beneficio", "peor_primero"] },
+        "presupuesto": { "type": ["number", "null"] },
+        "moneda": { "type": "string" },
+        "costos": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["valor", "unidad", "origen"],
+            "properties": {
+              "valor": { "type": "number" },
+              "unidad": { "type": "string" },
+              "origen": { "enum": ["calibrado", "ejemplo"] },
+              "fuente": { "type": "string" }
+            }
+          }
+        },
+        "umbrales_pci": { "type": "object" },
+        "parametros": { "type": "object" }
+      }
+    },
+    "tramos": { "type": "array", "items": { "$ref": "#/$defs/tramo" } },
+    "red": {
+      "type": "object",
+      "required": ["area_total_m2", "pci_ponderado", "orden_ejecucion"],
+      "properties": {
+        "area_total_m2": { "type": "number" },
+        "pci_ponderado": { "type": "number" },
+        "pci_ponderado_despues": { "type": "number", "description": "PCI de la red si se ejecuta lo financiado" },
+        "costo_seguridad": { "type": "number" },
+        "costo_total_necesario": { "type": "number" },
+        "costo_financiado": { "type": "number" },
+        "costo_interinos_diferidos": { "type": "number" },
+        "faltante": { "type": "number" },
+        "saldo_sin_asignar": { "type": "number", "description": "Presupuesto que sobra porque ninguna obra pendiente cabe completa" },
+        "orden_ejecucion": { "type": "array", "items": { "type": "string" }, "description": "IDs de tramo en orden de ejecución" },
+        "un_solo_tramo": { "type": "boolean", "description": "true = el análisis tiene un solo tramo: no hay ranking ni comparación de modos (no existe comparacion_modos)" },
+        "comparacion_modos": {
+          "type": "object",
+          "description": "Resultado del otro modo con el mismo presupuesto, para que el informe compare",
+          "properties": {
+            "modo": { "type": "string" },
+            "tramos_financiados": { "type": "array", "items": { "type": "string" } },
+            "pci_ponderado_despues": { "type": "number" },
+            "beneficio_total": { "type": "number" }
+          }
+        }
+      }
+    },
+    "alertas_globales": { "type": "array", "items": { "$ref": "#/$defs/alerta" } }
+  },
+  "$defs": {
+    "alerta": {
+      "type": "object",
+      "required": ["codigo", "nivel", "mensaje"],
+      "properties": {
+        "codigo": { "type": "string", "description": "Ver lista de códigos en docs/01-contrato-entrada-salida.md" },
+        "nivel": { "enum": ["info", "advertencia", "critica"] },
+        "mensaje": { "type": "string" },
+        "tramo_id": { "type": "string" }
+      }
+    },
+    "partida": {
+      "type": "object",
+      "required": ["actividad", "nombre", "cantidad", "unidad", "motivo"],
+      "properties": {
+        "actividad": { "type": "string" },
+        "nombre": { "type": "string" },
+        "cantidad": { "type": "number" },
+        "unidad": { "type": "string" },
+        "costo_unitario": { "type": "number" },
+        "costo": { "type": "number" },
+        "origen_costo": { "enum": ["calibrado", "ejemplo"] },
+        "motivo": { "type": "string", "description": "Ej.: 'Baches M: 6 und × 0.35 m² × 1.2'" },
+        "fallas_origen": { "type": "array", "items": { "type": "string" } },
+        "seguridad": { "type": "boolean" },
+        "disponible": { "type": "boolean" }
+      }
+    },
+    "falla_tramo": {
+      "type": "object",
+      "required": ["tipo", "nombre", "severidad", "unidad", "cantidad_muestras", "densidad_pct", "cantidad_estimada_tramo"],
+      "properties": {
+        "tipo": { "type": "string" },
+        "nombre": { "type": "string" },
+        "nombre_en": { "type": "string" },
+        "severidad": { "type": "string" },
+        "descripcion_severidad": { "type": "string", "description": "Ancho, profundidad o criterio ASTM de esa severidad" },
+        "unidad": { "type": "string" },
+        "cantidad_muestras": { "type": "number" },
+        "densidad_pct": { "type": "number" },
+        "cantidad_estimada_tramo": { "type": "number" },
+        "muestras": { "type": "array", "items": { "type": ["string", "integer"] } },
+        "grupo": { "type": "string" },
+        "estructural": { "type": "boolean" }
+      }
+    },
+    "tramo": {
+      "type": "object",
+      "required": ["id", "nombre", "area_m2", "pci", "nivel_id", "franja", "nivel", "categoria", "fallas", "tratamiento", "trabajos_previos", "prioridad", "alertas", "supuestos", "referencias"],
+      "properties": {
+        "id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "area_m2": { "type": "number" },
+        "longitud_m": { "type": "number" },
+        "pci": { "type": "number" },
+        "nivel_id": { "enum": ["A1", "A2", "B1", "B2", "C1", "C2"] },
+        "franja": { "enum": ["A", "B", "C"] },
+        "nivel": { "enum": ["Mantenimiento preventivo", "Rehabilitación menor", "Rehabilitación mayor", "Reconstrucción"] },
+        "categoria": { "type": "string" },
+        "contexto_usado": { "type": "object", "description": "Contexto con valores asumidos ya resueltos" },
+        "muestras": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": ["string", "integer"] },
+              "area_m2": { "type": "number" },
+              "pci": { "type": "number" },
+              "adicional": { "type": "boolean" },
+              "fallas": { "type": "array", "items": { "type": "object" } }
+            }
+          }
+        },
+        "factor_extrapolacion": { "type": "number" },
+        "fallas": { "type": "array", "items": { "$ref": "#/$defs/falla_tramo" } },
+        "deterioro_dominante": { "type": ["string", "null"] },
+        "pct_area_estructural": { "type": "number" },
+        "tratamiento": {
+          "type": "object",
+          "required": ["ideal", "seleccionado", "disponible", "interino", "regla"],
+          "properties": {
+            "ideal": { "type": "string" },
+            "seleccionado": { "type": ["string", "null"] },
+            "nombre": { "type": "string" },
+            "nombre_en": { "type": "string" },
+            "disponible": { "type": "boolean" },
+            "interino": { "type": "boolean" },
+            "descartados": {
+              "type": "array",
+              "items": { "type": "object", "properties": { "id": { "type": "string" }, "razon": { "type": "string" } } }
+            },
+            "regla": { "type": "string", "description": "Texto corto de la regla aplicada" },
+            "vida_util_anios": { "type": "number" },
+            "pci_despues": { "type": "number" }
+          }
+        },
+        "trabajos_previos": { "type": "array", "items": { "$ref": "#/$defs/partida" } },
+        "partidas_tratamiento": { "type": "array", "items": { "$ref": "#/$defs/partida" } },
+        "costos": {
+          "type": "object",
+          "required": ["seguridad", "previos", "tratamiento", "subtotal", "imprevistos", "total"],
+          "properties": {
+            "seguridad": { "type": "number" },
+            "previos": { "type": "number" },
+            "tratamiento": { "type": "number" },
+            "subtotal": { "type": "number" },
+            "imprevistos": { "type": "number" },
+            "total": { "type": "number" },
+            "costo_m2": { "type": "number" }
+          }
+        },
+        "beneficio": { "type": "number" },
+        "relacion_bc": { "type": "number" },
+        "prioridad": {
+          "type": "object",
+          "required": ["posicion", "estado"],
+          "properties": {
+            "posicion": { "type": ["integer", "null"] },
+            "estado": { "enum": ["financiado", "diferido", "solo_seguridad", "sin_presupuesto"] },
+            "costo_interino_si_diferido": { "type": "number" }
+          }
+        },
+        "alertas": { "type": "array", "items": { "$ref": "#/$defs/alerta" } },
+        "supuestos": { "type": "array", "items": { "type": "string" } },
+        "referencias": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
