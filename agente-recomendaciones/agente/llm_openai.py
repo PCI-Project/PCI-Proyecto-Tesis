@@ -14,6 +14,7 @@ Si el modelo falla (red, llave, cuota, JSON inválido), narrativa.redactar y asi
 """
 import json
 import os
+import urllib.error
 import urllib.request
 
 
@@ -45,8 +46,12 @@ def _chat(cfg, mensajes, timeout, pedir_json):
         data=json.dumps(cuerpo).encode('utf-8'),
         headers={'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg['key']},
     )
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        respuesta = json.loads(r.read().decode('utf-8'))
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            respuesta = json.loads(r.read().decode('utf-8'))
+    except urllib.error.HTTPError as exc:
+        detalle = ' '.join(exc.read().decode('utf-8', 'replace')[:300].split())  # el cuerpo del error no incluye la llave
+        raise RuntimeError(f'El proveedor respondió HTTP {exc.code}: {detalle}') from exc
     return respuesta['choices'][0]['message']['content'] or ''
 
 

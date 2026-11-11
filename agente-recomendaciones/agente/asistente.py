@@ -6,6 +6,7 @@ Con un modelo de lenguaje el modelo solo redacta sobre esos mismos datos; si inv
 y se usa la automática. Sin modelo (AGENTE_USAR_MODELO=0) todas las respuestas son automáticas.
 """
 import re
+import sys
 import unicodedata
 from functools import lru_cache
 
@@ -450,6 +451,6 @@ def responder(pregunta, analisis, narrativa=None, historial=None, llamar_texto=N
         texto = (llamar_texto(SISTEMA, mensajes) or '').strip()
         if texto and not cifras_inventadas(texto, auto, pregunta):
             resultado.update(respuesta=texto, origen='modelo')
-    except Exception:
-        pass
+    except Exception as exc:
+        print(f'[agente] el modelo no respondió el chat: {exc}'[:500], file=sys.stderr)
     return resultado
