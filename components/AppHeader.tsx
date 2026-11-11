@@ -17,6 +17,7 @@ const SetupIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" class
 const DataIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" /><path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" /></svg>);
 const CalcIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zM6 7a1 1 0 011-1h2a1 1 0 110 2H7a1 1 0 01-1-1zm0 4a1 1 0 011-1h2a1 1 0 110 2H7a1 1 0 01-1-1zm6-4a1 1 0 100 2h2a1 1 0 100-2h-2zm-3 4a1 1 0 110 2h2a1 1 0 110-2h-2z" clipRule="evenodd" /></svg>);
 const ResultsIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" /><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" /></svg>);
+const AgentIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a1 1 0 01.894.553l1.382 2.763 3.05.443a1 1 0 01.554 1.706l-2.207 2.15.52 3.037a1 1 0 01-1.451 1.054L10 12.282l-2.742 1.424a1 1 0 01-1.451-1.054l.52-3.037-2.207-2.15a1 1 0 01.554-1.706l3.05-.443 1.382-2.763A1 1 0 0110 2z" /></svg>);
 const InstallIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg>);
 
 
@@ -27,13 +28,14 @@ interface AppHeaderProps {
   onGoHome: () => void;
 }
 
-const VIEW_ORDER: ProjectView[] = ['SETUP', 'DATA_ENTRY', 'CALCULATION_DETAILS', 'RESULTS'];
+const VIEW_ORDER: ProjectView[] = ['SETUP', 'DATA_ENTRY', 'CALCULATION_DETAILS', 'RESULTS', 'AGENT'];
 
 const STEP_DEFINITIONS: { view: ProjectView, labelKey: string, icon: React.FC }[] = [
     { view: 'SETUP', labelKey: 'stepper.step1', icon: SetupIcon },
     { view: 'DATA_ENTRY', labelKey: 'stepper.step2', icon: DataIcon },
     { view: 'CALCULATION_DETAILS', labelKey: 'stepper.step3', icon: CalcIcon },
     { view: 'RESULTS', labelKey: 'stepper.step4', icon: ResultsIcon },
+    { view: 'AGENT', labelKey: 'stepper.step5', icon: AgentIcon },
 ];
 
 export const AppHeader: React.FC<AppHeaderProps> = ({ project, currentView, onNavigate, onGoHome }) => {

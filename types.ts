@@ -1,4 +1,4 @@
-export type ProjectView = 'SETUP' | 'DATA_ENTRY' | 'CALCULATION_DETAILS' | 'RESULTS' | 'RECOMMENDATIONS';
+export type ProjectView = 'SETUP' | 'DATA_ENTRY' | 'CALCULATION_DETAILS' | 'RESULTS' | 'AGENT';
 export type AppView = 'DASHBOARD' | ProjectView | 'PROFILE' | 'ADMIN_SETTINGS';
 
 export enum PavementType {
@@ -31,9 +31,11 @@ export interface MongoProject {
   descripcion?: string;
   inspector?: string;
   inspectionDate?: string;
-  lastView?: 'SETUP' | 'DATA_ENTRY' | 'CALCULATION_DETAILS' | 'RESULTS';
+  lastView?: ProjectView;
   weightedPCI?: number;
   sections: Section[];
+  agentConfig?: AgentConfig;
+  agentRuns?: AgentRun[];
   propietario: string;
   createdAt?: string;
   updatedAt?: string;
@@ -80,6 +82,8 @@ export interface Sample {
   pavementType: PavementType;
   distresses: Distress[];
   isAdditional: boolean;
+  /** true = el inspector la marcó evaluada aunque no tenga fallas (una unidad vacía sin marca está pendiente). */
+  evaluated?: boolean;
   calculationDetails?: PCICalculationDetails;
 }
 
@@ -102,7 +106,44 @@ export interface RouteLocation {
   endName?: string;
 }
 
+export interface SectionContext {
+  roadType: 'urbana' | 'rural' | null;
+  curbHeightCm: number | null;
+  trafficInput: 'esal' | 'clase';
+  esalMillions: number | null;
+  trafficClass: 'bajo' | 'medio' | 'alto' | null;
+  aadt: number | null;
+  yearBuilt: number | null;
+  lastInterventionYear: number | null;
+  lastInterventionType: string | null;
+  drainage: 'bueno' | 'regular' | 'malo' | null;
+  functionalClass: string | null;
+  notes: string | null;
+}
+export interface UnitCost { valor: number; unidad: 'm2' | 'm' | 'global'; fuente?: string; }
+export interface AgentConfig {
+  /** C1: 'diagnostico' = informe patológico sin costos, presupuesto, B/C ni prioridad. Sin valor = 'completo'. */
+  analysisMode?: 'completo' | 'diagnostico';
+  availableTreatments: string[];
+  unitCosts: Record<string, UnitCost>;
+  currency: string;
+  budget: number | null;
+  priorityMode: 'costo_beneficio' | 'peor_primero';
+  contingencyPct: number;
+  pciThresholds?: Partial<Record<'A1' | 'A2' | 'B1' | 'B2' | 'C1', number>>;
+  parameters?: Record<string, unknown>;
+  updatedAt: string;
+}
+export interface AgentRun {
+  id: string; number: number; createdAt: string; inputHash: string;
+  config: AgentConfig; contexts: Record<string, SectionContext | null>;
+  input: unknown; analysis: unknown; narrative: unknown;
+  narrativeSource: 'modelo' | 'automatica' | 'importado';
+  agentVersion: string; status: 'listo' | 'error'; error?: string;
+}
+
 export interface Section {
+  context?: SectionContext;
   id: string;
   name: string;
   length: number; // meters
@@ -147,4 +188,6 @@ export interface Project {
   sections: Section[];
   lastView?: ProjectView;
   weightedPCI?: number;
+  agentConfig?: AgentConfig;
+  agentRuns?: AgentRun[];
 }
