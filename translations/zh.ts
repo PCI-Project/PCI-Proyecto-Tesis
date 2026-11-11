@@ -16,6 +16,23 @@ export const zh = {
         beneficio_costo: "效益/成本",
         prioridad: "优先级",
         observaciones: "观察",
+        title: "养护建议（加权 PCI：{weightedPCI}）",
+        loading: "正在生成建议…",
+        loadingDescription: "正在分析项目路段。",
+        error: "无法加载建议",
+        retry: "重试",
+        selectProjectDesc: "请选择项目以查看其建议。",
+        noRecommendations: "暂无建议",
+        noRecommendationsDescription: "未能为项目的 {count} 个路段生成建议。",
+        serviceOffline: "建议服务不可用",
+        serviceOfflineDescription: "正在显示基于已计算 PCI 的本地数据。",
+        serviceVersion: "服务版本：{version}",
+        serviceOnline: "建议服务在线（版本 {version}）"
+    },
+    prioridad: {
+        alta: "高",
+        media: "中",
+        baja: "低"
     },
     rating: {
         excelente: "优秀",
@@ -145,6 +162,7 @@ export const zh = {
         selectSectionTitle: "选择路段以查看计算",
     },
     results: {
+        section: "路段",
         title: "4. 项目结果",
         exportButton: "导出报告",
         weightedPCI: "项目加权 PCI",
@@ -222,6 +240,7 @@ export const zh = {
         close: "关闭",
     },
     app: {
+        selectProject: "请选择项目",
         calculating: "计算中",
         unknownView: "未知视图",
     },

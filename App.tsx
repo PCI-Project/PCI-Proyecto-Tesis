@@ -195,7 +195,7 @@ export const App: React.FC = () => {
           // Llamada al backend para obtener recomendaciones
           const { data } = await API.post(`/projects/${projectToSave._id || projectToSave.id}/recommendations`, projectToSave);
           if (data.success) {
-            console.log('[saveProjectToStorage] Recomendaciones generadas:', data.recomendaciones.length, 'secciones');
+            console.log('[saveProjectToStorage] Recomendaciones generadas:', data.recommendations.length, 'secciones');
             // Aquí podríamos almacenar las recomendaciones o navegar a la vista
             // Por ahora, solo registramos en consola
           }

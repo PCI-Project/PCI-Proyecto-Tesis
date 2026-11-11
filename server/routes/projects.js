@@ -66,12 +66,13 @@ router.post('/:id/recommendations', async (req, res) => {
     }
     
     // Calcular recomendaciones usando el motor interno
-    const recomendaciones = calcularRecomendaciones(projectData);
+    const { weightedPCI, recommendations } = calcularRecomendaciones(projectData);
     
     res.json({
       success: true,
       proyectoId: id,
-      recomendaciones
+      weightedPCI,
+      recommendations
     });
   } catch (err) {
     console.error('[POST /projects/:id/recommendations] Error:', err.message);
@@ -89,16 +90,13 @@ function calcularRecomendaciones(project) {
     'Bueno': { tratamiento: 'Tratamiento superficial', prioridad: 'media' },
     'Regular': { tratamiento: 'Rehabilitación / recapeo', prioridad: 'alta' },
     'Malo': { tratamiento: 'Reconstrucción parcial', prioridad: 'alta' },
-    'Muy Malo': { tratamiento: 'Reconstrucción total', prioridad: 'crítica' }
+    'Muy Malo': { tratamiento: 'Reconstrucción total', prioridad: 'alta' }
   };
   
-  const recomendaciones = [];
+  const recommendations = [];
   
   project.sections.forEach(section => {
     const pci = section.pci ?? 100;
-    const ratingKey = Object.keys(ratingMap).find(key => 
-      pci >= ratingMap[key].pci ? false : true
-    );
     
     // Determinar rating simplificado
     let rating = 'Excelente';
@@ -111,7 +109,7 @@ function calcularRecomendaciones(project) {
     
     const info = ratingMap[rating] || ratingMap['Regular'];
     
-    recomendaciones.push({
+    recommendations.push({
       sectionId: section.id,
       sectionName: section.name,
       pci: pci,
@@ -120,12 +118,13 @@ function calcularRecomendaciones(project) {
       prioridad: info.prioridad,
       costoEstimado: Math.round(Math.random() * 5000 + 500), // Costo ejemplo
       beneficioCosto: Math.round((Math.random() * 10 + 1) * 100) / 100, // B/C ejemplo
-      alertas: []
+      alertaSuficienciaEstadistica: false,
+      observaciones: 'Tratamiento según el rango de PCI del tramo. El costo y el B/C son valores de ejemplo, no un presupuesto.'
     });
   });
   
   return {
     weightedPCI: project.weightedPCI || project.sections.reduce((sum, s) => sum + (s.pci || 100), 0) / project.sections.length,
-    recomendaciones
+    recommendations
   };
 }

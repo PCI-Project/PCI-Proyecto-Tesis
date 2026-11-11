@@ -1,6 +1,26 @@
 import axios from 'axios';
 
 /**
+ * Cliente HTTP del backend. Adjunta el token de sesión (igual que AuthContext),
+ * porque las rutas /api/projects/* exigen autenticación.
+ */
+const createApiClient = () => {
+  const API = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || 'https://pci-backend-mqoc.onrender.com/api',
+  });
+  API.interceptors.request.use((config) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) config.headers.Authorization = `Bearer ${token}`;
+    } catch {
+      // localStorage no disponible: la petición saldrá sin token
+    }
+    return config;
+  });
+  return API;
+};
+
+/**
  * API client para obtener recomendaciones de mantenimiento PCI.
  * Se conecta al backend Node.js que ejecuta el agente Python.
  */
@@ -35,9 +55,7 @@ export interface RecommendationsResponse {
 export const getRecommendations = async (
   project: { id: string; sections: any[] }
 ): Promise<RecommendationsResponse> => {
-  const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://pci-backend-mqoc.onrender.com/api',
-  });
+  const API = createApiClient();
 
   const { data } = await API.post(`/projects/${project.id}/recommendations`, project);
 
@@ -49,9 +67,7 @@ export const getRecommendations = async (
  * Hace una llamada ligera al endpoint raíz
  */
 export const checkServiceStatus = async (): Promise<{ status: string; version: string }> => {
-  const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'https://pci-backend-mqoc.onrender.com/api',
-  });
+  const API = createApiClient();
 
   const { data } = await API.get('/');
   return data;
