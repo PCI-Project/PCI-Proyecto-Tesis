@@ -1,4 +1,4 @@
-const base = (import.meta.env.VITE_AGENT_URL || 'http://localhost:8000').replace(/\/$/, '');
+const base = (import.meta.env.VITE_AGENT_URL || 'https://pci-agente.onrender.com').replace(/\/$/, '');
 // Un servicio gratuito dormido tarda hasta ~1 minuto en despertar: se espera ese tiempo (y se reintenta una vez)
 // antes de darlo por caído. Mientras tanto el panel muestra "Comprobando agente…".
 const WAKE_TIMEOUT_MS = 65000;

@@ -1,6 +1,7 @@
 """Textos del informe: narrativa automática, mensajes para un modelo de lenguaje y validación de su respuesta."""
 import json
 import re
+import sys
 from jsonschema import Draft202012Validator
 from .catalogo import leer, RAIZ
 
@@ -412,5 +413,6 @@ def redactar(analisis, llamar_modelo=None):
                 raise ValueError('; '.join(e.message for e in errores) + '; debe haber un texto por cada tramo del análisis')
             return data, 'modelo'
         except Exception as exc:
+            print(f'[agente] el modelo no redactó la narrativa: {exc}'[:500], file=sys.stderr)
             user = mensajes['user'] + '\nCorrige estos errores y devuelve solo el JSON válido: ' + str(exc)
     return narrativa_automatica(analisis), 'automatica'
