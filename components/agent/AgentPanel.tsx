@@ -23,6 +23,8 @@ interface Props {
   project: Project;
   onSave: (patch: { agentConfig?: AgentConfig; agentRuns?: AgentRun[]; contexts?: Record<string, SectionContext | null> }) => Promise<void>;
   onNavigate: (view: ProjectView) => void;
+  /** Confirma que las unidades sin datos del tramo no tienen fallas (las marca evaluadas y recalcula el PCI). */
+  onMarkNoDistresses: (sectionId: string) => void;
 }
 
 type Phase = 'configure' | 'consulting' | 'result';
@@ -30,7 +32,7 @@ type Health = 'checking' | 'online' | 'offline';
 
 const money = (n: number, currency: string) => `${n.toLocaleString('en-US', { maximumFractionDigits: 0 })} ${currency}`;
 
-export const AgentPanel: React.FC<Props> = ({ project, onSave, onNavigate }) => {
+export const AgentPanel: React.FC<Props> = ({ project, onSave, onNavigate, onMarkNoDistresses }) => {
   const { t } = useTranslations();
   const { user } = useAuth();
   const runs = project.agentRuns ?? [];
@@ -271,7 +273,7 @@ export const AgentPanel: React.FC<Props> = ({ project, onSave, onNavigate }) => 
   }
 
   const bodies: Record<number, React.ReactNode> = {
-    1: <ReceivedDataBlock project={project} config={config} issues={issues} onGoToCalculation={() => onNavigate('CALCULATION_DETAILS')} onGoToData={() => onNavigate('DATA_ENTRY')} />,
+    1: <ReceivedDataBlock project={project} config={config} issues={issues} onGoToCalculation={() => onNavigate('CALCULATION_DETAILS')} onGoToData={() => onNavigate('DATA_ENTRY')} onMarkNoDistresses={onMarkNoDistresses} />,
     2: <SectionContextBlock project={project} config={config} contexts={contexts} activeId={activeSection} onActiveChange={setActiveSection} onChange={updateContext} onCopy={copyContext} />,
     3: <EquipmentBlock project={project} config={config} contexts={contexts} onChange={updateConfig} />,
     4: config.analysisMode === 'diagnostico'

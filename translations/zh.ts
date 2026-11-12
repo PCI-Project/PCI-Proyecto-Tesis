@@ -422,8 +422,8 @@ export const zh = {
         issues: {
             noSections: "项目中没有路段。", missingPci: "{name}：尚未计算 PCI。", pavement: "{name}：智能体仅处理柔性路面。", missingSamples: "{name}：没有样本。",
             sampleArea: "{name}：样本 {sample} 的面积无效。", insufficient: "{name}：还需 {count} 个样本才能满足抽样要求；当前结果为初步结果。", goCalc: "前往计算",
-            incompleteCoverage: "{name}：此功能暂不可用。抽样计划共生成 {total} 个样本单元，您已评估 {done} 个。",
-            coverageWhy: "要启用干预建议，必须评估每个路段抽样计划生成的所有样本单元（100 %）。在完成之前，面板无法提供建议；目前只有 PCI 和检查数据可用。", goData: "前往数据录入",
+            incompleteCoverage: "{name}：此功能暂不可用。您已评估该路段 {total} 个样本单元中的 {done} 个。",
+            coverageWhy: "要启用建议，必须评估该路段 100 % 的样本单元，而不仅是最小抽样：基于最小样本外推工程量、计算按面积和单位成本的费用并不合理。在此之前，面板无法提供建议，仅可使用 PCI 和检查数据。", coverageAsk: "{name}：{count} 个样本单元没有数据（{ids}）。它们是什么情况？", coverageNone: "未发现病害", coverageMissing: "仍需评估", coverageNoneHint: "选择“未发现病害”会将其记录为已评估且无病害（PCI 100），并重新计算该路段的 PCI。选择“仍需评估”将转到数据录入。", goData: "前往数据录入",
             noEquipment: "请至少选择一项处理措施。", invalidCost: "存在无效成本。", invalidBudget: "预算必须大于零。", invalidContingency: "预备费必须介于 0 和 30 % 之间。",
             invalidParams: "部分高级参数超出范围。", invalidThresholds: "阈值必须为递减整数。",
             ctx_curb: "{name}：路缘数值超出范围。", ctx_esal: "{name}：ESAL 超出范围。", ctx_aadt: "{name}：AADT 超出范围。", ctx_yearBuilt: "{name}：建成年份无效。",

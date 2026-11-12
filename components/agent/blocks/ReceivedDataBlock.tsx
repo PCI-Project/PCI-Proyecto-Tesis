@@ -3,6 +3,7 @@ import type { AgentConfig, Project } from '../../../types';
 import { useTranslations } from '../../../hooks/useTranslations';
 import { levelOfSection } from '../../../services/agent/analysis';
 import type { AgentIssue } from '../../../services/agent/validation';
+import { pendingUnitIds } from '../../../services/agent/coverage';
 
 export const LEVEL_COLOR: Record<string, string> = { A: '#2e7d32', B: '#a35f00', C: '#b3261e' };
 
@@ -16,9 +17,10 @@ interface Props {
   issues: AgentIssue[];
   onGoToCalculation: () => void;
   onGoToData: () => void;
+  onMarkNoDistresses: (sectionId: string) => void;
 }
 
-export const ReceivedDataBlock: React.FC<Props> = ({ project, config, issues, onGoToCalculation, onGoToData }) => {
+export const ReceivedDataBlock: React.FC<Props> = ({ project, config, issues, onGoToCalculation, onGoToData, onMarkNoDistresses }) => {
   const { t } = useTranslations();
   const blocking = issues.filter(i => i.block === 1);
   const nameOf = (id?: string) => project.sections.find(s => s.id === id)?.name ?? '';
@@ -71,11 +73,24 @@ export const ReceivedDataBlock: React.FC<Props> = ({ project, config, issues, on
             <p key={i}>{t(`agent.issues.${issue.key}`, { name: nameOf(issue.sectionId), sample: issue.sampleId ?? '', done: issue.done ?? 0, total: issue.total ?? 0 })}</p>
           ))}
           {blocking.some(i => i.key === 'incompleteCoverage') && (
-            <>
-              <p className="text-xs">{t('agent.issues.coverageWhy')}</p>
-              <button type="button" onClick={onGoToData} className="font-semibold underline">{t('agent.issues.goData')}</button>
-            </>
+            <p className="text-xs">{t('agent.issues.coverageWhy')}</p>
           )}
+          {blocking.filter(i => i.key === 'incompleteCoverage').map(issue => {
+            const section = project.sections.find(s => s.id === issue.sectionId);
+            if (!section) return null;
+            const pending = pendingUnitIds(section);
+            const shown = pending.slice(0, 12).map(id => `#${id}`).join(', ') + (pending.length > 12 ? '…' : '');
+            return (
+              <div key={`ask-${section.id}`} className="rounded-md border border-danger/30 bg-bg-surface p-3 text-text-base space-y-2">
+                <p className="font-semibold">{t('agent.issues.coverageAsk', { name: section.name, count: pending.length, ids: shown })}</p>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" onClick={() => onMarkNoDistresses(section.id)} className="rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-white">{t('agent.issues.coverageNone')}</button>
+                  <button type="button" onClick={onGoToData} className="rounded-md border border-border-muted px-3 py-1.5 text-sm font-semibold underline">{t('agent.issues.coverageMissing')}</button>
+                </div>
+                <p className="text-xs text-text-muted">{t('agent.issues.coverageNoneHint')}</p>
+              </div>
+            );
+          })}
           {blocking.some(i => i.key === 'missingPci') && (
             <button type="button" onClick={onGoToCalculation} className="font-semibold underline">{t('agent.issues.goCalc')}</button>
           )}
