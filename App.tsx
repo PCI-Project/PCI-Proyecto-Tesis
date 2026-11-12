@@ -589,6 +589,29 @@ export const App: React.FC = () => {
     await saveProjectToStorage(next);
   };
 
+  // Panel del agente: las unidades sin datos se confirman como "sin fallas" (evaluadas, PCI 100) y se recalcula el PCI.
+  // Las unidades que nunca se registraron se crean vacías para que el tramo quede con el 100 % de sus unidades evaluadas.
+  const handleMarkNoDistresses = (sectionId: string) => {
+    setSelectedProject(current => {
+      if (!current) return current;
+      const draft: Project = JSON.parse(JSON.stringify(current));
+      const section = draft.sections.find(s => s.id === sectionId);
+      if (!section) return current;
+      const known = new Set(section.samples.map(s => s.id));
+      section.samples.forEach(s => { if (s.distresses.length === 0) s.evaluated = true; });
+      const total = Math.max(section.totalSampleUnits || 0, section.samples.length);
+      for (let id = 1; id <= total; id += 1) {
+        if (!known.has(id)) {
+          section.samples.push({ id, area: section.sampleUnitArea, pavementType: section.pavementType, distresses: [], isAdditional: false, evaluated: true });
+        }
+      }
+      section.samples.sort((a, b) => a.id - b.id);
+      const calculated = calculateProjectPCI(draft);
+      saveProjectToStorage(calculated);
+      return calculated;
+    });
+  };
+
   const handleSampleUpdate = (sectionId: string, updatedSample: Sample) => {
     updateProjectState(draft => {
       const section = draft.sections.find(s => s.id === sectionId);
@@ -737,6 +760,7 @@ export const App: React.FC = () => {
             project={selectedProject}
             onSave={handleAgentSave}
             onNavigate={handleNavigate}
+            onMarkNoDistresses={handleMarkNoDistresses}
           />
         );
       default:

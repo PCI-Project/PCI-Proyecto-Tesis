@@ -2,7 +2,7 @@ import type { AgentConfig, Project } from '../../types';
 import { PavementType } from '../../types';
 import { validThresholds } from './levels';
 import { invalidParams } from './params';
-import { isSampleEvaluated } from './coverage';
+import { pendingUnitIds, totalUnitsOf } from './coverage';
 export interface AgentIssue { block: 1 | 2 | 3 | 4 | 5; key: string; sectionId?: string; sampleId?: number; done?: number; total?: number; }
 export function validateAgentInput(project: Project, config: AgentConfig): AgentIssue[] {
   const issues: AgentIssue[] = [];
@@ -13,9 +13,9 @@ export function validateAgentInput(project: Project, config: AgentConfig): Agent
     if (!section.samples.length) issues.push({ block: 1, key: 'missingSamples', sectionId: section.id });
     // Regla C2: recomendaciones solo con el 100 % de las unidades de muestra del tramo evaluadas. Un muestreo mínimo
     // (parte de las unidades) sirve para el PCI, pero no para extrapolar cantidades, costos por área ni costos unitarios.
-    const evaluated = section.samples.filter(isSampleEvaluated).length;
-    const total = Math.max(section.totalSampleUnits || 0, section.samples.length);
-    if (total && evaluated < total) issues.push({ block: 1, key: 'incompleteCoverage', sectionId: section.id, done: evaluated, total });
+    const total = totalUnitsOf(section);
+    const pending = pendingUnitIds(section).length;
+    if (pending) issues.push({ block: 1, key: 'incompleteCoverage', sectionId: section.id, done: total - pending, total });
     section.samples.filter(s => !(s.area > 0)).forEach(s => issues.push({ block: 1, key: 'sampleArea', sectionId: section.id, sampleId: s.id }));
   }
   if (!config.availableTreatments.length) issues.push({ block: 3, key: 'noEquipment' });
