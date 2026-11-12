@@ -35,7 +35,7 @@ app.use(cors({
     'Origin'
   ],
 })); // URLs permitidas para el frontend (local, red y GitHub Pages)
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // una consulta del agente guarda entrada, análisis y narrativa completos
 
 // Comprobación de estado (pública): la usa el panel de recomendaciones
 app.get('/api', (req, res) => {

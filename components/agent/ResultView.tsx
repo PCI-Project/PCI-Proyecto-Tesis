@@ -73,7 +73,18 @@ export const ResultView: React.FC<Props> = ({ project, runs, run, draft, stale, 
         <Button variant="ghost" className="border border-border-base" onClick={() => generateAgentReportPdf(project, run, t)}>{t('agent.result.pdf')}</Button>
         <Button variant="ghost" className="border border-border-base" onClick={() => { setTab('report'); setTimeout(() => window.print(), 300); }}>{t('agent.result.print')}</Button>
         <Button variant="ghost" className="border border-border-base" onClick={() => downloadText(`recomendaciones_v${run.number}.json`, JSON.stringify({ analisis: run.analysis, narrativa: run.narrative }, null, 2))}>JSON</Button>
-        <span className="text-sm text-text-muted">v{run.number} · {run.createdAt.slice(0, 16).replace('T', ' ')} · {t(`agent.source.${run.narrativeSource}`)}</span>
+        <Button variant="ghost" className="border border-border-base" disabled={busy || !online} title={t('agent.result.regenerateHint')} onClick={() => onQuick({})}>{t('agent.result.regenerate')}</Button>
+        <label className="ml-auto flex items-center gap-2 text-sm text-text-muted">
+          <span>{t('agent.history.version')}</span>
+          <select
+            aria-label={t('agent.history.version')}
+            className="rounded-xl border border-border-base bg-bg-surface text-text-base text-sm p-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
+            value={run.id}
+            onChange={e => onSelect(e.target.value)}
+          >
+            {runs.map(r => <option key={r.id} value={r.id}>v{r.number} · {r.createdAt.slice(0, 16).replace('T', ' ')} · {t(`agent.source.${r.narrativeSource}`)}{r.id === runs[0].id ? ` · ${t('agent.history.latest')}` : ''}</option>)}
+          </select>
+        </label>
       </div>
 
       {!isLatest && (
@@ -222,16 +233,6 @@ export const ResultView: React.FC<Props> = ({ project, runs, run, draft, stale, 
         </div>
       )}
 
-      {runs.length > 1 && (
-        <p className="text-sm text-text-muted flex flex-wrap items-center gap-2">
-          <span>{t('agent.history.title')}:</span>
-          {[...runs].reverse().map(r => (
-            <button key={r.id} type="button" onClick={() => onSelect(r.id)} aria-current={r.id === run.id} className={`rounded px-2 py-0.5 border ${r.id === run.id ? 'border-primary text-primary font-bold' : 'border-border-base text-text-base'}`}>
-              v{r.number} ({r.createdAt.slice(5, 10)})
-            </button>
-          ))}
-        </p>
-      )}
     </div>
   );
 };

@@ -38,7 +38,7 @@ export const BudgetBlock: React.FC<Props> = ({ config, onChange }) => {
       <FieldRow label={t('agent.b5.budget')} hint={budgetBad ? <ErrorHint>{t('agent.issues.invalidBudget')}</ErrorHint> : <p className="text-xs text-text-muted">{noCap ? t('agent.b5.noCapHint') : t('agent.b5.capHint')}</p>}>
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 max-w-[16rem]">
-            <Input type="number" min="0" step="100" aria-label={t('agent.b5.budget')} disabled={noCap} value={config.budget ?? ''} onChange={e => onChange({ budget: e.target.value === '' ? null : Number(e.target.value) })} />
+            <Input type="number" min="0" step="100" aria-label={t('agent.b5.budget')} disabled={noCap} value={config.budget === null || Number.isNaN(config.budget) ? '' : config.budget} onChange={e => onChange({ budget: e.target.value === '' ? NaN : Number(e.target.value) })} />
             <span className="text-sm text-text-muted">{config.currency}</span>
           </div>
           <label className="flex items-center gap-2 cursor-pointer text-sm text-text-base">
@@ -75,6 +75,7 @@ export const BudgetBlock: React.FC<Props> = ({ config, onChange }) => {
               <div key={key}>
                 <label className="block text-xs font-semibold text-text-muted mb-1" htmlFor={`thr-${key}`}>{key} ≥</label>
                 <Input id={`thr-${key}`} type="number" min="1" max="99" step="1" value={Number.isFinite(thresholds[key]) ? thresholds[key] : ''} onChange={e => setThreshold(key, e.target.value)} />
+                <p className="text-xs text-text-muted mt-1">{t(`agent.level.${key}`)}</p>
               </div>
             ))}
           </div>

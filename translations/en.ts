@@ -374,13 +374,13 @@ export const en = {
             error: "The agent could not answer. Check that the service is running and try again.",
             noEndpoint: "This agent service has no chat. Update the agent service (the /api/chat route is missing).",
             offline: "The chat needs the agent service online. Offline you can read the report but not ask about it.",
-            suggestions: "Suggested questions", sources: "Sources",
+            showDetail: "Show details", hideDetail: "Hide details", suggestions: "Suggested questions", sources: "Sources",
             origin: { automatica: "Built from the report data", modelo: "Written by the model from the report data" },
             note: "Decision support: answers come from the report and the catalog and must be reviewed by a qualified engineer. The assistant reads and answers in Spanish.",
         },
         chip: { title: "Parameters of this run · click one to edit it", equipment: "Equipment", mode: "Mode", ownCosts: "Own costs", assumed: "Assumed data", interim: "Interim" },
         quick: { title: "Quick adjust", rerun: "Run again" },
-        history: { title: "Runs", viewing: "You are viewing v{n}", restore: "Restore its parameters", backLatest: "Back to the latest" },
+        history: { version: "Version", latest: "latest", title: "Runs", viewing: "You are viewing v{n}", restore: "Restore its parameters", backLatest: "Back to the latest" },
         compare: { title: "Compared with v{n}:", pciAfter: "Network PCI after", needed: "Needed", financed: "Funded", shortfall: "Shortfall", unassigned: "Unassigned" },
         report: {
             pciBar: "Current PCI {now} (filled mark) and expected {after} (hollow mark)", annexA: "Annex A. Distresses per sample unit", annexB: "Annex B. Glossary", annexC: "Annex C. Parameters and assumptions", sample: "Sample", additional: "additional", term: "Term", definition: "Definition", parameter: "Parameter", assumptions: "Assumptions per section", 
@@ -442,7 +442,7 @@ export const en = {
         },
         b4: {
             title: "Unit costs", currency: "Currency", counts: "{own} yours, {example} example", exampleWarning: "There are example costs: the budget will be preliminary.",
-            treatment: "Treatment", unit: "Unit", value: "Value", source: "Source", yours: "Yours", example: "Example", import: "Import CSV", template: "Download template", saveMine: "Save as my values", saved: "Saved", reset: "Back to example values"
+            treatment: "Treatment", unit: "Unit", value: "Value", source: "Source", yours: "Yours", example: "Example", import: "Import CSV", template: "Download template", resetTitle: "Remove your costs", resetText: "The {n} costs you entered will be deleted and the example values will return. This cannot be undone.", resetConfirm: "Remove costs", sourcePlaceholder: "Source (optional)", saveMine: "Save as my values", saved: "Saved", reset: "Back to example values"
         },
         b5: {
             title: "Budget and priority", budget: "Budget", noCap: "No cap", noCapHint: "The cost to treat the whole network is computed.", capHint: "Safety repairs are funded first, then works according to the mode.",
@@ -472,6 +472,6 @@ export const en = {
         bar: { assumed: "{n} value(s) to assume", complete: "Data complete", lastResult: "View last result", downloadInput: "Download entrada.json", importResults: "Import results", generate: "Generate recommendations", rerun: "Run again" },
         consulting: { working: "The agent is working…", elapsed: "{s} s elapsed", cancel: "Cancel" },
         error: { rateLimit: "Too many requests in a row. Wait a minute and try again.", network: "Could not reach the agent. Check that it is running or use offline mode.", import: "The files are not valid ({fields}).", hash: "The results do not match the current data. Generate entrada.json again.", fix: "Fix the marked blocks before generating." },
-        result: { edit: "Edit parameters", download: "Download JSON", runs: "Runs", pci: "Weighted PCI", needed: "Cost needed", financed: "Funded", shortfall: "Shortfall", summary: "Executive summary", treatment: "Treatment", cost: "Cost", interim: "interim", pdf: "Download PDF", print: "Print", title: "Result" }
+        result: { regenerate: "Regenerate", regenerateHint: "Queries the agent again with the current parameters and saves a new version; this one is kept.", edit: "Edit parameters", download: "Download JSON", runs: "Runs", pci: "Weighted PCI", needed: "Cost needed", financed: "Funded", shortfall: "Shortfall", summary: "Executive summary", treatment: "Treatment", cost: "Cost", interim: "interim", pdf: "Download PDF", print: "Print", title: "Result" }
     },
   };

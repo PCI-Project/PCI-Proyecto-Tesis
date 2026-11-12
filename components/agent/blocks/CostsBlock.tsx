@@ -3,6 +3,7 @@ import type { AgentConfig } from '../../../types';
 import { useTranslations } from '../../../hooks/useTranslations';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { Button } from '../../ui/Button';
+import { ConfirmationModal } from '../../ui/ConfirmationModal';
 import { costRows, countExampleCosts } from '../../../services/agent/analysis';
 import { treatmentName } from '../../../services/agent/catalogUi';
 import { costTemplateCsv, type CsvRow } from '../../../services/agent/csv';
@@ -23,6 +24,7 @@ export const CostsBlock: React.FC<Props> = ({ config, onChange, onSaveDefaults, 
   const { language } = useLanguage();
   const fileRef = useRef<HTMLInputElement>(null);
   const [csv, setCsv] = useState<{ name: string; text: string } | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
   const rows = costRows(config);
   const counts = countExampleCosts(config);
 
@@ -32,7 +34,13 @@ export const CostsBlock: React.FC<Props> = ({ config, onChange, onSaveDefaults, 
     else next[id] = { ...next[id], valor: Number(raw), unidad: unit };
     onChange({ unitCosts: next });
   };
-  const applyCsv = (list: CsvRow[]) => {
+  const setSource = (id: string, text: string) => {
+    const current = config.unitCosts[id];
+    if (!current) return;
+    const { fuente: _old, ...rest } = current;
+    onChange({ unitCosts: { ...config.unitCosts, [id]: text.trim() === '' ? rest : { ...rest, fuente: text } } });
+  };
+  const applyCsv =(list: CsvRow[]) => {
     const next = { ...config.unitCosts };
     list.forEach(r => {
       const unit = (rows.find(x => x.id === r.id)?.unit ?? 'm2') as 'm2' | 'm' | 'global';
@@ -89,7 +97,18 @@ export const CostsBlock: React.FC<Props> = ({ config, onChange, onSaveDefaults, 
                       onChange={e => setCost(row.id, row.unit, e.target.value)}
                     />
                   </td>
-                  <td className="p-2 text-xs text-text-muted">{own ? (own.fuente || t('agent.b4.yours')) : t('agent.b4.example')}</td>
+                  <td className="p-2 text-xs text-text-muted">
+                    {own ? (
+                      <input
+                        type="text" maxLength={120}
+                        aria-label={`${treatmentName(row.id, language)} — ${t('agent.b4.source')}`}
+                        className="w-full min-w-[9rem] rounded-lg border border-border-base p-1.5 bg-bg-surface text-text-base text-xs focus:outline-none focus:ring-2 focus:ring-primary/40"
+                        value={own.fuente ?? ''}
+                        placeholder={t('agent.b4.sourcePlaceholder')}
+                        onChange={e => setSource(row.id, e.target.value)}
+                      />
+                    ) : t('agent.b4.example')}
+                  </td>
                 </tr>
               );
             })}
@@ -102,8 +121,18 @@ export const CostsBlock: React.FC<Props> = ({ config, onChange, onSaveDefaults, 
         <Button type="button" variant="ghost" className="border border-border-base" onClick={() => fileRef.current?.click()}>{t('agent.b4.import')}</Button>
         <Button type="button" variant="ghost" className="border border-border-base" onClick={() => downloadText('costos_plantilla.csv', costTemplateCsv(), 'text/csv')}>{t('agent.b4.template')}</Button>
         <Button type="button" variant="ghost" className="border border-border-base" onClick={onSaveDefaults}>{defaultsSaved ? t('agent.b4.saved') : t('agent.b4.saveMine')}</Button>
-        <Button type="button" variant="ghost" className="border border-border-base" onClick={() => onChange({ unitCosts: {} })} disabled={counts.own === 0}>{t('agent.b4.reset')}</Button>
+        <Button type="button" variant="ghost" className="border border-border-base" onClick={() => setConfirmReset(true)} disabled={counts.own === 0}>{t('agent.b4.reset')}</Button>
       </div>
+
+      <ConfirmationModal
+        isOpen={confirmReset}
+        onClose={() => setConfirmReset(false)}
+        onConfirm={() => { setConfirmReset(false); onChange({ unitCosts: {} }); }}
+        title={t('agent.b4.resetTitle')}
+        confirmText={t('agent.b4.resetConfirm')}
+      >
+        <p>{t('agent.b4.resetText', { n: counts.own })}</p>
+      </ConfirmationModal>
 
       {csv && <CsvImportModal isOpen onClose={() => setCsv(null)} text={csv.text} fileName={csv.name} onApply={applyCsv} />}
     </div>

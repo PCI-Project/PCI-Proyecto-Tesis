@@ -41,6 +41,12 @@ export const AgentPanel: React.FC<Props> = ({ project, onSave, onNavigate, onMar
   const [contexts, setContexts] = useState<Record<string, SectionContext | null>>({});
   const [phase, setPhase] = useState<Phase>(runs.length ? 'result' : 'configure');
   const [selectedRunId, setSelectedRunId] = useState<string | null>(runs[0]?.id ?? null);
+  // Las consultas guardadas llegan de la base de datos un instante después de abrir el panel: se muestra la última sin pedir nada.
+  const firstRunId = runs[0]?.id;
+  useEffect(() => {
+    if (firstRunId && selectedRunId === null) { setSelectedRunId(firstRunId); setPhase(p => (p === 'configure' && !dirty.current ? 'result' : p)); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firstRunId]);
   const [open, setOpen] = useState<number[]>([2]);
   const [activeSection, setActiveSection] = useState(project.sections[0]?.id ?? '');
   const [health, setHealth] = useState<Health>('checking');
@@ -87,7 +93,11 @@ export const AgentPanel: React.FC<Props> = ({ project, onSave, onNavigate, onMar
   }, []);
   useEffect(() => { checkHealth(); }, [checkHealth]);
 
-  const updateConfig = (patch: Partial<AgentConfig>) => { setConfig(c => ({ ...c, ...patch })); touch(); };
+  const updateConfig = (patch: Partial<AgentConfig>) => {
+    if (patch.unitCosts !== undefined || patch.currency !== undefined) setDefaultsSaved(false); // el «Guardado» ya no vale si cambian los costos
+    setConfig(c => ({ ...c, ...patch }));
+    touch();
+  };
   const updateContext = (id: string, next: SectionContext) => { setContexts(c => ({ ...c, [id]: next })); touch(); };
   const copyContext = (sourceId: string, targets: string[]) => {
     const source = project.sections.find(s => s.id === sourceId);
