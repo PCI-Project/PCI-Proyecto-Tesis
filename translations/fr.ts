@@ -340,13 +340,13 @@ export const fr = {
             error: "L'agent n'a pas pu répondre. Vérifiez que le service fonctionne et réessayez.",
             noEndpoint: "Ce service d'agent ne propose pas de chat. Mettez à jour le service (la route /api/chat est absente).",
             offline: "Le chat nécessite que le service de l'agent soit en ligne. Hors ligne, vous pouvez lire le rapport, mais pas poser de questions à son sujet.",
-            showDetail: "Voir le détail", hideDetail: "Masquer le détail", suggestions: "Questions suggérées", sources: "Sources",
+            suggestions: "Questions suggérées", sources: "Sources",
             origin: { automatica: "Élaborée à partir des données du rapport", modelo: "Rédigée par le modèle à partir des données du rapport" },
             note: "Aide à la décision : les réponses s'appuient sur le rapport et le catalogue et doivent être vérifiées par un ingénieur qualifié. L'assistant lit et répond en espagnol.",
         },
         chip: { title: "Paramètres de cette exécution · cliquez pour modifier", equipment: "Équipement", mode: "Mode", ownCosts: "Coûts personnalisés", assumed: "Données supposées", interim: "Provisoire" },
         quick: { title: "Ajustement rapide", rerun: "Relancer" },
-        history: { version: "Version", latest: "la plus récente", title: "Exécutions", viewing: "Affichage de v{n}", restore: "Restaurer ses paramètres", backLatest: "Revenir à la plus récente" },
+        history: { title: "Exécutions", viewing: "Affichage de v{n}", restore: "Restaurer ses paramètres", backLatest: "Revenir à la plus récente" },
         compare: { title: "Comparé à v{n} :", pciAfter: "PCI du réseau après", needed: "Nécessaire", financed: "Financé", shortfall: "Déficit", unassigned: "Non affecté" },
         report: {
             pciBar: "PCI actuel {now} (repère plein) et prévu {after} (repère creux)", annexA: "Annexe A. Dégradations par unité d'échantillonnage", annexB: "Annexe B. Glossaire", annexC: "Annexe C. Paramètres et hypothèses", sample: "Échantillon", additional: "supplémentaire", term: "Terme", definition: "Définition", parameter: "Paramètre", assumptions: "Hypothèses par section",
@@ -408,7 +408,7 @@ export const fr = {
         },
         b4: {
             title: "Coûts unitaires", currency: "Devise", counts: "{own} personnalisés, {example} exemples", exampleWarning: "Des coûts d'exemple sont présents : le budget sera préliminaire.",
-            treatment: "Traitement", unit: "Unité", value: "Valeur", source: "Source", yours: "Personnalisé", example: "Exemple", import: "Importer CSV", template: "Télécharger le modèle", resetTitle: "Supprimer vos coûts", resetText: "Les {n} coûts saisis seront supprimés et les valeurs d’exemple reviendront. Cette action est irréversible.", resetConfirm: "Supprimer les coûts", sourcePlaceholder: "Source (facultatif)", saveMine: "Enregistrer comme mes valeurs", saved: "Enregistré", reset: "Revenir aux valeurs d'exemple"
+            treatment: "Traitement", unit: "Unité", value: "Valeur", source: "Source", yours: "Personnalisé", example: "Exemple", import: "Importer CSV", template: "Télécharger le modèle", saveMine: "Enregistrer comme mes valeurs", saved: "Enregistré", reset: "Revenir aux valeurs d'exemple"
         },
         b5: {
             title: "Budget et priorité", budget: "Budget", noCap: "Sans plafond", noCapHint: "Le coût de traitement de tout le réseau est calculé.", capHint: "Les réparations de sécurité sont financées en premier, puis les travaux selon le mode.",
@@ -438,6 +438,6 @@ export const fr = {
         bar: { assumed: "{n} valeur(s) à supposer", complete: "Données complètes", lastResult: "Voir le dernier résultat", downloadInput: "Télécharger entrada.json", importResults: "Importer les résultats", generate: "Générer les recommandations", rerun: "Relancer" },
         consulting: { working: "L'agent travaille…", elapsed: "{s} s écoulées", cancel: "Annuler" },
         error: { rateLimit: "Trop de requêtes à la suite. Attendez une minute et réessayez.", network: "Impossible de joindre l'agent. Vérifiez qu'il fonctionne ou utilisez le mode hors ligne.", import: "Les fichiers ne sont pas valides ({fields}).", hash: "Les résultats ne correspondent pas aux données actuelles. Générez à nouveau entrada.json.", fix: "Corrigez les blocs signalés avant de générer." },
-        result: { regenerate: "Régénérer", regenerateHint: "Interroge à nouveau l’agent avec les paramètres actuels et enregistre une nouvelle version ; celle-ci est conservée.", edit: "Modifier les paramètres", download: "Télécharger JSON", runs: "Exécutions", pci: "PCI pondéré", needed: "Coût nécessaire", financed: "Financé", shortfall: "Déficit", summary: "Résumé exécutif", treatment: "Traitement", cost: "Coût", interim: "provisoire", pdf: "Télécharger PDF", print: "Imprimer", title: "Résultat" }
+        result: { edit: "Modifier les paramètres", download: "Télécharger JSON", runs: "Exécutions", pci: "PCI pondéré", needed: "Coût nécessaire", financed: "Financé", shortfall: "Déficit", summary: "Résumé exécutif", treatment: "Traitement", cost: "Coût", interim: "provisoire", pdf: "Télécharger PDF", print: "Imprimer", title: "Résultat" }
     },
   };

@@ -340,13 +340,13 @@ export const de = {
             error: "Der Agent konnte nicht antworten. Prüfen Sie, ob der Dienst läuft, und versuchen Sie es erneut.",
             noEndpoint: "Dieser Agentendienst unterstützt keinen Chat. Aktualisieren Sie den Agentendienst (die Route /api/chat fehlt).",
             offline: "Für den Chat muss der Agentendienst online sein. Offline können Sie den Bericht lesen, aber keine Fragen dazu stellen.",
-            showDetail: "Details anzeigen", hideDetail: "Details ausblenden", suggestions: "Fragenvorschläge", sources: "Quellen",
+            suggestions: "Fragenvorschläge", sources: "Quellen",
             origin: { automatica: "Aus den Berichtsdaten erstellt", modelo: "Vom Modell anhand der Berichtsdaten verfasst" },
             note: "Entscheidungshilfe: Die Antworten basieren auf dem Bericht und dem Katalog und müssen von einer qualifizierten Ingenieurin oder einem qualifizierten Ingenieur geprüft werden. Der Assistent liest und antwortet auf Spanisch.",
         },
         chip: { title: "Parameter dieses Laufs · zum Bearbeiten anklicken", equipment: "Ausrüstung", mode: "Modus", ownCosts: "Eigene Kosten", assumed: "Angenommene Daten", interim: "Zwischenlösung" },
         quick: { title: "Schnellanpassung", rerun: "Erneut ausführen" },
-        history: { version: "Version", latest: "neueste", title: "Läufe", viewing: "Lauf v{n} wird angezeigt", restore: "Parameter wiederherstellen", backLatest: "Zum neuesten Lauf" },
+        history: { title: "Läufe", viewing: "Lauf v{n} wird angezeigt", restore: "Parameter wiederherstellen", backLatest: "Zum neuesten Lauf" },
         compare: { title: "Verglichen mit v{n}:", pciAfter: "Netz-PCI danach", needed: "Benötigt", financed: "Finanziert", shortfall: "Fehlbetrag", unassigned: "Nicht zugewiesen" },
         report: {
             pciBar: "Aktueller PCI {now} (gefüllte Markierung) und erwarteter PCI {after} (leere Markierung)", annexA: "Anhang A. Schäden je Probeneinheit", annexB: "Anhang B. Glossar", annexC: "Anhang C. Parameter und Annahmen", sample: "Probe", additional: "zusätzlich", term: "Begriff", definition: "Definition", parameter: "Parameter", assumptions: "Annahmen je Abschnitt",
@@ -408,7 +408,7 @@ export const de = {
         },
         b4: {
             title: "Einheitspreise", currency: "Währung", counts: "{own} eigene, {example} Beispielwerte", exampleWarning: "Es gibt Beispielkosten: Das Budget ist vorläufig.",
-            treatment: "Behandlung", unit: "Einheit", value: "Wert", source: "Quelle", yours: "Eigene", example: "Beispiel", import: "CSV importieren", template: "Vorlage herunterladen", resetTitle: "Eigene Kosten entfernen", resetText: "Die {n} eingegebenen Kosten werden gelöscht und die Beispielwerte kehren zurück. Das lässt sich nicht rückgängig machen.", resetConfirm: "Kosten entfernen", sourcePlaceholder: "Quelle (optional)", saveMine: "Als eigene Werte speichern", saved: "Gespeichert", reset: "Beispielwerte wiederherstellen"
+            treatment: "Behandlung", unit: "Einheit", value: "Wert", source: "Quelle", yours: "Eigene", example: "Beispiel", import: "CSV importieren", template: "Vorlage herunterladen", saveMine: "Als eigene Werte speichern", saved: "Gespeichert", reset: "Beispielwerte wiederherstellen"
         },
         b5: {
             title: "Budget und Priorität", budget: "Budget", noCap: "Keine Obergrenze", noCapHint: "Die Kosten für die Behandlung des gesamten Netzes werden berechnet.", capHint: "Sicherheitsreparaturen werden zuerst finanziert, danach die Arbeiten entsprechend dem Modus.",
@@ -438,6 +438,6 @@ export const de = {
         bar: { assumed: "{n} anzunehmende Werte", complete: "Daten vollständig", lastResult: "Letztes Ergebnis anzeigen", downloadInput: "entrada.json herunterladen", importResults: "Ergebnisse importieren", generate: "Empfehlungen erstellen", rerun: "Erneut ausführen" },
         consulting: { working: "Der Agent arbeitet…", elapsed: "{s} s vergangen", cancel: "Abbrechen" },
         error: { rateLimit: "Zu viele Anfragen hintereinander. Warten Sie eine Minute und versuchen Sie es erneut.", network: "Der Agent ist nicht erreichbar. Prüfen Sie, ob er läuft, oder verwenden Sie den Offline-Modus.", import: "Die Dateien sind ungültig ({fields}).", hash: "Die Ergebnisse stimmen nicht mit den aktuellen Daten überein. Erstellen Sie entrada.json erneut.", fix: "Korrigieren Sie die markierten Blöcke, bevor Sie fortfahren." },
-        result: { regenerate: "Neu erzeugen", regenerateHint: "Fragt den Agenten erneut mit den aktuellen Parametern ab und speichert eine neue Version; diese bleibt erhalten.", edit: "Parameter bearbeiten", download: "JSON herunterladen", runs: "Läufe", pci: "Gewichteter PCI", needed: "Benötigte Kosten", financed: "Finanziert", shortfall: "Fehlbetrag", summary: "Zusammenfassung", treatment: "Behandlung", cost: "Kosten", interim: "vorläufig", pdf: "PDF herunterladen", print: "Drucken", title: "Ergebnis" }
+        result: { edit: "Parameter bearbeiten", download: "JSON herunterladen", runs: "Läufe", pci: "Gewichteter PCI", needed: "Benötigte Kosten", financed: "Finanziert", shortfall: "Fehlbetrag", summary: "Zusammenfassung", treatment: "Behandlung", cost: "Kosten", interim: "vorläufig", pdf: "PDF herunterladen", print: "Drucken", title: "Ergebnis" }
     },
   };

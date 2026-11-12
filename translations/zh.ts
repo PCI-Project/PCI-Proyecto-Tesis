@@ -340,13 +340,13 @@ export const zh = {
             error: "智能体无法回答。请检查服务是否正在运行，然后重试。",
             noEndpoint: "此智能体服务不支持聊天。请更新智能体服务（缺少 /api/chat 路由）。",
             offline: "聊天功能需要智能体服务在线。离线时可以阅读报告，但无法就报告提问。",
-            showDetail: "查看详情", hideDetail: "收起详情", suggestions: "建议问题", sources: "来源",
+            suggestions: "建议问题", sources: "来源",
             origin: { automatica: "根据报告数据生成", modelo: "模型根据报告数据撰写" },
             note: "决策支持：回答基于报告和目录，须由合格工程师审核。助手以西班牙语阅读并作答。",
         },
         chip: { title: "本次运行的参数 · 点击进行编辑", equipment: "设备", mode: "模式", ownCosts: "自定义成本", assumed: "假设数据", interim: "临时方案" },
         quick: { title: "快速调整", rerun: "再次运行" },
-        history: { version: "版本", latest: "最新", title: "运行记录", viewing: "正在查看 v{n}", restore: "恢复其参数", backLatest: "返回最新记录" },
+        history: { title: "运行记录", viewing: "正在查看 v{n}", restore: "恢复其参数", backLatest: "返回最新记录" },
         compare: { title: "与 v{n} 对比：", pciAfter: "处理后的路网 PCI", needed: "所需费用", financed: "已资助", shortfall: "资金缺口", unassigned: "未分配" },
         report: {
             pciBar: "当前 PCI {now}（实心标记）和预期 PCI {after}（空心标记）", annexA: "附录 A. 每个样本单元的病害", annexB: "附录 B. 术语表", annexC: "附录 C. 参数和假设", sample: "样本", additional: "附加", term: "术语", definition: "定义", parameter: "参数", assumptions: "各路段的假设",
@@ -408,7 +408,7 @@ export const zh = {
         },
         b4: {
             title: "单位成本", currency: "货币", counts: "{own} 个自定义，{example} 个示例", exampleWarning: "包含示例成本：预算将为初步估算。",
-            treatment: "处理措施", unit: "单位", value: "值", source: "来源", yours: "自定义", example: "示例", import: "导入 CSV", template: "下载模板", resetTitle: "清除您的成本", resetText: "您输入的 {n} 项成本将被删除，并恢复为示例值。此操作无法撤销。", resetConfirm: "清除成本", sourcePlaceholder: "来源（可选）", saveMine: "保存为我的值", saved: "已保存", reset: "恢复示例值"
+            treatment: "处理措施", unit: "单位", value: "值", source: "来源", yours: "自定义", example: "示例", import: "导入 CSV", template: "下载模板", saveMine: "保存为我的值", saved: "已保存", reset: "恢复示例值"
         },
         b5: {
             title: "预算与优先级", budget: "预算", noCap: "无上限", noCapHint: "将计算处理整个路网的费用。", capHint: "优先资助安全修补，其余工程按所选模式安排。",
@@ -438,6 +438,6 @@ export const zh = {
         bar: { assumed: "{n} 个待假设值", complete: "数据完整", lastResult: "查看上次结果", downloadInput: "下载 entrada.json", importResults: "导入结果", generate: "生成建议", rerun: "再次运行" },
         consulting: { working: "智能体正在处理…", elapsed: "已用 {s} 秒", cancel: "取消" },
         error: { rateLimit: "连续请求过多。请等待一分钟后重试。", network: "无法连接智能体。请检查服务是否正在运行，或使用离线模式。", import: "文件无效（{fields}）。", hash: "结果与当前数据不匹配。请重新生成 entrada.json。", fix: "生成前请修正标记的区块。" },
-        result: { regenerate: "重新生成", regenerateHint: "用当前参数再次查询智能体并保存新版本；当前版本会保留。", edit: "编辑参数", download: "下载 JSON", runs: "运行记录", pci: "加权 PCI", needed: "所需费用", financed: "已资助", shortfall: "资金缺口", summary: "执行摘要", treatment: "处理措施", cost: "费用", interim: "临时", pdf: "下载 PDF", print: "打印", title: "结果" }
+        result: { edit: "编辑参数", download: "下载 JSON", runs: "运行记录", pci: "加权 PCI", needed: "所需费用", financed: "已资助", shortfall: "资金缺口", summary: "执行摘要", treatment: "处理措施", cost: "费用", interim: "临时", pdf: "下载 PDF", print: "打印", title: "结果" }
     },
   };

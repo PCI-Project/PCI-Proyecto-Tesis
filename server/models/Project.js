@@ -13,7 +13,6 @@ const SampleSchema = new mongoose.Schema({
   pavementType: { type: String, required: true },
   distresses: { type: [DistressSchema], default: [] },
   isAdditional: { type: Boolean, default: false },
-  evaluated: { type: Boolean },                     // unidad confirmada como evaluada aunque no tenga fallas
   calculationDetails: { type: mongoose.Schema.Types.Mixed },
 }, { _id: false });
 
@@ -36,8 +35,6 @@ const SectionSchema = new mongoose.Schema({
   samplingInterval: { type: Number, required: true },
   samples: { type: [SampleSchema], default: [] },
   pci: Number,
-  samplesSufficient: { type: Boolean },
-  context: { type: mongoose.Schema.Types.Mixed },   // datos del tramo para el agente (tipo de vía, bordillo, tránsito…)
 }, { _id: false });
 
 const ProjectSchema = new mongoose.Schema({
@@ -50,7 +47,6 @@ const ProjectSchema = new mongoose.Schema({
   descripcion: String,
   propietario: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   sections: { type: [SectionSchema], default: [] },
-  agentConfig: { type: mongoose.Schema.Types.Mixed }, // calibración del agente (costos, presupuesto, umbrales…)
 }, { timestamps: true });
 
 module.exports = mongoose.model('Project', ProjectSchema);

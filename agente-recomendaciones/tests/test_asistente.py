@@ -125,7 +125,7 @@ class ConsultarTest(unittest.TestCase):
     def test_ok_serializable(self):
         cuerpo, codigo = consultar({'pregunta': 'como esta la red', 'analisis': ANALISIS, 'narrativa': NARRATIVA})
         self.assertEqual(codigo, 200)
-        self.assertEqual(set(cuerpo), {'success', 'version', 'respuesta', 'origen', 'fuentes', 'sugerencias', 'resumen', 'datos', 'detalle'})
+        self.assertEqual(set(cuerpo), {'success', 'version', 'respuesta', 'origen', 'fuentes', 'sugerencias'})
         json.dumps(cuerpo)
 
     def test_validaciones(self):

@@ -37,12 +37,11 @@ export const SectionContextBlock: React.FC<Props> = ({ project, config, contexts
   const invalid = invalidContextFields(ctx);
   const level = levelOfSection(section, config);
   const set = (patch: Partial<SectionContext>) => onChange(section.id, { ...ctx, ...patch });
-  const statusOf = (id: string): 'ok' | 'warn' | 'error' => {
+  const dotClass = (id: string) => {
     const c = ctxOf(project.sections.find(s => s.id === id)!, contexts);
-    if (invalidContextFields(c).length) return 'error';
-    return sectionAssumptions(c).length ? 'warn' : 'ok';
+    if (invalidContextFields(c).length) return 'bg-danger';
+    return sectionAssumptions(c).length ? 'bg-amber-500' : 'bg-primary';
   };
-  const dotClass = (id: string) => ({ error: 'bg-danger', warn: 'bg-amber-500', ok: 'bg-primary' })[statusOf(id)];
   const yearNow = new Date().getFullYear();
 
   return (
@@ -59,7 +58,6 @@ export const SectionContextBlock: React.FC<Props> = ({ project, config, contexts
           >
             <span className={`inline-block h-2.5 w-2.5 rounded-full ${s.id === section.id ? 'bg-white' : dotClass(s.id)}`} aria-hidden="true" />
             {s.name}
-            <span className="sr-only"> — {t(`agent.status.${statusOf(s.id)}`)}</span>
           </button>
         ))}
       </div>
@@ -120,10 +118,9 @@ export const SectionContextBlock: React.FC<Props> = ({ project, config, contexts
         hint={invalid.includes('yearBuilt') ? <ErrorHint>{t('agent.b2.range', { min: 1950, max: yearNow })}</ErrorHint> : invalid.includes('lastInterventionYear') ? <ErrorHint>{t('agent.b2.lastYearError')}</ErrorHint> : ctx.yearBuilt === null ? <p className="text-xs text-text-muted">{t('agent.b2.ageDefault')}</p> : undefined}
       >
         <div className="flex flex-wrap items-center gap-3">
-          <div className="w-32"><span className="block text-xs font-semibold text-text-muted mb-1" aria-hidden="true">{t('agent.b2.yearBuilt')}</span><Input type="number" aria-label={t('agent.b2.yearBuilt')} value={ctx.yearBuilt ?? ''} onChange={e => set({ yearBuilt: numberOrNull(e.target.value) })} /></div>
-          <div className="w-40"><span className="block text-xs font-semibold text-text-muted mb-1" aria-hidden="true">{t('agent.b2.lastYear')}</span><Input type="number" aria-label={t('agent.b2.lastYear')} value={ctx.lastInterventionYear ?? ''} onChange={e => set({ lastInterventionYear: numberOrNull(e.target.value) })} /></div>
+          <div className="w-32"><Input type="number" aria-label={t('agent.b2.yearBuilt')} placeholder={t('agent.b2.yearBuilt')} value={ctx.yearBuilt ?? ''} onChange={e => set({ yearBuilt: numberOrNull(e.target.value) })} /></div>
+          <div className="w-40"><Input type="number" aria-label={t('agent.b2.lastYear')} placeholder={t('agent.b2.lastYear')} value={ctx.lastInterventionYear ?? ''} onChange={e => set({ lastInterventionYear: numberOrNull(e.target.value) })} /></div>
           <div className="w-64">
-            <span className="block text-xs font-semibold text-text-muted mb-1" aria-hidden="true">{t('agent.b2.lastType')}</span>
             <select aria-label={t('agent.b2.lastType')} className={selectClasses} value={ctx.lastInterventionType ?? ''} onChange={e => set({ lastInterventionType: e.target.value || null })}>
               <option value="">{t('agent.b2.lastType')}</option>
               {TREATMENTS.map(tr => <option key={tr.id} value={tr.id}>{treatmentName(tr.id, language)}</option>)}

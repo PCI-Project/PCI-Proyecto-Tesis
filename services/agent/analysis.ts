@@ -138,10 +138,10 @@ export function computeBlocks(
     status: has(5) ? 'error' : 'ok',
     summaryKey: config.budget === null ? 'agent.summary.b5NoCap' : 'agent.summary.b5',
     params: {
-      budget: config.budget === null ? '' : Number.isFinite(config.budget) ? config.budget.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '—',
+      budget: config.budget === null ? '' : config.budget.toLocaleString('en-US', { maximumFractionDigits: 2 }),
       currency: config.currency,
       mode: config.priorityMode === 'costo_beneficio' ? 'agent.mode.bc' : 'agent.mode.worst',
-      pct: Number.isFinite(config.contingencyPct) ? config.contingencyPct : '—',
+      pct: config.contingencyPct,
     },
   };
   return [b1, b2, b3, b4, b5];

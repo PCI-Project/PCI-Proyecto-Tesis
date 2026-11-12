@@ -1,16 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { AgentRun } from '../../types';
 import { useTranslations } from '../../hooks/useTranslations';
+import { Button } from '../ui/Button';
 import { askAgent } from '../../services/agent/agentClient';
 
 interface Message {
   id: number;
   role: 'user' | 'assistant';
   text: string;
-  /** Frase corta, cifras clave y detalle plegable (servicio nuevo); sin ellos se muestra el texto completo. */
-  summary?: string;
-  facts?: { etiqueta: string; valor: string }[];
-  detail?: string | null;
   origin?: 'modelo' | 'automatica';
   sources?: string[];
   error?: boolean;
@@ -38,58 +35,6 @@ function startingQuestions(analysis: any): string[] {
   ].filter(Boolean);
 }
 
-const Avatar: React.FC = () => (
-  <div className="h-8 w-8 shrink-0 rounded-full bg-primary/15 text-primary-dark flex items-center justify-center" aria-hidden="true">
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" /></svg>
-  </div>
-);
-
-const AssistantMessage: React.FC<{ message: Message }> = ({ message: m }) => {
-  const { t } = useTranslations();
-  const [open, setOpen] = useState(false);
-  const structured = Boolean(m.summary) && !m.error;
-  const detail = structured ? m.detail : null;
-  return (
-    <div className="flex gap-3">
-      <Avatar />
-      <div className="min-w-0 max-w-[88%] space-y-2">
-        <div className={`rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm space-y-3 ${m.error ? 'border border-amber-300 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200' : 'border border-border-muted bg-bg-surface text-text-base'}`}>
-          <p className="text-[15px] leading-relaxed whitespace-pre-line break-words">{structured ? m.summary : m.text}</p>
-          {structured && m.facts && m.facts.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {m.facts.map(f => (
-                <div key={f.etiqueta} className="rounded-lg bg-secondary/15 px-3 py-1.5">
-                  <div className="text-[11px] uppercase tracking-wide text-text-muted">{f.etiqueta}</div>
-                  <div className="text-sm font-semibold text-text-base">{f.valor}</div>
-                </div>
-              ))}
-            </div>
-          )}
-          {detail && (
-            <>
-              <button type="button" aria-expanded={open} onClick={() => setOpen(v => !v)} className="text-sm font-semibold text-primary-dark hover:underline focus:outline-none focus:ring-2 focus:ring-primary/40 rounded">
-                {open ? t('agent.chat.hideDetail') : t('agent.chat.showDetail')}
-              </button>
-              {open && <p className="text-sm whitespace-pre-line break-words border-t border-border-muted pt-3">{detail}</p>}
-            </>
-          )}
-        </div>
-        {!m.error && (
-          <div className="flex flex-wrap items-center gap-1.5 pl-1">
-            {m.sources && m.sources.length > 0 && (
-              <>
-                <span className="text-xs text-text-muted">{t('agent.chat.sources')}</span>
-                {m.sources.map(s => <span key={s} className="rounded-full border border-border-muted px-2.5 py-0.5 text-xs text-text-muted">{s}</span>)}
-              </>
-            )}
-            <span className="text-xs text-text-muted">{m.sources && m.sources.length > 0 ? '· ' : ''}{t(`agent.chat.origin.${m.origin ?? 'automatica'}`)}</span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
 interface Props { run: AgentRun; online: boolean }
 
 export const ChatView: React.FC<Props> = ({ run, online }) => {
@@ -103,19 +48,11 @@ export const ChatView: React.FC<Props> = ({ run, online }) => {
   const nextId = useRef(messages.length + 1);
   const abort = useRef<AbortController | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
   const alive = useRef(true);
 
   useEffect(() => { alive.current = true; return () => { alive.current = false; abort.current?.abort(); }; }, []);
   useEffect(() => { saved.set(run.id, { messages, suggestions }); }, [run.id, messages, suggestions]);
   useEffect(() => { endRef.current?.scrollIntoView?.({ block: 'nearest' }); }, [messages, busy]);
-  // El cuadro de texto crece con lo que se escribe (hasta un máximo) y vuelve a una línea al enviar.
-  useEffect(() => {
-    const el = inputRef.current;
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = `${Math.min(el.scrollHeight, 128)}px`;
-  }, [text]);
 
   const add = (message: Omit<Message, 'id'>) => setMessages(list => [...list, { ...message, id: nextId.current++ }]);
 
@@ -131,7 +68,7 @@ export const ChatView: React.FC<Props> = ({ run, online }) => {
     try {
       const reply = await askAgent(question, analysis, narrative, history, controller);
       if (!alive.current) return;
-      add({ role: 'assistant', text: reply.respuesta, summary: reply.resumen, facts: reply.datos, detail: reply.detalle, origin: reply.origen, sources: reply.fuentes });
+      add({ role: 'assistant', text: reply.respuesta, origin: reply.origen, sources: reply.fuentes });
       setSuggestions(reply.sugerencias ?? []);
     } catch (e: any) {
       if (!alive.current) return;
@@ -152,77 +89,68 @@ export const ChatView: React.FC<Props> = ({ run, online }) => {
   const clear = () => { abort.current?.abort(); setMessages([]); setSuggestions(startingQuestions(analysis)); saved.delete(run.id); };
 
   return (
-    <section aria-label={t('agent.chat.title')} className="flex flex-col overflow-hidden rounded-2xl border border-border-muted bg-bg-surface shadow-sm">
-      <header className="flex items-center justify-between gap-3 border-b border-border-muted px-4 py-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <Avatar />
-          <div className="min-w-0">
-            <h3 className="text-base font-bold text-text-base leading-tight">{t('agent.chat.title')}</h3>
-            <p className="flex items-center gap-1.5 text-xs text-text-muted">
-              <span className={`h-2 w-2 shrink-0 rounded-full ${online ? 'bg-primary' : 'bg-amber-500'}`} aria-hidden="true" />
-              <span className="truncate">{t(online ? 'agent.health.online' : 'agent.health.offline')} · {t('agent.chat.about', { n: run.number })}</span>
-            </p>
-          </div>
+    <section aria-label={t('agent.chat.title')} className="rounded-xl border border-border-muted bg-bg-surface">
+      <header className="flex flex-wrap items-center gap-2 justify-between p-3 border-b border-border-muted">
+        <div>
+          <h3 className="text-base font-bold text-text-base">{t('agent.chat.title')}</h3>
+          <p className="text-xs text-text-muted">{t('agent.chat.about', { n: run.number })}</p>
         </div>
-        <button type="button" disabled={!messages.length && !busy} onClick={clear} className="shrink-0 rounded-lg border border-border-base px-3 py-1.5 text-sm font-semibold text-text-muted hover:text-text-base disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary/40">{t('agent.chat.clear')}</button>
+        <Button variant="ghost" className="border border-border-base !py-1.5" disabled={!messages.length && !busy} onClick={clear}>{t('agent.chat.clear')}</Button>
       </header>
 
-      <div role="log" aria-live="polite" aria-label={t('agent.chat.log')} className="space-y-5 px-4 py-5 min-h-[16rem] max-h-[min(36rem,70vh)] overflow-y-auto bg-bg-base/40">
-        {!messages.length && (
-          <div className="flex gap-3">
-            <Avatar />
-            <p className="max-w-[88%] rounded-2xl rounded-tl-sm border border-border-muted bg-bg-surface px-4 py-3 text-[15px] leading-relaxed text-text-base shadow-sm">{t('agent.chat.intro')}</p>
+      <div role="log" aria-live="polite" aria-label={t('agent.chat.log')} className="p-3 space-y-3 max-h-[28rem] min-h-[10rem] overflow-y-auto bg-bg-base">
+        {!messages.length && <p className="text-sm text-text-muted">{t('agent.chat.intro')}</p>}
+        {messages.map(m => (
+          <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm ${m.role === 'user' ? 'bg-primary text-text-inverted' : m.error ? 'border border-amber-300 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200' : 'border border-border-muted bg-bg-surface text-text-base'}`}>
+              <p className="whitespace-pre-line break-words">{m.text}</p>
+              {m.role === 'assistant' && !m.error && (
+                <p className="mt-2 text-xs text-text-muted">
+                  {t(`agent.chat.origin.${m.origin ?? 'automatica'}`)}
+                  {m.sources && m.sources.length > 0 && ` · ${t('agent.chat.sources')}: ${m.sources.join(', ')}`}
+                </p>
+              )}
+            </div>
           </div>
-        )}
-        {messages.map(m => m.role === 'user' ? (
-          <div key={m.id} className="flex justify-end">
-            <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-primary px-4 py-2.5 text-[15px] text-text-inverted shadow-sm whitespace-pre-line break-words">{m.text}</div>
-          </div>
-        ) : <AssistantMessage key={m.id} message={m} />)}
+        ))}
         {busy && (
-          <div className="flex items-center gap-3" role="status" aria-label={t('agent.chat.thinking')}>
-            <Avatar />
-            <div className="flex items-center gap-3 rounded-2xl rounded-tl-sm border border-border-muted bg-bg-surface px-4 py-3">
-              <span className="flex items-center gap-1.5" aria-hidden="true">
-                {[0, 150, 300].map(delay => <span key={delay} className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: `${delay}ms` }} />)}
-              </span>
-              <span className="text-sm text-text-muted">{t('agent.chat.thinking')}</span>
-              <button type="button" className="text-sm font-semibold text-primary-dark underline" onClick={() => abort.current?.abort()}>{t('agent.chat.stop')}</button>
+          <div className="flex justify-start" role="status">
+            <div className="rounded-2xl px-3.5 py-2.5 text-sm border border-border-muted bg-bg-surface text-text-muted flex items-center gap-3">
+              <span>{t('agent.chat.thinking')}</span>
+              <button type="button" className="text-primary font-semibold underline" onClick={() => abort.current?.abort()}>{t('agent.chat.stop')}</button>
             </div>
           </div>
         )}
         <div ref={endRef} />
       </div>
 
-      <form className="border-t border-border-muted bg-bg-surface px-4 pb-3 pt-3 space-y-3" onSubmit={e => { e.preventDefault(); void send(text); }}>
-        {shownSuggestions.length > 0 && (
-          <div className="flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none]" aria-label={t('agent.chat.suggestions')}>
-            {shownSuggestions.map(q => (
-              <button key={q} type="button" disabled={busy || !online} onClick={() => void send(q)} className="shrink-0 rounded-full border border-border-base bg-bg-surface px-3 py-1.5 text-sm text-text-base hover:border-primary hover:text-primary-dark disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary/40">{q}</button>
-            ))}
-          </div>
-        )}
+      {shownSuggestions.length > 0 && (
+        <div className="px-3 pt-3 flex flex-wrap gap-2" aria-label={t('agent.chat.suggestions')}>
+          {shownSuggestions.map(q => (
+            <button key={q} type="button" disabled={busy || !online} onClick={() => void send(q)} className="rounded-full border border-border-base px-3 py-1 text-xs font-semibold text-text-muted hover:text-primary hover:border-primary disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary/40">{q}</button>
+          ))}
+        </div>
+      )}
+
+      <form className="p-3 space-y-2" onSubmit={e => { e.preventDefault(); void send(text); }}>
         {!online && <p role="status" className="text-xs font-semibold text-amber-800 dark:text-amber-200">{t('agent.chat.offline')}</p>}
-        <div className="flex items-end gap-2 rounded-2xl border border-border-base bg-bg-base/40 px-3 py-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30">
+        <div className="flex gap-2 items-end">
           <textarea
-            ref={inputRef}
             value={text}
-            rows={1}
+            rows={2}
             maxLength={MAX_LEN}
             aria-label={t('agent.chat.input')}
             placeholder={t('agent.chat.placeholder')}
             disabled={!online}
             onChange={e => setText(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); void send(text); } }}
-            className="max-h-32 flex-1 resize-none bg-transparent py-1.5 text-[15px] text-text-base outline-none placeholder:text-text-muted disabled:opacity-60"
+            className="flex-1 border border-border-base rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary text-text-base bg-bg-surface p-3 shadow-sm text-sm resize-none disabled:opacity-60"
           />
-          <button type="submit" aria-label={t('agent.chat.send')} disabled={!online || busy || !text.trim()} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-text-inverted disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary/40">
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
-          </button>
+          <Button type="submit" disabled={!online || busy || !text.trim()}>{t('agent.chat.send')}</Button>
         </div>
-        <p className="text-center text-xs text-text-muted">
-          {t('agent.chat.note')}
-          {text.length > MAX_LEN * 0.8 && <span className="ml-2 tabular-nums">{text.length}/{MAX_LEN}</span>}
+        <p className="text-xs text-text-muted flex flex-wrap justify-between gap-2">
+          <span>{t('agent.chat.note')}</span>
+          <span className="tabular-nums">{text.length}/{MAX_LEN}</span>
         </p>
       </form>
     </section>

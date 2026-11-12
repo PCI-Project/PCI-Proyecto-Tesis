@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
 const Project = require('../models/Project');
-const AgentRun = require('../models/AgentRun');
 const { protegerRuta } = require('../middleware/authMiddleware');
 
 // Todas las rutas requieren autenticación
@@ -45,57 +43,6 @@ router.put('/:id', async (req, res) => {
   } catch (err) { res.status(400).json({ msg: err.message }); }
 });
 
-// --- Consultas (versiones) del agente de recomendaciones ---------------------------------------------
-// Se guardan aparte del proyecto para poder consultarlas sin volver a generarlas.
-const RUN_FIELDS = ['number', 'inputHash', 'config', 'contexts', 'input', 'analysis', 'narrative', 'narrativeSource', 'agentVersion', 'status', 'error'];
-const toClientRun = doc => {
-  const o = doc.toObject ? doc.toObject() : doc;
-  const run = { id: o.runId, createdAt: o.ranAt };
-  RUN_FIELDS.forEach(k => { if (o[k] !== undefined && o[k] !== null) run[k] = o[k]; });
-  return run;
-};
-const ownsProject = async req => {
-  if (!mongoose.isValidObjectId(req.params.id)) return false;
-  return Boolean(await Project.exists({ _id: req.params.id, propietario: req.user._id }));
-};
-
-// GET /api/projects/:id/agent-runs — todas las consultas del proyecto, la más nueva primero
-router.get('/:id/agent-runs', async (req, res) => {
-  try {
-    if (!(await ownsProject(req))) return res.status(404).json({ msg: 'Proyecto no encontrado' });
-    const runs = await AgentRun.find({ project: req.params.id, propietario: req.user._id }).sort({ number: -1 });
-    res.json(runs.map(toClientRun));
-  } catch (err) { res.status(500).json({ msg: err.message }); }
-});
-
-// PUT /api/projects/:id/agent-runs/:runId — guarda (o reemplaza) una consulta; repetirla no duplica
-router.put('/:id/agent-runs/:runId', async (req, res) => {
-  try {
-    if (!(await ownsProject(req))) return res.status(404).json({ msg: 'Proyecto no encontrado' });
-    const body = req.body || {};
-    if (!body.analysis || !body.config || !body.createdAt || !body.inputHash || !Number.isFinite(Number(body.number))) {
-      return res.status(400).json({ msg: 'Consulta incompleta' });
-    }
-    const data = { ranAt: String(body.createdAt) };
-    RUN_FIELDS.forEach(k => { if (body[k] !== undefined) data[k] = body[k]; });
-    const saved = await AgentRun.findOneAndUpdate(
-      { project: req.params.id, propietario: req.user._id, runId: req.params.runId },
-      { $set: data }, // los campos del filtro (proyecto, dueño, runId) se insertan solos con el upsert
-      { upsert: true, returnDocument: 'after', runValidators: true, setDefaultsOnInsert: true }
-    );
-    res.json(toClientRun(saved));
-  } catch (err) { res.status(400).json({ msg: err.message }); }
-});
-
-// DELETE /api/projects/:id/agent-runs/:runId — borra una consulta
-router.delete('/:id/agent-runs/:runId', async (req, res) => {
-  try {
-    if (!(await ownsProject(req))) return res.status(404).json({ msg: 'Proyecto no encontrado' });
-    await AgentRun.deleteOne({ project: req.params.id, propietario: req.user._id, runId: req.params.runId });
-    res.json({ msg: 'Consulta eliminada' });
-  } catch (err) { res.status(500).json({ msg: err.message }); }
-});
-
 // DELETE /api/projects/:id — eliminar proyecto
 router.delete('/:id', async (req, res) => {
   try {
@@ -103,7 +50,6 @@ router.delete('/:id', async (req, res) => {
       _id: req.params.id, propietario: req.user._id
     });
     if (!proyecto) return res.status(404).json({ msg: 'Proyecto no encontrado' });
-    await AgentRun.deleteMany({ project: proyecto._id }); // sus consultas del agente se van con él
     res.json({ msg: 'Proyecto eliminado' });
   } catch (err) { res.status(500).json({ msg: err.message }); }
 });

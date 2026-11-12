@@ -46,7 +46,7 @@ export const EquipmentBlock: React.FC<Props> = ({ project, config, contexts, onC
             <fieldset key={group} className="rounded-lg border border-border-muted p-3">
               <legend className="px-1 text-sm font-bold text-secondary-dark">{t(`agent.group.${group}`)}</legend>
               <label className="flex items-center gap-3 cursor-pointer p-1.5 rounded-md hover:bg-bg-muted text-sm font-semibold text-text-muted">
-                <input type="checkbox" className={checkClasses} checked={all} ref={el => { if (el) el.indeterminate = !all && items.some(i => selected.has(i.id)); }} onChange={e => set(e.target.checked ? Array.from(new Set([...config.availableTreatments, ...items.map(i => i.id)])) : config.availableTreatments.filter(id => !items.some(i => i.id === id)))} />
+                <input type="checkbox" className={checkClasses} checked={all} onChange={e => set(e.target.checked ? Array.from(new Set([...config.availableTreatments, ...items.map(i => i.id)])) : config.availableTreatments.filter(id => !items.some(i => i.id === id)))} />
                 {t('agent.b3.groupAll')}
               </label>
               {items.map(item => (
