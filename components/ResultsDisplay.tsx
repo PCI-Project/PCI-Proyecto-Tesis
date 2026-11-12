@@ -5,6 +5,7 @@ import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { useTranslations } from '../hooks/useTranslations';
 import { ExportModal } from './ExportModal';
+import { PCIResultsMap } from './map/PCIResultsMap';
 
 const ChevronDownIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 transition-transform ${className}`} viewBox="0 0 20 20" fill="currentColor">
@@ -263,6 +264,8 @@ export const ResultsDisplay: React.FC<{ project: Project; onEvaluateAdditionalSa
             </div>
         </Card>
       )}
+
+      <PCIResultsMap project={project} />
 
       <h3 className="text-xl font-bold text-text-base mb-4">{t('results.sectionBreakdown')}</h3>
       <div className="overflow-x-auto border border-border-muted rounded-lg">

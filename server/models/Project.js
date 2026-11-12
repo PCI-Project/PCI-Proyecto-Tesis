@@ -28,6 +28,8 @@ const SectionSchema = new mongoose.Schema({
   allowableError: { type: Number, required: true },
   evaluateAllSamples: { type: Boolean, required: true },
   startSampleUnit: { type: Number },
+  location: { type: String },
+  routeLocation: { type: mongoose.Schema.Types.Mixed },   // ruta del tramo en el mapa (coordenadas, datum, UTM)
   area: { type: Number, required: true },
   sampleUnitLength: { type: Number, required: true },
   totalSampleUnits: { type: Number, required: true },
