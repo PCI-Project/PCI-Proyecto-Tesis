@@ -23,7 +23,11 @@ export async function agentCatalog(): Promise<any> {
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return response.json();
 }
-export interface ChatReply { respuesta: string; origen: 'modelo' | 'automatica'; fuentes: string[]; sugerencias: string[] }
+export interface ChatReply {
+  respuesta: string; origen: 'modelo' | 'automatica'; fuentes: string[]; sugerencias: string[];
+  /** Servicio nuevo: frase corta, cifras clave y detalle plegable. Un servicio antiguo solo manda `respuesta`. */
+  resumen?: string; datos?: { etiqueta: string; valor: string }[]; detalle?: string | null;
+}
 export interface ChatTurn { rol: 'usuario' | 'asistente'; texto: string }
 
 /** Pregunta al asistente del agente sobre un análisis ya calculado. No envía las muestras crudas (el asistente no las usa). */
