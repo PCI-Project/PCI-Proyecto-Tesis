@@ -422,8 +422,8 @@ export const pt = {
         issues: {
             noSections: "O projeto não tem trechos.", missingPci: "{name}: o PCI não foi calculado.", pavement: "{name}: o agente trabalha somente com pavimento flexível.", missingSamples: "{name}: não há amostras.",
             sampleArea: "{name}: a amostra {sample} não tem uma área válida.", insufficient: "{name}: faltam {count} amostra(s) para uma amostragem suficiente; o resultado é preliminar.", goCalc: "Ir para o cálculo",
-            incompleteCoverage: "{name}: função indisponível. Você avaliou {done} de {total} unidades amostrais geradas pelo plano de amostragem.",
-            coverageWhy: "Para habilitar recomendações de intervenção, você precisa avaliar 100 % das unidades amostrais geradas pelo plano de amostragem de cada trecho. Até lá, o painel não pode fornecer recomendações: somente o PCI e os dados da inspeção estão disponíveis.", goData: "Ir para a entrada de dados",
+            incompleteCoverage: "{name}: função indisponível. Você avaliou {done} de {total} unidades de amostra do trecho.",
+            coverageWhy: "Para habilitar as recomendações, é preciso avaliar 100 % das unidades de amostra do trecho, e não apenas a amostragem mínima: extrapolar quantidades e calcular custos por área e custos unitários a partir de uma amostra mínima não é lógico. Enquanto isso não for feito, o painel não pode dar recomendações: só estão disponíveis o PCI e os dados de inspeção.", goData: "Ir para a entrada de dados",
             noEquipment: "Selecione pelo menos um tratamento.", invalidCost: "Há custos inválidos.", invalidBudget: "O orçamento deve ser maior que zero.", invalidContingency: "A contingência deve ficar entre 0 e 30 %.",
             invalidParams: "Alguns parâmetros avançados estão fora do intervalo.", invalidThresholds: "Os limites devem ser inteiros e decrescentes.",
             ctx_curb: "{name}: altura do meio-fio fora do intervalo.", ctx_esal: "{name}: ESAL fora do intervalo.", ctx_aadt: "{name}: VDMA fora do intervalo.", ctx_yearBuilt: "{name}: ano de construção inválido.",
