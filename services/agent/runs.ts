@@ -1,6 +1,7 @@
 import type { AgentConfig, AgentRun, SectionContext } from '../../types';
 
-export const MAX_RUNS = 5;
+/** Consultas que se conservan por proyecto (se guardan en la base de datos). Con el tope, la más antigua se borra solo si el usuario lo confirma. */
+export const MAX_RUNS = 15;
 
 export interface RunSummary {
   pciBefore: number;

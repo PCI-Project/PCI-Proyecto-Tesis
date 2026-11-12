@@ -340,13 +340,13 @@ export const pt = {
             error: "O agente não conseguiu responder. Verifique se o serviço está em execução e tente novamente.",
             noEndpoint: "Este serviço do agente não tem chat. Atualize o serviço do agente (a rota /api/chat está ausente).",
             offline: "O chat precisa que o serviço do agente esteja online. Offline, você pode ler o relatório, mas não perguntar sobre ele.",
-            suggestions: "Perguntas sugeridas", sources: "Fontes",
+            showDetail: "Ver detalhe", hideDetail: "Ocultar detalhe", suggestions: "Perguntas sugeridas", sources: "Fontes",
             origin: { automatica: "Elaborada com os dados do relatório", modelo: "Redigida pelo modelo com os dados do relatório" },
             note: "Apoio à decisão: as respostas vêm do relatório e do catálogo e devem ser revisadas por um engenheiro qualificado. O assistente lê e responde em espanhol.",
         },
         chip: { title: "Parâmetros desta execução · clique para editar", equipment: "Equipamento", mode: "Modo", ownCosts: "Custos próprios", assumed: "Dados presumidos", interim: "Provisório" },
         quick: { title: "Ajuste rápido", rerun: "Executar novamente" },
-        history: { title: "Execuções", viewing: "Visualizando v{n}", restore: "Restaurar seus parâmetros", backLatest: "Voltar à mais recente" },
+        history: { version: "Versão", latest: "a mais recente", title: "Execuções", viewing: "Visualizando v{n}", restore: "Restaurar seus parâmetros", backLatest: "Voltar à mais recente" },
         compare: { title: "Comparado com v{n}:", pciAfter: "PCI da rede depois", needed: "Necessário", financed: "Financiado", shortfall: "Déficit", unassigned: "Não alocado" },
         report: {
             pciBar: "PCI atual {now} (marca preenchida) e previsto {after} (marca vazia)", annexA: "Anexo A. Defeitos por unidade amostral", annexB: "Anexo B. Glossário", annexC: "Anexo C. Parâmetros e suposições", sample: "Amostra", additional: "adicional", term: "Termo", definition: "Definição", parameter: "Parâmetro", assumptions: "Suposições por trecho",
@@ -408,7 +408,7 @@ export const pt = {
         },
         b4: {
             title: "Custos unitários", currency: "Moeda", counts: "{own} próprios, {example} de exemplo", exampleWarning: "Há custos de exemplo: o orçamento será preliminar.",
-            treatment: "Tratamento", unit: "Unidade", value: "Valor", source: "Fonte", yours: "Seus", example: "Exemplo", import: "Importar CSV", template: "Baixar modelo", saveMine: "Salvar como meus valores", saved: "Salvo", reset: "Voltar aos valores de exemplo"
+            treatment: "Tratamento", unit: "Unidade", value: "Valor", source: "Fonte", yours: "Seus", example: "Exemplo", import: "Importar CSV", template: "Baixar modelo", resetTitle: "Remover seus custos", resetText: "Os {n} custos que você inseriu serão apagados e os valores de exemplo voltarão. Esta ação não pode ser desfeita.", resetConfirm: "Remover custos", sourcePlaceholder: "Fonte (opcional)", saveMine: "Salvar como meus valores", saved: "Salvo", reset: "Voltar aos valores de exemplo"
         },
         b5: {
             title: "Orçamento e prioridade", budget: "Orçamento", noCap: "Sem limite", noCapHint: "O custo para tratar toda a rede é calculado.", capHint: "Os reparos de segurança são financiados primeiro e, depois, as obras conforme o modo.",
@@ -438,6 +438,6 @@ export const pt = {
         bar: { assumed: "{n} dado(s) a presumir", complete: "Dados completos", lastResult: "Ver último resultado", downloadInput: "Baixar entrada.json", importResults: "Importar resultados", generate: "Gerar recomendações", rerun: "Executar novamente" },
         consulting: { working: "O agente está trabalhando…", elapsed: "{s} s decorridos", cancel: "Cancelar" },
         error: { rateLimit: "Muitas consultas seguidas. Aguarde um minuto e tente novamente.", network: "Não foi possível acessar o agente. Verifique se está em execução ou use o modo offline.", import: "Os arquivos não são válidos ({fields}).", hash: "Os resultados não correspondem aos dados atuais. Gere entrada.json novamente.", fix: "Corrija os blocos indicados antes de gerar." },
-        result: { edit: "Editar parâmetros", download: "Baixar JSON", runs: "Execuções", pci: "PCI ponderado", needed: "Custo necessário", financed: "Financiado", shortfall: "Déficit", summary: "Resumo executivo", treatment: "Tratamento", cost: "Custo", interim: "provisório", pdf: "Baixar PDF", print: "Imprimir", title: "Resultado" }
+        result: { regenerate: "Regenerar", regenerateHint: "Consulta o agente novamente com os parâmetros atuais e salva uma nova versão; esta é mantida.", edit: "Editar parâmetros", download: "Baixar JSON", runs: "Execuções", pci: "PCI ponderado", needed: "Custo necessário", financed: "Financiado", shortfall: "Déficit", summary: "Resumo executivo", treatment: "Tratamento", cost: "Custo", interim: "provisório", pdf: "Baixar PDF", print: "Imprimir", title: "Resultado" }
     },
   };
