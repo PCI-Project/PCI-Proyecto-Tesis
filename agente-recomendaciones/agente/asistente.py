@@ -389,6 +389,79 @@ def respuesta_automatica(pregunta, analisis, narrativa=None):
     return '\n\n'.join(b[0] for b in bloques), sorted({b[1] for b in bloques}), _sugerencias(analisis, ent)
 
 
+# --- Forma de la respuesta para el panel: frase corta, cifras clave y detalle plegable -----------------------------------
+
+def _primera_frase(texto, limite=260):
+    t = re.sub(r'\s+', ' ', texto or '').strip()
+    m = re.match(r'(.+?[.!?])(?:\s|$)', t)
+    f = m.group(1) if m else t
+    return f if len(f) <= limite else f[:limite - 1].rstrip() + '…'
+
+
+def _resumen_y_datos(pregunta, analisis, narrativa):
+    """(resumen, datos) armados solo con cifras del análisis según lo que se preguntó; (None, []) si no hay una forma clara."""
+    pn = _n(pregunta)
+    ent = _entidades(pn, analisis)
+    temas = _temas(pn)
+    mon = analisis['calibracion_usada'].get('moneda', 'USD')
+    ts = analisis.get('tramos', [])
+    r = analisis.get('red', {})
+    diagnostico = analisis.get('modo') == 'diagnostico'
+    if len(ent['tramo']) == 1 and not ent['falla'] and 'diferir' not in temas:
+        t = next(x for x in ts if x['id'] == ent['tramo'][0])
+        tr, pr, c = t.get('tratamiento') or {}, t.get('prioridad') or {}, t.get('costos') or {}
+        resumen = f"{t['nombre']} está en nivel «{t.get('nivel', '')}» (PCI {_pci(t['pci'])}, {t.get('categoria', '')})"
+        resumen += f" y recibe «{tr['nombre']}»." if tr.get('nombre') else '.'
+        explicar = any(p in pn for p in ('por que', 'porque', 'justific', 'razon', 'explica', 'motivo'))
+        n = next((x for x in (narrativa or {}).get('tramos', []) if x.get('tramo_id') == t['id']), {})
+        if explicar and n.get('justificacion'):
+            resumen += ' ' + _primera_frase(n['justificacion'])
+        datos = [dict(etiqueta='PCI', valor=_pci(t['pci']))]
+        if tr.get('nombre'):
+            datos.append(dict(etiqueta='Tratamiento', valor=tr['nombre']))
+        if c.get('total') is not None:
+            datos.append(dict(etiqueta='Costo', valor=dinero(c['total'], mon)))
+        if pr.get('posicion'):
+            datos.append(dict(etiqueta='Prioridad', valor=f"{pr['posicion']}.º de {len(ts)}"))
+        elif pr.get('estado'):
+            datos.append(dict(etiqueta='Estado', valor=ESTADO.get(pr['estado'], pr['estado'])))
+        return resumen, datos
+    if not ent['tramo'] and not diagnostico and 'presupuesto' in temas and 'costo_financiado' in r:
+        resumen = (f"Se financian {dinero(r['costo_financiado'], mon)} de los {dinero(r['costo_total_necesario'], mon)} necesarios; "
+                   f"faltan {dinero(r['faltante'], mon)} y quedan {dinero(r['saldo_sin_asignar'], mon)} sin asignar.")
+        return resumen, [dict(etiqueta='Financiado', valor=dinero(r['costo_financiado'], mon)),
+                         dict(etiqueta='Faltante', valor=dinero(r['faltante'], mon)),
+                         dict(etiqueta='Sin asignar', valor=dinero(r['saldo_sin_asignar'], mon))]
+    if not ent['tramo'] and 'red' in temas and 'pci_ponderado' in r:
+        resumen = f"El PCI ponderado de la red es {_pci(r['pci_ponderado'])}"
+        if r.get('pci_ponderado_despues') is not None:
+            resumen += f" y quedaría en {_pci(r['pci_ponderado_despues'])} tras intervenir"
+        resumen += f" ({len(ts)} tramos, {num(r['area_total_m2'])} m²)."
+        datos = [dict(etiqueta='PCI de la red', valor=_pci(r['pci_ponderado']))]
+        if r.get('pci_ponderado_despues') is not None:
+            datos.append(dict(etiqueta='PCI esperado', valor=_pci(r['pci_ponderado_despues'])))
+        datos += [dict(etiqueta='Tramos', valor=str(len(ts))), dict(etiqueta='Área', valor=f"{num(r['area_total_m2'])} m²")]
+        return resumen, datos
+    return None, []
+
+
+def estructurar(texto, resumen=None, datos=None, ayuda=False):
+    """Divide la respuesta en {resumen, datos, detalle}. `respuesta` sigue llevando el texto completo (compatibilidad)."""
+    texto = (texto or '').strip()
+    if ayuda:
+        return dict(resumen=texto, datos=[], detalle=None)
+    if resumen:  # frase armada con cifras del análisis: el detalle es la ficha completa
+        return dict(resumen=resumen, datos=datos or [], detalle=texto or None)
+    m = re.match(r'\s*(.+?[.!?])(?=\s|$)', texto, re.S)
+    if not m:
+        return dict(resumen=_primera_frase(texto), datos=datos or [], detalle=None)
+    completa = re.sub(r'\s+', ' ', m.group(1)).strip()
+    frase = _primera_frase(completa)
+    if len(frase) < len(completa):  # frase demasiado larga: se acorta y el texto completo va al detalle
+        return dict(resumen=frase, datos=datos or [], detalle=texto)
+    return dict(resumen=frase, datos=datos or [], detalle=texto[m.end():].strip() or None)
+
+
 # --- Modelo de lenguaje (opcional) ----------------------------------------------------------------------------------
 
 SISTEMA = (
@@ -441,6 +514,11 @@ def responder(pregunta, analisis, narrativa=None, historial=None, llamar_texto=N
     """Pregunta -> {respuesta, origen, fuentes, sugerencias}. `llamar_texto(system, mensajes) -> str` es opcional."""
     auto, fuentes, sugerencias = respuesta_automatica(pregunta, analisis, narrativa)
     resultado = dict(respuesta=auto, origen='automatica', fuentes=fuentes, sugerencias=sugerencias)
+    try:
+        resumen, datos = _resumen_y_datos(pregunta, analisis, narrativa)
+    except (KeyError, TypeError, ValueError, StopIteration):
+        resumen, datos = None, []
+    resultado.update(estructurar(auto, resumen, datos, ayuda=auto == AYUDA))
     if llamar_texto is None or auto == AYUDA:
         return resultado
     try:
@@ -450,7 +528,7 @@ def responder(pregunta, analisis, narrativa=None, historial=None, llamar_texto=N
         mensajes.append({'role': 'user', 'content': f"DATOS:\n{auto}\n\nPREGUNTA: {pregunta}"})
         texto = (llamar_texto(SISTEMA, mensajes) or '').strip()
         if texto and not cifras_inventadas(texto, auto, pregunta):
-            resultado.update(respuesta=texto, origen='modelo')
+            resultado.update(respuesta=texto, origen='modelo', **estructurar(texto, None, datos))
     except Exception as exc:
         print(f'[agente] el modelo no respondió el chat: {exc}'[:500], file=sys.stderr)
     return resultado
