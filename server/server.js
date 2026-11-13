@@ -24,6 +24,9 @@ connectDB();
 
 const app = express();
 
+// Confiar en el proxy de Render para leer X-Forwarded-For correctamente
+app.set('trust proxy', 1);
+
 // --- Límites de cuerpo por ruta (no 10 MB en todo el servidor) -----------
 const jsonLargo = express.json({ limit: '2mb' });   // consultas del agente / projects
 const jsonEstricto = express.json({ limit: '100kb' }); // auth y rutas pequeñas
