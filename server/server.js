@@ -32,8 +32,8 @@ const jsonLargo = express.json({ limit: '2mb' });   // consultas del agente / pr
 const jsonEstricto = express.json({ limit: '100kb' }); // auth y rutas pequeñas
 
 // --- Seguridad de cabeceras -----------------------------------------------
-// app.use(helmet());
-// app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
+app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 
 // --- CORS: solo orígenes de confianza, sin IPs privadas -------------------
 const origenesPermitidos = (process.env.CORS_ORIGINS || '')
