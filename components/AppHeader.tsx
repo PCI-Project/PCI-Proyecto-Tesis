@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Project, AppView, ProjectView } from '../types';
 import { useTranslations } from '../hooks/useTranslations';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { useAuth } from '../contexts/AuthContext';
 import { ThemeSwitcher } from './ui/ThemeSwitcher';
 import { Avatar } from './ui/Avatar';
+import { Logo } from './ui/Logo';
 
 // Icons
 const HamburgerIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>);
@@ -16,6 +17,7 @@ const SetupIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" class
 const DataIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" /><path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" /></svg>);
 const CalcIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zM6 7a1 1 0 011-1h2a1 1 0 110 2H7a1 1 0 01-1-1zm0 4a1 1 0 011-1h2a1 1 0 110 2H7a1 1 0 01-1-1zm6-4a1 1 0 100 2h2a1 1 0 100-2h-2zm-3 4a1 1 0 110 2h2a1 1 0 110-2h-2z" clipRule="evenodd" /></svg>);
 const ResultsIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" /><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" /></svg>);
+const AgentIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a1 1 0 01.894.553l1.382 2.763 3.05.443a1 1 0 01.554 1.706l-2.207 2.15.52 3.037a1 1 0 01-1.451 1.054L10 12.282l-2.742 1.424a1 1 0 01-1.451-1.054l.52-3.037-2.207-2.15a1 1 0 01.554-1.706l3.05-.443 1.382-2.763A1 1 0 0110 2z" /></svg>);
 const InstallIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg>);
 
 
@@ -26,13 +28,14 @@ interface AppHeaderProps {
   onGoHome: () => void;
 }
 
-const VIEW_ORDER: ProjectView[] = ['SETUP', 'DATA_ENTRY', 'CALCULATION_DETAILS', 'RESULTS'];
+const VIEW_ORDER: ProjectView[] = ['SETUP', 'DATA_ENTRY', 'CALCULATION_DETAILS', 'RESULTS', 'AGENT'];
 
 const STEP_DEFINITIONS: { view: ProjectView, labelKey: string, icon: React.FC }[] = [
     { view: 'SETUP', labelKey: 'stepper.step1', icon: SetupIcon },
     { view: 'DATA_ENTRY', labelKey: 'stepper.step2', icon: DataIcon },
     { view: 'CALCULATION_DETAILS', labelKey: 'stepper.step3', icon: CalcIcon },
     { view: 'RESULTS', labelKey: 'stepper.step4', icon: ResultsIcon },
+    { view: 'AGENT', labelKey: 'stepper.step5', icon: AgentIcon },
 ];
 
 export const AppHeader: React.FC<AppHeaderProps> = ({ project, currentView, onNavigate, onGoHome }) => {
@@ -40,6 +43,37 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ project, currentView, onNa
     const { user, logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [installPrompt, setInstallPrompt] = useState<Event | null>(null);
+    const headerRef = useRef<HTMLElement>(null);
+    const [isHidden, setIsHidden] = useState(false);
+    const [headerHeight, setHeaderHeight] = useState(0);
+
+    // El contenido se desplaza dentro de <main>: se oculta el encabezado al bajar y se muestra al subir.
+    useEffect(() => {
+        let lastTop = 0;
+        let lockedUntil = 0;
+        const onScroll = (event: Event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement) || target.tagName !== 'MAIN') return;
+            const top = target.scrollTop;
+            const delta = top - lastTop;
+            lastTop = top;
+            if (top <= 10) { setIsHidden(false); return; }
+            const now = performance.now();
+            if (now < lockedUntil) return; // evita rebotes mientras el contenido se reacomoda
+            if (delta > 6 && top > 80) {
+                setHeaderHeight(headerRef.current?.offsetHeight ?? 65);
+                setIsHidden(true);
+                lockedUntil = now + 400;
+            } else if (delta < -6) {
+                setIsHidden(false);
+                lockedUntil = now + 400;
+            }
+        };
+        window.addEventListener('scroll', onScroll, true);
+        return () => window.removeEventListener('scroll', onScroll, true);
+    }, []);
+
+    useEffect(() => { setIsHidden(false); }, [currentView, project?.id]);
 
     useEffect(() => {
         const handleBeforeInstallPrompt = (e: Event) => {
@@ -95,7 +129,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ project, currentView, onNa
                                    )
                                })}
                            </div>
-                        </div>
+                       </div>
                     )}
 
                     <div className="border-t border-border-muted pt-6 space-y-4">
@@ -125,15 +159,17 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ project, currentView, onNa
     );
 
     return (
-        <header className="sticky top-0 bg-bg-surface border-b border-border-base z-30 shadow-sm">
+        <header ref={headerRef} style={{ marginTop: isHidden ? -headerHeight : 0 }} className="relative bg-bg-surface border-b border-border-base z-30 shadow-sm transition-[margin-top] duration-300 ease-in-out">
             <div className="container mx-auto px-4 sm:px-6 md:px-8">
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center gap-4">
                         <button onClick={() => setIsMenuOpen(true)} className="p-2 text-text-base" aria-label={t('header.openMenu')}>
                             <HamburgerIcon />
                         </button>
-                        <button onClick={onGoHome} className="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity">
-                            <h1 className="text-xl font-bold">AsphaltPCI Pro</h1>
+                        <button onClick={onGoHome} className="flex items-center text-primary hover:opacity-80 transition-opacity" aria-label="AsphaltPCI Pro">
+                            <h1 className="sr-only">AsphaltPCI Pro</h1>
+                            <Logo variant="horizontal" height={42} className="hidden min-[360px]:block" />
+                            <Logo variant="emblema" height={40} className="block min-[360px]:hidden" />
                         </button>
                     </div>
 
