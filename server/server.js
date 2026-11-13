@@ -54,23 +54,23 @@ app.use(cors({
 }));
 
 // --- Rate limiting global (protege contra fuerza bruta) --------------------
-// const limiterGlobal = rateLimit({
-//   windowMs: 15 * 60 * 1000, // 15 minutos
-//   max: 100,                 // 100 requests por IP por ventana
-//   standardHeaders: true,
-//   legacyHeaders: false,
-//   message: { error: 'Demasiadas solicitudes. Intenta de nuevo más tarde.' },
-// });
-// app.use(limiterGlobal);
+const limiterGlobal = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100,                 // 100 requests por IP por ventana
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Demasiadas solicitudes. Intenta de nuevo más tarde.' },
+});
+app.use(limiterGlobal);
 
 // Límite más estricto solo para rutas de auth (login / registro / recuperación)
-// const limiterAuth = rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   max: 20,
-//   standardHeaders: true,
-//   legacyHeaders: false,
-//   message: { error: 'Demasiados intentos de autenticación. Intenta de nuevo más tarde.' },
-// });
+const limiterAuth = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Demasiados intentos de autenticación. Intenta de nuevo más tarde.' },
+});
 
 // --- Comprobación de estado (pública) -------------------------------------
 app.get('/api', (req, res) => {
@@ -78,7 +78,7 @@ app.get('/api', (req, res) => {
 });
 
 // Rutas de auth con límite estricto y cuerpo pequeño
-app.use('/api/auth', jsonEstricto, Authroute);
+app.use('/api/auth', limiterAuth, jsonEstricto, Authroute);
 // Rutas de proyectos con cuerpo más grande (datos del agente)
 app.use('/api/projects', jsonLargo, Projectroute);
 
