@@ -18,7 +18,7 @@ httpx==0.28.1
 httpx-sse==0.4.3
 idna==3.19
 jsonpatch==1.33
-jsonpointer==3.1.1
+jsonpointer==3.11
 langchain-classic==1.0.8
 langchain-community==0.4.2
 langchain-core==1.6.0
