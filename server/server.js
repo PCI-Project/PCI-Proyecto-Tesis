@@ -46,12 +46,12 @@ if (process.env.NODE_ENV !== 'production') {
   origenesPermitidos.push('http://localhost:3500', 'http://localhost:5173');
 }
 
-app.use(cors({
-  origin: origenesPermitidos.length ? origenesPermitidos : false,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-}));
+// app.use(cors({
+//   origin: origenesPermitidos.length ? origenesPermitidos : false,
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+// }));
 
 // --- Rate limiting global (protege contra fuerza bruta) --------------------
 // const limiterGlobal = rateLimit({
