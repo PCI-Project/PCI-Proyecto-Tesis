@@ -28,12 +28,3 @@ updates:
     labels:
       - "dependabot"
       - "security"
-
-  - package-ecosystem: "pip"
-    directory: "/agent"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependabot"
-      - "security"
