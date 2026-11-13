@@ -78,7 +78,7 @@ app.get('/api', (req, res) => {
 });
 
 // Rutas de auth con límite estricto y cuerpo pequeño
-app.use('/api/auth', limiterAuth, jsonEstricto, Authroute);
+app.use('/api/auth', jsonEstricto, Authroute);
 // Rutas de proyectos con cuerpo más grande (datos del agente)
 app.use('/api/projects', jsonLargo, Projectroute);
 
