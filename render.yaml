@@ -1,0 +1,31 @@
+# Blueprint de Render para el agente de recomendaciones (FastAPI).
+# Crea el servicio desde Render: New > Blueprint (o New > Web Service con los mismos valores).
+# LLM_API_KEY se define a mano en el panel de Render (sync: false): nunca va en el repositorio ni en el front.
+services:
+  - type: web
+    name: pci-agente
+    runtime: python
+    plan: free
+    rootDir: agente-recomendaciones
+    buildCommand: pip install -r servicio/requirements.txt
+    startCommand: uvicorn servicio.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      - key: LLM_PROVIDER
+        value: openai
+      - key: LLM_BASE_URL
+        value: https://generativelanguage.googleapis.com/v1beta/openai
+      - key: LLM_MODEL
+        value: gemini-3.8-flash
+      - key: LLM_JSON_MODE
+        value: "0"
+      - key: LLM_REASONING_EFFORT
+        value: low
+      - key: LLM_API_KEY
+        sync: false
+      - key: AGENTE_CORS
+        value: https://asphaltpcipro.company,https://www.asphaltpcipro.company
+      - key: AGENTE_LIMITE_POR_MIN
+        value: "20"

@@ -25,6 +25,7 @@ export interface ExportOptions {
     sectionResults: boolean;
     distressData: boolean;
     calculationDetails: boolean;
+    locationData: boolean;
 }
 
 export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, project }) => {
@@ -35,6 +36,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
         sectionResults: true,
         distressData: true,
         calculationDetails: false,
+        locationData: true,
     });
     const [isGenerating, setIsGenerating] = useState(false);
 
@@ -63,6 +65,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
         { key: 'sectionResults', label: t('exportModal.sectionResults') },
         { key: 'distressData', label: t('exportModal.distressData') },
         { key: 'calculationDetails', label: t('exportModal.calculationDetails') },
+        { key: 'locationData', label: t('exportModal.locationData') },
     ];
 
     return (

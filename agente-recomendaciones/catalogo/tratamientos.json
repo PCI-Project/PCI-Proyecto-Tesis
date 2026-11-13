@@ -1,0 +1,188 @@
+{
+  "_fuente": "Matriz de propuesta_umbrales_pci.md y MS-16 4.ª ed. 2009 (Fig. 1.4 p. 13, Tabla 1.1 p. 14, Fig. 3.1 p. 33). Vida útil, PCI resultante y restricciones de tránsito son valores por defecto del agente (sin norma específica): calibrarlos con datos locales.",
+  "_campos": {
+    "tipo": "tratamiento = solución global del tramo; actividad = trabajo previo o reparación localizada",
+    "unidad": "m2, m o global",
+    "previos": "actividades de reparación local que el tratamiento EXIGE hacer antes; las demás quedan absorbidas por el tratamiento",
+    "adicionales": "actividades sobre toda el área del tramo que siempre acompañan al tratamiento",
+    "adicionales_rural": "actividades extra cuando la vía es rural",
+    "pci_resultante": "suma = PCI actual + valor (tope 100); fijo = PCI tras la obra",
+    "trafico_max": "clase de tránsito máxima recomendada (bajo < medio < alto)",
+    "no_aplicar_si": "fallas que impiden usarlo: {id_falla: [severidades]}"
+  },
+  "items": {
+    "monitoreo": {
+      "tipo": "tratamiento", "nombre": "Sin intervención, reinspeccionar", "nombre_en": "Do nothing / monitor",
+      "nivel": "Mantenimiento preventivo", "unidad": "global",
+      "equipo": [], "vida_util_anios": 1, "pci_resultante": { "tipo": "suma", "valor": 0 },
+      "previos": ["sellado_grietas", "parcheo_profundidad_parcial", "parcheo_profundidad_total", "parcheo_superficial", "fresado_local", "arenado_exudacion", "relleno_roderas", "nivelacion_hombros"],
+      "adicionales": [], "adicionales_rural": []
+    },
+    "sellado_grietas": {
+      "tipo": "ambos", "nombre": "Sellado y relleno de grietas", "nombre_en": "Crack sealing / crack filling",
+      "nivel": "Mantenimiento preventivo", "unidad": "m",
+      "equipo": ["Compresor o lanza de aire caliente (limpieza)", "Fundidor-aplicador de sellante", "Ruteadora (opcional)"],
+      "vida_util_anios": 3, "pci_resultante": { "tipo": "suma", "valor": 3 },
+      "previos": ["parcheo_profundidad_parcial", "parcheo_profundidad_total", "parcheo_superficial", "fresado_local", "arenado_exudacion", "relleno_roderas", "nivelacion_hombros"],
+      "adicionales": [], "adicionales_rural": [],
+      "nota": "Grietas L (< 10 mm) y M (10–75 mm). Las H (> 75 mm) no se sellan: se parchean."
+    },
+    "fog_seal": {
+      "tipo": "tratamiento", "nombre": "Riego de niebla (emulsión diluida)", "nombre_en": "Fog seal",
+      "nivel": "Mantenimiento preventivo", "unidad": "m2",
+      "equipo": ["Distribuidor de asfalto", "Barredora"],
+      "vida_util_anios": 2, "pci_resultante": { "tipo": "suma", "valor": 4 },
+      "trafico_max": "medio",
+      "no_aplicar_si": { "2": ["M", "H"] },
+      "previos": ["sellado_grietas", "parcheo_profundidad_parcial", "parcheo_profundidad_total", "parcheo_superficial", "fresado_local", "relleno_roderas", "nivelacion_hombros"],
+      "adicionales": ["limpieza_superficie"], "adicionales_rural": [],
+      "nota": "Reduce la fricción unas horas o días: cerrar o controlar el tránsito."
+    },
+    "rejuvenecedor": {
+      "tipo": "tratamiento", "nombre": "Rejuvenecedor", "nombre_en": "Rejuvenator",
+      "nivel": "Mantenimiento preventivo", "unidad": "m2",
+      "equipo": ["Distribuidor de asfalto", "Barredora"],
+      "vida_util_anios": 3, "pci_resultante": { "tipo": "suma", "valor": 5 },
+      "trafico_max": "medio",
+      "no_aplicar_si": { "2": ["L", "M", "H"] },
+      "previos": ["sellado_grietas", "parcheo_profundidad_parcial", "parcheo_profundidad_total", "parcheo_superficial", "fresado_local", "relleno_roderas", "nivelacion_hombros"],
+      "adicionales": ["limpieza_superficie"], "adicionales_rural": []
+    },
+    "sand_seal": {
+      "tipo": "tratamiento", "nombre": "Sello de arena", "nombre_en": "Sand seal",
+      "nivel": "Mantenimiento preventivo", "unidad": "m2",
+      "equipo": ["Distribuidor de asfalto", "Esparcidora de agregado", "Rodillo neumático", "Barredora"],
+      "vida_util_anios": 3, "pci_resultante": { "tipo": "suma", "valor": 6 },
+      "trafico_max": "bajo",
+      "previos": ["sellado_grietas", "parcheo_profundidad_parcial", "parcheo_profundidad_total", "parcheo_superficial", "fresado_local", "arenado_exudacion", "relleno_roderas", "nivelacion_hombros"],
+      "adicionales": ["limpieza_superficie"], "adicionales_rural": []
+    },
+    "chip_seal": {
+      "tipo": "tratamiento", "nombre": "Tratamiento superficial con gravilla", "nombre_en": "Chip seal",
+      "nivel": "Mantenimiento preventivo", "unidad": "m2",
+      "equipo": ["Distribuidor de asfalto", "Esparcidora de agregado", "Rodillo neumático", "Barredora"],
+      "vida_util_anios": 6, "pci_resultante": { "tipo": "suma", "valor": 10 },
+      "trafico_max": "medio",
+      "no_aplicar_si": { "2": ["M", "H"] },
+      "previos": ["sellado_grietas", "parcheo_profundidad_parcial", "parcheo_profundidad_total", "parcheo_superficial", "fresado_local", "relleno_roderas", "nivelacion_hombros"],
+      "adicionales": ["limpieza_superficie"], "adicionales_rural": [],
+      "nota": "En vía urbana el agregado suelto molesta a peatones y daña vehículos: barrer a las 24–48 h."
+    },
+    "slurry_seal": {
+      "tipo": "tratamiento", "nombre": "Lechada asfáltica", "nombre_en": "Slurry seal",
+      "nivel": "Mantenimiento preventivo", "unidad": "m2",
+      "equipo": ["Mezcladora-extendedora de lechada", "Barredora"],
+      "vida_util_anios": 4, "pci_resultante": { "tipo": "suma", "valor": 8 },
+      "trafico_max": "medio",
+      "no_aplicar_si": { "15": ["M", "H"] },
+      "previos": ["sellado_grietas", "parcheo_profundidad_parcial", "parcheo_profundidad_total", "parcheo_superficial", "fresado_local", "arenado_exudacion", "relleno_roderas", "nivelacion_hombros"],
+      "adicionales": ["limpieza_superficie"], "adicionales_rural": []
+    },
+    "micropavimento": {
+      "tipo": "tratamiento", "nombre": "Micropavimento", "nombre_en": "Micro-surfacing",
+      "nivel": "Mantenimiento preventivo", "unidad": "m2",
+      "equipo": ["Mezcladora-extendedora de micropavimento", "Caja de relleno de roderas (opcional)", "Barredora"],
+      "vida_util_anios": 6, "pci_resultante": { "tipo": "suma", "valor": 12 },
+      "trafico_max": "alto",
+      "previos": ["sellado_grietas", "parcheo_profundidad_parcial", "parcheo_profundidad_total", "parcheo_superficial", "fresado_local", "arenado_exudacion", "nivelacion_hombros"],
+      "adicionales": ["limpieza_superficie"], "adicionales_rural": [],
+      "nota": "Rellena roderas de hasta ~25 mm con caja de relleno: absorbe el relleno de roderas."
+    },
+    "thin_overlay": {
+      "tipo": "tratamiento", "nombre": "Sobrecapa delgada (≤ 40 mm)", "nombre_en": "Thin overlay",
+      "nivel": "Rehabilitación menor", "unidad": "m2",
+      "equipo": ["Planta de mezcla en caliente (o proveedor)", "Pavimentadora", "Rodillo liso", "Rodillo neumático", "Distribuidor de asfalto (riego de liga)"],
+      "vida_util_anios": 8, "pci_resultante": { "tipo": "fijo", "valor": 95 },
+      "requiere_bordillo_min_cm": 7.6,
+      "previos": ["sellado_grietas", "parcheo_profundidad_parcial", "parcheo_profundidad_total", "parcheo_superficial", "fresado_local", "arenado_exudacion", "relleno_roderas", "nivelacion_hombros"],
+      "adicionales": ["limpieza_superficie", "riego_liga"], "adicionales_rural": ["conformacion_hombros"],
+      "fuente": "MS-16 4.ª ed. 2009, Tabla 1.1 p. 14 (PCI 50–70 con bordillo > 3 in)"
+    },
+    "mill_and_replace": {
+      "tipo": "tratamiento", "nombre": "Fresado y reposición", "nombre_en": "Mill and replace (mill and inlay)",
+      "nivel": "Rehabilitación menor", "unidad": "m2",
+      "equipo": ["Fresadora", "Planta de mezcla en caliente (o proveedor)", "Pavimentadora", "Rodillo liso", "Rodillo neumático", "Distribuidor de asfalto (riego de liga)", "Volquetes"],
+      "vida_util_anios": 10, "pci_resultante": { "tipo": "fijo", "valor": 95 },
+      "previos": ["parcheo_profundidad_total", "nivelacion_hombros"],
+      "adicionales": ["riego_liga"], "adicionales_rural": [],
+      "fuente": "MS-16 4.ª ed. 2009, Tabla 1.1 p. 14 (PCI 50–70 con bordillo < 3 in)"
+    },
+    "sobrecapa_estructural": {
+      "tipo": "tratamiento", "nombre": "Sobrecapa estructural", "nombre_en": "Structural overlay",
+      "nivel": "Rehabilitación mayor", "unidad": "m2",
+      "equipo": ["Planta de mezcla en caliente (o proveedor)", "Pavimentadora", "Rodillo liso", "Rodillo neumático", "Distribuidor de asfalto (riego de liga)"],
+      "vida_util_anios": 12, "pci_resultante": { "tipo": "fijo", "valor": 98 },
+      "requiere_bordillo_min_cm": 7.6,
+      "previos": ["sellado_grietas", "parcheo_profundidad_parcial", "parcheo_profundidad_total", "parcheo_superficial", "fresado_local", "relleno_roderas", "nivelacion_hombros"],
+      "adicionales": ["limpieza_superficie", "riego_liga"], "adicionales_rural": ["conformacion_hombros"],
+      "fuente": "MS-16 4.ª ed. 2009, Tabla 1.1 p. 14 (PCI < 50); espesor según MS-17"
+    },
+    "fresado_sobrecapa_estructural": {
+      "tipo": "tratamiento", "nombre": "Fresado y sobrecapa estructural", "nombre_en": "Mill and structural overlay",
+      "nivel": "Rehabilitación mayor", "unidad": "m2",
+      "equipo": ["Fresadora", "Planta de mezcla en caliente (o proveedor)", "Pavimentadora", "Rodillo liso", "Rodillo neumático", "Distribuidor de asfalto (riego de liga)", "Volquetes"],
+      "vida_util_anios": 12, "pci_resultante": { "tipo": "fijo", "valor": 98 },
+      "previos": ["parcheo_profundidad_total", "nivelacion_hombros"],
+      "adicionales": ["riego_liga"], "adicionales_rural": ["conformacion_hombros"],
+      "fuente": "Regla del agente: estructural donde el bordillo no deja subir la rasante; espesor según MS-17"
+    },
+    "fdr": {
+      "tipo": "tratamiento", "nombre": "Recuperación a profundidad total", "nombre_en": "Full-depth reclamation (FDR)",
+      "nivel": "Rehabilitación mayor", "unidad": "m2",
+      "equipo": ["Recicladora-estabilizadora", "Distribuidor de cemento o emulsión", "Motoniveladora", "Rodillo pata de cabra", "Rodillo liso", "Pavimentadora"],
+      "vida_util_anios": 15, "pci_resultante": { "tipo": "fijo", "valor": 100 },
+      "previos": ["nivelacion_hombros"],
+      "adicionales": [], "adicionales_rural": ["conformacion_hombros"],
+      "fuente": "Haas 2015, Tabla 17.1 (por verificar); diseño según MS-4 / MS-22"
+    },
+    "reconstruccion": {
+      "tipo": "tratamiento", "nombre": "Reconstrucción completa", "nombre_en": "Full reconstruction",
+      "nivel": "Reconstrucción", "unidad": "m2",
+      "equipo": ["Excavadora", "Volquetes", "Motoniveladora", "Rodillos", "Planta de mezcla en caliente (o proveedor)", "Pavimentadora"],
+      "vida_util_anios": 20, "pci_resultante": { "tipo": "fijo", "valor": 100 },
+      "previos": [],
+      "adicionales": [], "adicionales_rural": ["conformacion_hombros"],
+      "fuente": "Fuera del alcance del MS-16; diseño según MS-4 y MS-22"
+    },
+    "limpieza_superficie": {
+      "tipo": "actividad", "nombre": "Barrido y limpieza de la superficie", "nombre_en": "Surface cleaning", "unidad": "m2",
+      "equipo": ["Barredora o compresor"]
+    },
+    "riego_liga": {
+      "tipo": "actividad", "nombre": "Riego de liga", "nombre_en": "Tack coat", "unidad": "m2",
+      "equipo": ["Distribuidor de asfalto"]
+    },
+    "parcheo_profundidad_parcial": {
+      "tipo": "actividad", "nombre": "Parcheo a profundidad parcial", "nombre_en": "Partial-depth patching", "unidad": "m2",
+      "equipo": ["Cortadora o fresadora pequeña", "Compactador de placa o rodillo pequeño", "Mezcla en caliente o en frío"]
+    },
+    "parcheo_profundidad_total": {
+      "tipo": "actividad", "nombre": "Parcheo a profundidad total", "nombre_en": "Full-depth patching", "unidad": "m2",
+      "equipo": ["Cortadora", "Retroexcavadora o equipo de excavación", "Compactador", "Mezcla en caliente"]
+    },
+    "parcheo_superficial": {
+      "tipo": "actividad", "nombre": "Parcheo superficial / nivelación de depresiones", "nombre_en": "Skin patching / leveling", "unidad": "m2",
+      "equipo": ["Rodillo pequeño", "Mezcla en caliente"]
+    },
+    "fresado_local": {
+      "tipo": "actividad", "nombre": "Fresado localizado y reposición", "nombre_en": "Spot milling", "unidad": "m2",
+      "equipo": ["Fresadora", "Rodillo pequeño", "Mezcla en caliente"]
+    },
+    "arenado_exudacion": {
+      "tipo": "actividad", "nombre": "Arenado de la exudación", "nombre_en": "Sanding of bleeding areas", "unidad": "m2",
+      "equipo": ["Esparcidora de arena", "Rodillo neumático"]
+    },
+    "relleno_roderas": {
+      "tipo": "actividad", "nombre": "Relleno de roderas", "nombre_en": "Rut filling", "unidad": "m2",
+      "equipo": ["Mezcladora de micropavimento con caja de roderas, o pavimentadora"]
+    },
+    "nivelacion_hombros": {
+      "tipo": "actividad", "nombre": "Nivelación de hombros (desnivel carril/berma)", "nombre_en": "Shoulder leveling", "unidad": "m",
+      "equipo": ["Motoniveladora", "Compactador", "Material granular"]
+    },
+    "conformacion_hombros": {
+      "tipo": "actividad", "nombre": "Conformación de hombros tras subir la rasante", "nombre_en": "Shoulder build-up", "unidad": "m",
+      "equipo": ["Motoniveladora", "Compactador", "Material granular"]
+    }
+  }
+}

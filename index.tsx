@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { HashRouter as Router } from 'react-router-dom';
 import { App } from './App';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -16,7 +17,9 @@ root.render(
     <ThemeProvider>
       <LanguageProvider>
         <AuthProvider>
-          <App />
+          <Router>
+            <App />
+          </Router>
         </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>
