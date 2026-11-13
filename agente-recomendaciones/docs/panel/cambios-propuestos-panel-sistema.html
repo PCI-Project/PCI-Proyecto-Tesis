@@ -1,0 +1,139 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Cambios propuestos</title><style>
+*{box-sizing:border-box}
+body{font:9.8pt/1.45 "Segoe UI",Arial,sans-serif;color:#1c2833;margin:0}
+h1{font-size:20pt;margin:0 0 2pt;color:#0f3d5e}
+h2{font-size:13.5pt;color:#0f3d5e;border-bottom:2px solid #0f3d5e;padding-bottom:2pt;margin:18pt 0 6pt;break-after:avoid}
+h3{font-size:11pt;color:#16507a;margin:12pt 0 3pt;break-after:avoid}
+p{margin:4pt 0}
+.sub{color:#5b6b78;font-size:10pt;margin-bottom:10pt}
+table{border-collapse:collapse;width:100%;margin:5pt 0 8pt;font-size:8.7pt}
+tr{break-inside:avoid}
+th{background:#0f3d5e;color:#fff;text-align:left;padding:3.5pt 5pt;font-weight:600}
+td{border:1px solid #cfd8df;padding:3.5pt 5pt;vertical-align:top}
+tbody tr:nth-child(even) td{background:#f4f8fb}
+.warn{background:#fff6e5;border-left:3px solid #d99000;padding:5pt 8pt;margin:6pt 0;font-size:9.2pt}
+.ok{background:#eaf6ee;border-left:3px solid #2e8b57;padding:5pt 8pt;margin:6pt 0;font-size:9.2pt}
+.info{background:#eaf2fa;border-left:3px solid #16507a;padding:5pt 8pt;margin:6pt 0;font-size:9.2pt}
+.q{background:#f4f4f1;border:1px solid #d9d9d2;padding:5pt 9pt;margin:5pt 0;font:9pt Consolas,monospace;white-space:pre-wrap}
+code{font:8.4pt Consolas,monospace;background:#eef3f7;padding:0 2pt;border-radius:2pt}
+.tag{display:inline-block;padding:0 5pt;border-radius:8pt;font-size:7.8pt;font-weight:600;color:#fff;white-space:nowrap}
+.v{background:#2e8b57}.n{background:#d99000}.s{background:#7a4fa3}.a{background:#c0392b}.b{background:#16507a}
+ul{margin:3pt 0 3pt 14pt;padding:0} li{margin:1.5pt 0}
+ol{margin:3pt 0 3pt 16pt;padding:0} ol li{margin:2pt 0}
+.pb{break-before:page}
+</style></head><body>
+<h1>Cambios propuestos para el panel y el sistema</h1>
+<div class="sub">AsphaltPCI Pro · Agente de recomendaciones · Notas para implementar · 2026-11-05 · actualizado 2026-11-07</div>
+
+<div class="info"><b>Estado.</b> C1, C2 y C3 ya están aplicados en el motor y en el panel (2026-11-07). Todo lo demás sigue siendo una lista: no está aplicado en el código. Las fuentes de Panamá salen de búsquedas en la web y de la base de costos de la Contraloría, que sí leí. Lo que viene de NotebookLM (MS-16, MS-17, Haas) está marcado «Según NotebookLM» y sus páginas hay que confirmarlas en tu copia.</div>
+
+<h2>Resumen</h2>
+<table class="wide"><thead><tr><th>#</th><th>Cambio</th><th>Prioridad</th><th>Esfuerzo</th><th>Dónde toca</th></tr></thead><tbody><tr><td>C1</td><td><b>Hecho (2026-11-07).</b> Modo «solo diagnóstico patológico»: sin presupuesto ni costos, con las intervenciones que se deberían hacer</td><td><span class="tag a">Alta</span></td><td>Medio</td><td>Panel (selector), motor, informe</td></tr><tr><td>C2</td><td><b>Hecho (2026-11-07).</b> Recomendaciones solo si se evalúa el 100 % de las muestras generadas; si no, aviso de «función no disponible» y explicación en el detalle</td><td><span class="tag a">Alta</span></td><td>Medio</td><td>Panel, validación del servicio</td></tr><tr><td>C3</td><td><b>Hecho (2026-11-07).</b> Un solo tramo: sin ranking de prioridad ni comparación de modos (el B/C del tramo se muestra solo como dato; ver C11)</td><td><span class="tag a">Alta</span></td><td>Bajo</td><td>Panel, informe</td></tr><tr><td>C4</td><td>Preguntar si hay hombro (lado, tipo, ancho, desnivel, drenaje) y usarlo en el cálculo</td><td><span class="tag a">Alta</span></td><td>Medio</td><td>Panel, esquema, motor</td></tr><tr><td>C5</td><td>Curva de deterioro: declarar su origen, calibrarla con dos inspecciones y elegir curva por familia</td><td><span class="tag n">Media</span></td><td>Medio</td><td>Motor, informe</td></tr><tr><td>C6</td><td>Varios tipos de informe: ejecutivo, técnico, patológico, ficha por tramo, comparativo</td><td><span class="tag n">Media</span></td><td>Alto</td><td>Informe, plantillas</td></tr><tr><td>C7</td><td>Costos unitarios de Panamá (Contraloría) como tabla inicial</td><td><span class="tag a">Alta</span></td><td>Bajo</td><td>Catálogo de costos</td></tr><tr><td>C8</td><td>Perfil «Panamá» de soluciones disponibles según lo que se usa en el país</td><td><span class="tag n">Media</span></td><td>Bajo</td><td>Catálogo de tratamientos</td></tr><tr><td>C9</td><td>Marco normativo panameño en las referencias del informe</td><td><span class="tag v">Baja</span></td><td>Bajo</td><td>Informe, bibliografía</td></tr><tr><td>C10</td><td>Usar el MS-17: deflexión opcional, fresado por rasante, agrietamiento reflejo, espesor mínimo</td><td><span class="tag n">Media</span></td><td>Medio</td><td>Motor, alertas</td></tr><tr><td>C11</td><td>Historial de inspecciones: el costo-beneficio solo con más de un tramo y más de una evaluación del mismo tramo; cargar 2.ª y 3.ª evaluación para armar curvas de deterioro</td><td><span class="tag a">Alta</span></td><td>Alto</td><td>Panel, esquema, motor</td></tr></tbody></table>
+
+<h2>C1. Modo «solo diagnóstico patológico»</h2>
+<p><b>Qué es.</b> Un modo de trabajo donde el inspector no ingresa presupuesto ni costos. El agente entrega el diagnóstico (PCI, nivel, fallas dominantes, causa probable) y la intervención que corresponde a cada tramo con sus <b>cantidades físicas</b> (m², m, unidades), pero sin dinero.</p>
+<ul>
+<li><b>En el panel:</b> selector «Modo de análisis» al inicio del paso 5: <i>Completo (con presupuesto)</i> o <i>Solo diagnóstico</i>. En diagnóstico se ocultan las pantallas de costos y presupuesto.</li>
+<li><b>En el motor:</b> se omiten los costos, el beneficio, la relación B/C, la prioridad y la reserva de seguridad. Se conservan las alertas, los filtros de tratamiento, los trabajos previos y las cantidades.</li>
+<li><b>Orden de tramos (decidido por Dk):</b> los tramos se listan en el <b>orden de inspección</b>. Sin curvas de deterioro ni costo-beneficio el agente no sugiere prioridades ni dice cuál va primero. Solo existe, como filtro que elige el usuario, «ordenar de peor a mejor PCI»; por defecto no se aplica.</li>
+<li><b>Informe:</b> es el <i>informe patológico</i> del punto C6.</li>
+</ul>
+
+<h2>C2. Recomendaciones solo con el 100 % de las muestras</h2>
+<p><b>Regla.</b> Las recomendaciones de intervención solo se habilitan cuando el inspector evaluó <b>el 100 % de las muestras generadas</b> por el plan de muestreo del panel (aleatorias y adicionales).</p>
+<ul>
+<li><b>Hoy:</b> si faltan muestras, el motor extrapola y solo avisa con <code>MUESTREO_INSUFICIENTE</code> (ASTM D6433, 95 % de confianza). La regla nueva es más estricta: bloquea las recomendaciones.</li>
+<li><b>Qué se bloquea:</b> tratamiento, trabajos previos, costos, B/C y prioridad. <b>Qué sigue disponible:</b> PCI de lo evaluado, nivel preliminar y fallas.</li>
+<li><b>Aviso sugerido en pantalla:</b> «Recomendaciones no disponibles para este tramo: evaluaste X de Y muestras. Completa las Y muestras generadas para activarlas.»</li>
+<li><b>Aviso sugerido en el panel de detalle:</b> «Para activar las recomendaciones de intervención debes evaluar el 100 % de las muestras del tramo. Mientras no lo hagas, el panel solo muestra el diagnóstico.» Con un botón «Ver muestras pendientes».</li>
+<li><b>Servicio:</b> el servicio debe rechazar la petición con un código claro (por ejemplo <code>COBERTURA_INCOMPLETA</code>) aunque el panel falle, para que la regla no dependa de la pantalla.</li>
+</ul>
+<div class="warn"><b>Confirmado por Dk:</b> «100 %» son <b>todas las unidades de muestra generadas por el plan de muestreo</b> del panel (no un censo de todas las unidades del tramo).</div>
+
+<h2>C3. Un solo tramo</h2>
+<ul>
+<li>Con <b>un solo tramo</b> no hay red: se oculta la matriz de beneficio/costo, el ranking, la reserva de seguridad entre tramos y la comparación de los dos modos de prioridad.</li>
+<li>Se conservan el diagnóstico, la recomendación, las cantidades y, en modo completo, el costo del tramo y su relación B/C individual (como dato, no como ranking).</li>
+<li>El informe cambia de «red» a «tramo»: «PCI de red» pasa a «PCI del tramo».</li>
+<li>Con dos o más tramos todo sigue como hoy.</li>
+</ul>
+
+<h2>C4. Hombro</h2>
+<p>El catálogo ya tiene las actividades <i>nivelación de hombros</i> y <i>conformación de hombros</i>, pero el panel <b>no pregunta</b> si hay hombro. El motor supone dos en entorno rural. Preguntas y efecto:</p>
+<table class="wide"><thead><tr><th>Pregunta en el panel</th><th>Opciones</th><th>Efecto en el agente</th></tr></thead><tbody><tr><td>¿Tiene hombro?</td><td>Sí / No, por lado (izquierdo, derecho)</td><td>Sin hombro no se generan partidas de nivelación ni conformación. Hoy el motor supone dos hombros en entorno rural (<code>adicionales_rural</code>, «Ambos hombros», 2 × longitud).</td></tr><tr><td>Tipo</td><td>Pavimentado (asfalto o concreto) / granular o de tierra / cordón-cuneta (urbano)</td><td>Hombro granular y grietas de borde: causa raíz por falta de soporte lateral; reparar el hombro antes de sellar (MS-16, p. 33, según NotebookLM).</td></tr><tr><td>Ancho (m)</td><td>Número</td><td>Cantidad de la partida de conformación y costo.</td></tr><tr><td>Desnivel carril–hombro</td><td>Menor de 25 / 25 a 50 / 50 a 100 / mayor de 100 mm</td><td>Severidad baja, media o alta de la falla «Lane/Shoulder drop-off» (ASTM D6433, ver apéndice X1); activa nivelación o reconstrucción del hombro.</td></tr><tr><td>Estado y drenaje</td><td>Bueno, regular, malo; encharcamiento o vegetación</td><td>Alerta de drenaje inminente (<code>DRENAJE_MALO</code>) y, si se prevé sobrecapa, conformar el hombro a la nueva rasante (MS-17, p. 15-2).</td></tr><tr><td>¿Se desea pavimentar el hombro?</td><td>Sí / No</td><td>Opción de mejora: alarga la vida del carril y reduce la infiltración (MS-17, p. 15-2).</td></tr></tbody></table>
+
+<h2>C5. Curva de deterioro</h2>
+<h3>De dónde salió nuestra curva</h3>
+<p>La forma <code>PCI(t) = 100 − α·t<sup>β</sup></code> con β = 1,5 y 20 años por defecto <b>no viene de ninguna norma</b>: la eligió el diseño del agente por sencillez, porque un β mayor que 1 hace que el deterioro se acelere con la edad. Está marcada como «supuesto» en el catálogo. El MS-16 respalda el concepto (modelos de comportamiento y beneficio como área bajo la curva), no la fórmula ni los valores.</p>
+<h3>Qué dice la literatura <span class="tag b">Según NotebookLM</span></h3>
+<ul>
+<li><b>Haas, Hudson y Falls (2015), Cap. 15, pp. 151 a 158:</b> los modelos de deterioro se agrupan en determinísticos (regresión empírica), probabilísticos (cadenas de Markov) y mecanístico-empíricos.</li>
+<li><b>Forma auto-adaptativa</b> (Sec. 15.2.1.2, p. 157): P = P₀ ± e<sup>(a + b·c<sup>t</sup>)</sup>, con t = ln(1/edad). Según los coeficientes, la curva sale cóncava, convexa o sigmoidal. Para una falla individual, D = e<sup>−(edad/k)<sup>b</sup></sup>.</li>
+<li><b>Curvas de familia</b> (p. 153): se agrupan tramos con la misma estructura, espesor, tránsito y clima, y se usa una curva promedio.</li>
+<li><b>Sin histórico</b> (pp. 153, 329 y 330): el sistema asigna una curva por defecto o de familia, y la va ajustando con cada auscultación nueva (p. 157). Se recomienda reinspeccionar cada 2 o 3 años.</li>
+</ul>
+<h3>Cambios propuestos</h3>
+<ol>
+<li><b>Decirlo en el informe:</b> cada tramo indica si su curva es <i>calibrada</i>, <i>por edad</i> o <i>por defecto (supuesto)</i>. Hoy solo se registra un supuesto.</li>
+<li><b>Calibrar con dos inspecciones:</b> con dos fechas de PCI en el mismo tramo, ajustar α (y opcionalmente β) en vez de usar la edad. Hoy no está implementado.</li>
+<li><b>Curva por familia editable:</b> el inspector elige entre familias (tránsito, clima, tipo de estructura) con años hasta PCI 40 distintos, en lugar de un único valor de 20 años.</li>
+<li><b>Advertir con pocos datos:</b> con un solo punto, el beneficio y la relación B/C se muestran con la etiqueta «curva por defecto».</li>
+<li><b>Vida útil por tratamiento</b> de la tabla siguiente como base del «PCI después» (hoy es un supuesto sin fuente). Cifras de Haas (Tabla 17.1) según NotebookLM; hay que abrirla antes de citarla.</li>
+</ol>
+<table class="wide"><thead><tr><th>Tratamiento</th><th>Vida útil esperada</th><th>Observación</th></tr></thead><tbody><tr><td>Sello de gravilla (chip seal)</td><td>hasta 7 años</td><td>Funcional; no aporta estructura.</td></tr><tr><td>Micropavimento</td><td>5 años</td><td>Rellena huellas; solo con estructura sana.</td></tr><tr><td>Sobrecapa fina (≤ 40 mm)</td><td>hasta 10 a 15 años</td><td>PCI cercano a 100.</td></tr><tr><td>Fresado y reposición</td><td>hasta 15 años</td><td>Corrige perfil y rugosidad.</td></tr><tr><td>Reciclado en caliente en sitio</td><td>hasta 8 años</td><td>Capa superior oxidada.</td></tr><tr><td>Sobrecapa estructural (&gt; 40 mm)</td><td>10 a 20 años</td><td>Reinicia la curva.</td></tr><tr><td>Sellado de grietas</td><td>3 a 8 años</td><td>Frena la caída del PCI; no lo sube.</td></tr><tr><td>Sello de niebla</td><td>1 a 3 años</td><td>Rejuvenece la película.</td></tr></tbody></table>
+
+<h2>C6. Tipos de informe</h2>
+<table class="wide"><thead><tr><th>Informe</th><th>Para quién</th><th>Contenido</th><th>Extensión</th></tr></thead><tbody><tr><td><b>Ejecutivo</b></td><td>Alcalde, gerente, decisor</td><td>PCI de red, semáforo por tramo (A, B, C), alertas críticas, costo total, qué se financia y qué se difiere, tres decisiones requeridas.</td><td>1 a 2 págs.</td></tr><tr><td><b>Técnico completo</b> (el actual)</td><td>Ingeniero revisor, tesis</td><td>Cálculos, supuestos, matrices, fuentes, alertas, costos y bibliografía.</td><td>10 a 15 págs.</td></tr><tr><td><b>Patológico</b> (sin presupuesto)</td><td>Inspector, auditor</td><td>Fallas, severidades, causa probable, nivel, intervención que corresponde y cantidades físicas. Sin dinero.</td><td>4 a 8 págs.</td></tr><tr><td><b>Ficha por tramo</b></td><td>Cuadrilla, contratista</td><td>Una página por tramo: actividades, cantidades, materiales, restricciones (bordillo, hombro, drenaje).</td><td>1 pág. por tramo</td></tr><tr><td><b>Comparativo de escenarios</b></td><td>Quien decide el presupuesto</td><td>Modo «mayor beneficio por dólar» frente a «peor primero» con presupuestos distintos.</td><td>2 a 3 págs.</td></tr><tr><td><b>Anexo de trazabilidad</b></td><td>Jurado de tesis</td><td>Cada regla con su fuente y su estado: verificado, por verificar, supuesto.</td><td>2 a 3 págs.</td></tr></tbody></table>
+<p><b>Mi recomendación:</b> empezar por el <i>ejecutivo</i> y el <i>patológico</i>. El primero se arma con datos que el motor ya calcula; el segundo es el que necesita el modo C1. Los demás pueden esperar.</p>
+
+<h2>C7. Costos unitarios en Panamá</h2>
+<p><b>Fuente.</b> Contraloría General de la República, Dirección Nacional de Ingeniería, <i>Base de costos directos para proyectos, versión 11, carreteras</i> (archivo <code>2324P4-CARRETERAS.pdf</code>, «proyectos de Chiriquí y Colón»). Salarios de julio 2023 a junio 2024; actualizada el 12 de enero de 2024; 312 páginas. Homologada con el MOP, con rendimientos laborales de la convención colectiva CAPAC–SUNTRACS 2022–2025. <span class="tag v">Verificado</span> (leí el PDF).</p>
+<div class="warn"><b>Límites.</b> (1) Son <b>costos directos</b>: no incluyen gastos generales, utilidad ni impuestos. (2) El propio documento dice que aplican a proyectos de inversión pública. (3) Es la edición de Chiriquí y Colón; falta buscar la de <b>Veraguas</b> y confirmar si hay una versión posterior a la V11. (4) Los valores marcados «cálculo mío» no están en el documento.</div>
+<h3>Rubros útiles</h3>
+<table class="wide"><thead><tr><th>Rubro (Contraloría, carreteras V11)</th><th>Unidad</th><th>Costo directo (USD)</th><th>Página</th></tr></thead><tbody><tr><td>Hormigón asfáltico caliente (incluye RC-250 de liga, mezcla de 2,4 t/m³ y colocación)</td><td>t</td><td>133,22</td><td>96</td></tr><tr><td>Riego de imprimación</td><td>m²</td><td>2,24</td><td>95</td></tr><tr><td>Primer sello (tratamiento superficial)</td><td>m²</td><td>2,45</td><td>97</td></tr><tr><td>Segundo sello</td><td>m²</td><td>2,36</td><td>98</td></tr><tr><td>Tercer sello</td><td>m²</td><td>2,64</td><td>99</td></tr><tr><td>Sello de refuerzo</td><td>m²</td><td>3,40</td><td>100</td></tr><tr><td>Perfilado en frío de carpeta, 5 cm</td><td>m²</td><td>1,66</td><td>13</td></tr><tr><td>Perfilado en frío de carpeta, 10 cm</td><td>m²</td><td>3,35</td><td>13</td></tr><tr><td>Perfilado en frío de carpeta, 15 cm</td><td>m²</td><td>4,18</td><td>13</td></tr><tr><td>Sello de grietas</td><td>m</td><td>2,53</td><td>13</td></tr><tr><td>Parcheo profundo con mezcla asfáltica caliente</td><td>m²</td><td>71,13</td><td>12</td></tr><tr><td>Parcheo superficial con mezcla asfáltica caliente</td><td>m²</td><td>61,75</td><td>13</td></tr><tr><td>Remoción de pavimento de hormigón asfáltico</td><td>m²</td><td>8,01</td><td>4</td></tr><tr><td>Restauración de calzada tipo A / B / C con sello simple</td><td>m²</td><td>7,43 / 14,05 / 20,09</td><td>12</td></tr><tr><td>Restauración de calzada tipo A / B / C con sello doble</td><td>m²</td><td>9,79 / 16,41 / 22,45</td><td>12</td></tr></tbody></table>
+<h3>Comparación con el catálogo de ejemplo</h3>
+<table class="wide"><thead><tr><th>Partida del catálogo</th><th>Valor de ejemplo</th><th>Valor Contraloría</th><th>Comentario</th></tr></thead><tbody><tr><td>Sellado de grietas (m)</td><td>2,50</td><td>2,53</td><td>Casi igual.</td></tr><tr><td>Parcheo a profundidad total (m²)</td><td>60,00</td><td>71,13</td><td>Subir.</td></tr><tr><td>Parcheo superficial (m²)</td><td>25,00</td><td>61,75</td><td>El de ejemplo está muy bajo.</td></tr><tr><td>Sobrecapa fina de 4 cm (m²)</td><td>12,00</td><td>12,79</td><td>Cálculo mío: 0,04 × 2,4 × 133,22.</td></tr><tr><td>Fresado y reposición de 5 cm (m²)</td><td>16,00</td><td>17,65</td><td>Cálculo mío: 1,66 + 15,99.</td></tr><tr><td>Sobrecapa estructural de 7,5 cm (m²)</td><td>22,00</td><td>23,98</td><td>Cálculo mío: 0,075 × 2,4 × 133,22.</td></tr><tr><td>Sello de gravilla (m²)</td><td>4,50</td><td>2,45</td><td>Primer sello; más 2,24 de imprimación solo sobre base nueva.</td></tr><tr><td>Sello de niebla, sello de arena, lechada, micropavimento, rejuvenecedor, recuperación a profundidad total</td><td>1,2 a 30</td><td>Sin rubro</td><td>No aparecen en la base. Hay que cotizar o aplicar un análisis propio.</td></tr><tr><td>Reconstrucción (m²)</td><td>65,00</td><td>Sin equivalente directo</td><td>La «restauración tipo C» (20,09) no incluye carpeta de mezcla en caliente.</td></tr><tr><td>Nivelación y conformación de hombros (m)</td><td>8 y 10</td><td>No encontrado</td><td>Falta rubro.</td></tr></tbody></table>
+<p><b>Cambio propuesto.</b> Cargar estos valores como la tabla inicial de «Costos unitarios», con la fuente y la fecha en cada línea, un factor editable de gastos generales y utilidad, y una marca «sin rubro oficial» donde falten. Así el informe deja de decir «ejemplo» en lo principal. Referencias de licitación (por ejemplo, la compra de mezcla asfáltica en caliente por UNOPS para la comarca Ngäbe Buglé, 2026) no publican precios en lo que pude leer; los precios adjudicados están en PanamaCompra.</p>
+
+<h2>C8. Soluciones más usadas en Panamá</h2>
+<table class="wide"><thead><tr><th>Solución</th><th>Evidencia encontrada</th><th>En el catálogo del agente</th></tr></thead><tbody><tr><td>Parcheo profundo y superficial con mezcla caliente</td><td>MOP: rehabilitación de 262 calles de la capital (más de 34 millones de USD, 2019); plan «tapa huecos»; licitación ENA de reparación de baches.</td><td>Sí (parcheo profundidad parcial, total y superficial).</td></tr><tr><td>Perfilado (fresado) de unos 3 in y reposición con mezcla caliente</td><td>Mismo proyecto de las 262 calles; rubros de perfilado de 5, 10 y 15 cm en la Contraloría.</td><td>Sí (fresado y reposición).</td></tr><tr><td>Reposición de losas de concreto con geomalla, material selecto y base</td><td>Mismo proyecto; vías de concreto en la ciudad.</td><td>No (solo pavimento flexible).</td></tr><tr><td>Tratamiento superficial (sello simple, doble o triple)</td><td>Rubros de primer, segundo y tercer sello y restauración tipo A, B, C en la Contraloría.</td><td>Parcial (chip seal).</td></tr><tr><td>Sello de grietas y de juntas</td><td>Rubro en la Contraloría; proyecto de las 262 calles; sello asfáltico caliente de clima tropical en el MOP.</td><td>Sí.</td></tr><tr><td>Rejuvenecedor asfáltico</td><td>Licitación ENA 008-22: reparación de baches y colocación de rejuvenecedor.</td><td>Sí.</td></tr><tr><td>Micropavimento, lechada, sello de niebla</td><td>No hallé evidencia local; los resultados de microcarpeta eran de Argentina.</td><td>Sí (estarían sin respaldo de costo).</td></tr></tbody></table>
+<p><b>Cambio propuesto.</b> Un <i>perfil «Panamá»</i> que marque como disponibles por defecto: sellado de grietas, parcheo, tratamiento superficial, rejuvenecedor, perfilado más mezcla caliente y sobrecapa. Micropavimento, lechada y reciclado quedan desactivados hasta que el inspector confirme que hay contratista y rubro. El inspector puede cambiar la selección, como hoy. <b>Validar con el MOP o un contratista:</b> mis fuentes son prensa, licitaciones y la base de costos, no un manual de prácticas.</p>
+
+<h2>C9. Marco normativo panameño</h2>
+<table class="wide"><thead><tr><th>Documento</th><th>Qué encontré</th><th>Estado</th></tr></thead><tbody><tr><td><b>Reglamento Estructural Panameño (REP-2014)</b></td><td>Es el reglamento de diseño estructural de edificaciones y obras. Una copia no oficial (Scribd) dice que su Capítulo 1 lo aplica en todo el territorio y que el diseño de obras de infraestructura y vialidad se rige por su Capítulo 14. Un artículo de octubre de 2026 informa que la UTP propone revisarlo tras un sismo.</td><td><span class="tag n">Por verificar</span></td></tr><tr><td><b>MOP: Especificaciones Técnicas Generales para la Construcción y Rehabilitación de Carreteras y Puentes</b></td><td>Es el marco que citan las licitaciones. Capítulo 24: carpetas de hormigón asfáltico (incluye asfalto modificado). Capítulo 23: riego de imprimación.</td><td><span class="tag n">Por verificar</span></td></tr><tr><td><b>MOP: Manual de requisitos y normas generales para la revisión de planos</b></td><td>Tiene una sección «Diseño de Pavimento» (alrededor de la p. 18) para calles de urbanizaciones. No pude abrirlo completo (el PDF es muy grande).</td><td><span class="tag n">Por verificar</span></td></tr><tr><td><b>Contraloría: base de costos directos de carreteras</b></td><td>Referencia oficial de costos para obra pública (ver C7).</td><td><span class="tag v">Verificado</span></td></tr></tbody></table>
+<div class="warn"><b>Lo que NO puedo afirmar.</b> No encontré texto del REP-2014 sobre evaluación ni mantenimiento de pavimentos, y no pude abrir su versión oficial. <b>No lo cites como respaldo de las recomendaciones</b> hasta leer su Capítulo 14. Para la parte técnica, el apoyo real es el MS-16, el MS-17, ASTM D6433 y las especificaciones del MOP; para costos, la Contraloría.</div>
+<p><b>Cómo puede ayudar en la tesis.</b> (1) Como marco legal de que el diseño de vialidad tiene norma panameña y que el agente <i>no diseña</i> espesores, solo orienta. (2) El MOP (capítulos 23 y 24) para decir con qué especificación se ejecutaría cada solución. (3) La JTIA y la SPIA para la responsabilidad profesional de quien firma el informe. <b>Pendiente:</b> pedir el REP-2014 oficial y el texto vigente de las especificaciones del MOP.</p>
+
+<h2>C10. Aprovechar el MS-17</h2>
+<p>Detalle en el <i>Informe del MS-17</i>. Resumen de lo que se añadiría:</p>
+<ul>
+<li><b>Deflexión opcional:</b> campo «deflexión representativa» por tramo; si existe, decidir «estructural» con ese criterio.</li>
+<li><b>Fresado por rasante:</b> con bordillo limitado, proponer «fresar y reponer» y avisar de tragantes, registros y cunetas.</li>
+<li><b>Agrietamiento reflejo:</b> alerta cuando hay mucha grieta y la solución es sobrecapa delgada.</li>
+<li><b>Espesor mínimo:</b> aviso de ≥ 3 × NMAS.</li>
+<li><b>ESAL de diseño:</b> calcularlo desde el conteo de camiones (Cap. 4) como alternativa a la clase de tránsito.</li>
+</ul>
+
+<h2>C11. Historial de inspecciones y regla del costo-beneficio</h2>
+<p><b>Regla pedida por Dk.</b> La relación beneficio/costo (B/C) y la prioridad por B/C solo se activan cuando hay <b>más de un tramo</b> y <b>más de una evaluación en el tiempo del mismo tramo</b>. Con ellas se construye la curva de deterioro de cada tramo, como indica la literatura (el PCI se ajusta contra la edad con al menos dos o tres puntos medidos).</p>
+<ul>
+<li><b>Cargar la 2.ª y 3.ª evaluación:</b> el panel necesita una forma de registrar, para un mismo tramo, evaluaciones de otras fechas (PCI y fecha; opcionalmente las fallas). Con dos puntos se calibra α y β de la curva del tramo; con tres se puede verificar el ajuste.</li>
+<li><b>Con una sola inspección:</b> se usa la curva por defecto del agente, con una alerta clara: la curva puede <b>subestimar o sobrestimar el deterioro</b> y, por tanto, los costos y el beneficio.</li>
+<li><b>Hoy (C3):</b> con un solo tramo el agente ya no emite ranking ni comparación de modos, pero sigue mostrando el costo y el B/C del tramo como dato, con la alerta <code>UN_SOLO_TRAMO</code>. Lo de esta sección no está implementado.</li>
+<li><b>Efecto en el esquema:</b> cada tramo trae una lista <code>evaluaciones[]</code> con fecha, PCI y, si existe, el detalle de fallas; el motor calibra la curva cuando hay dos o más.</li>
+</ul>
+<p><b>Por decidir:</b> con dos o más tramos pero una sola inspección cada uno, ¿se muestra el B/C con la advertencia de curva por defecto o se bloquea?</p>
+
+<h2>Preguntas abiertas</h2>
+<ol>
+<li><s>¿Qué es «100 %»?</s> Resuelta: todas las unidades generadas por el plan de muestreo (C2).</li>
+<li><s>¿Orden de tramos en modo diagnóstico?</s> Resuelta: orden de inspección, sin sugerir prioridades; solo un filtro opcional de peor a mejor PCI (C1).</li>
+<li>¿Quieres que el perfil «Panamá» venga activado por defecto o como opción?</li>
+<li>¿Dónde está el tramo de la tesis? Si es Veraguas, hay que buscar la base de la Contraloría de esa provincia.</li>
+<li>¿Tienes inspecciones de dos fechas de algún tramo para probar la calibración de la curva?</li>
+<li>Regla del B/C (C11): con dos o más tramos y una sola inspección cada uno, ¿mostrar el B/C con advertencia o bloquearlo?</li>
+</ol>
+
+<h2>Orden de implementación sugerido</h2>
+<table class="wide"><thead><tr><th>Etapa</th><th>Cambios</th><th>Por qué en ese orden</th></tr></thead><tbody><tr><td>1 (hecha)</td><td>C2, C3 y C1</td><td>Son reglas de decisión del panel y comparten pantallas. Cierran el comportamiento sin datos completos o con un solo tramo.</td></tr><tr><td>2</td><td>C7 y C8</td><td>Son solo datos del catálogo; quitan el «ejemplo» de los costos.</td></tr><tr><td>3</td><td>C4</td><td>Cambia el esquema de entrada y el motor; conviene tener estable la etapa 1.</td></tr><tr><td>4</td><td>C6 (ejecutivo y patológico) y C9</td><td>Dependen del modo diagnóstico y de los costos reales.</td></tr><tr><td>5</td><td>C5, C11 y C10</td><td>Mejoras del motor; la calibración y la regla del B/C necesitan datos de dos fechas por tramo.</td></tr></tbody></table>
+</body></html>

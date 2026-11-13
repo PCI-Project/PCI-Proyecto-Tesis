@@ -1,0 +1,312 @@
+{
+  "_fuente": "ASTM D6433-24, Apéndice X1 (definiciones, severidades y forma de medir). Los anchos y profundidades vienen de la norma; las reparaciones locales y los factores de conversión son reglas del agente, calibrables.",
+  "_campos": {
+    "unidad": "m2 = área, m = longitud, und = conteo (así lo mide ASTM D6433)",
+    "grupo": "familia usada para elegir el deterioro dominante en la franja A",
+    "estructural": "true si la falla indica daño de la estructura (cuenta para el % estructural de la franja C)",
+    "reparacion_local": "trabajo previo obligatorio por severidad: actividad, cómo se convierte la cantidad y si es de seguridad"
+  },
+  "fallas": {
+    "1": {
+      "nombre": "Piel de cocodrilo",
+      "nombre_en": "Alligator (fatigue) cracking",
+      "unidad": "m2",
+      "grupo": "estructural",
+      "estructural": true,
+      "severidad": {
+        "L": "Grietas finas, longitudinales y paralelas, pocas o ninguna interconectada; sin desprendimiento de bordes",
+        "M": "Patrón de bloques ya formado; bordes ligeramente desprendidos",
+        "H": "Bloques bien definidos, bordes desprendidos; algunos se mueven con el tránsito"
+      },
+      "reparacion_local": {
+        "M": { "actividad": "parcheo_profundidad_parcial", "conversion": "area", "seguridad": false },
+        "H": { "actividad": "parcheo_profundidad_total", "conversion": "area", "seguridad": true }
+      }
+    },
+    "2": {
+      "nombre": "Exudación",
+      "nombre_en": "Bleeding",
+      "unidad": "m2",
+      "grupo": "exudacion",
+      "estructural": false,
+      "severidad": {
+        "L": "Solo visible unos días al año; el asfalto no se pega a zapatos ni llantas",
+        "M": "El asfalto se pega a zapatos y llantas unas semanas al año",
+        "H": "El asfalto se pega a zapatos y llantas varias semanas al año"
+      },
+      "reparacion_local": {
+        "M": { "actividad": "arenado_exudacion", "conversion": "area", "seguridad": false },
+        "H": { "actividad": "arenado_exudacion", "conversion": "area", "seguridad": true }
+      },
+      "nota": "No aplicar fog seal ni rejuvenecedor sobre exudación."
+    },
+    "3": {
+      "nombre": "Grietas en bloque",
+      "nombre_en": "Block cracking",
+      "unidad": "m2",
+      "grupo": "grietas",
+      "estructural": false,
+      "severidad": {
+        "L": "Bloques definidos por grietas de baja severidad (sin sellar < 10 mm)",
+        "M": "Bloques definidos por grietas de severidad media (10 a 75 mm)",
+        "H": "Bloques definidos por grietas de alta severidad (> 75 mm o con desprendimiento)"
+      },
+      "reparacion_local": {
+        "L": { "actividad": "sellado_grietas", "conversion": "area_a_longitud_bloque", "seguridad": false },
+        "M": { "actividad": "sellado_grietas", "conversion": "area_a_longitud_bloque", "seguridad": false },
+        "H": { "actividad": "parcheo_profundidad_parcial", "conversion": "area", "seguridad": false }
+      }
+    },
+    "4": {
+      "nombre": "Abultamientos y hundimientos",
+      "nombre_en": "Bumps and sags",
+      "unidad": "m",
+      "grupo": "deformacion",
+      "estructural": false,
+      "severidad": {
+        "L": "Calidad de rodadura baja",
+        "M": "Calidad de rodadura media",
+        "H": "Calidad de rodadura alta (se debe reducir la velocidad)"
+      },
+      "reparacion_local": {
+        "M": { "actividad": "fresado_local", "conversion": "longitud_por_ancho_deformacion", "seguridad": false },
+        "H": { "actividad": "fresado_local", "conversion": "longitud_por_ancho_deformacion", "seguridad": true }
+      }
+    },
+    "5": {
+      "nombre": "Corrugación",
+      "nombre_en": "Corrugation",
+      "unidad": "m2",
+      "grupo": "deformacion",
+      "estructural": false,
+      "severidad": {
+        "L": "Calidad de rodadura baja",
+        "M": "Calidad de rodadura media",
+        "H": "Calidad de rodadura alta"
+      },
+      "reparacion_local": {
+        "M": { "actividad": "fresado_local", "conversion": "area", "seguridad": false },
+        "H": { "actividad": "fresado_local", "conversion": "area", "seguridad": true }
+      }
+    },
+    "6": {
+      "nombre": "Depresión",
+      "nombre_en": "Depression",
+      "unidad": "m2",
+      "grupo": "deformacion",
+      "estructural": false,
+      "severidad": {
+        "L": "13 a 25 mm de profundidad máxima",
+        "M": "25 a 50 mm",
+        "H": "Más de 50 mm"
+      },
+      "reparacion_local": {
+        "M": { "actividad": "parcheo_superficial", "conversion": "area", "seguridad": false },
+        "H": { "actividad": "parcheo_superficial", "conversion": "area", "seguridad": true }
+      }
+    },
+    "7": {
+      "nombre": "Grieta de borde",
+      "nombre_en": "Edge cracking",
+      "unidad": "m",
+      "grupo": "grietas",
+      "estructural": false,
+      "severidad": {
+        "L": "Agrietamiento bajo o medio sin fragmentación ni desprendimiento",
+        "M": "Agrietamiento medio con algo de fragmentación y desprendimiento",
+        "H": "Fragmentación o desprendimiento considerable a lo largo del borde"
+      },
+      "reparacion_local": {
+        "L": { "actividad": "sellado_grietas", "conversion": "longitud", "seguridad": false },
+        "M": { "actividad": "sellado_grietas", "conversion": "longitud", "seguridad": false },
+        "H": { "actividad": "parcheo_profundidad_parcial", "conversion": "longitud_por_ancho_borde", "seguridad": false }
+      }
+    },
+    "8": {
+      "nombre": "Grieta de reflexión de junta",
+      "nombre_en": "Joint reflection cracking",
+      "unidad": "m",
+      "grupo": "grietas",
+      "estructural": false,
+      "severidad": {
+        "L": "Sin sellar < 10 mm, o sellada en buen estado",
+        "M": "Sin sellar 10 a 75 mm; o < 75 mm con grietas secundarias leves; o sellada rodeada de grietas leves",
+        "H": "Sin sellar > 75 mm; o rodeada de grietas secundarias medias o altas; o ~100 mm alrededor fracturado"
+      },
+      "reparacion_local": {
+        "L": { "actividad": "sellado_grietas", "conversion": "longitud", "seguridad": false },
+        "M": { "actividad": "sellado_grietas", "conversion": "longitud", "seguridad": false },
+        "H": { "actividad": "parcheo_profundidad_parcial", "conversion": "longitud_por_ancho_grieta", "seguridad": false }
+      },
+      "nota": "Solo existe en asfalto colocado sobre losas de concreto."
+    },
+    "9": {
+      "nombre": "Desnivel carril/berma",
+      "nombre_en": "Lane/shoulder drop-off",
+      "unidad": "m",
+      "grupo": "borde",
+      "estructural": false,
+      "severidad": {
+        "L": "Diferencia de 25 a 50 mm",
+        "M": "Diferencia de 50 a 100 mm",
+        "H": "Diferencia mayor de 100 mm"
+      },
+      "reparacion_local": {
+        "M": { "actividad": "nivelacion_hombros", "conversion": "longitud", "seguridad": false },
+        "H": { "actividad": "nivelacion_hombros", "conversion": "longitud", "seguridad": true }
+      }
+    },
+    "10": {
+      "nombre": "Grietas longitudinales y transversales",
+      "nombre_en": "Longitudinal and transverse cracking",
+      "unidad": "m",
+      "grupo": "grietas",
+      "estructural": false,
+      "severidad": {
+        "L": "Sin sellar < 10 mm, o sellada (cualquier ancho) con sellante en buen estado",
+        "M": "Sin sellar 10 a 75 mm; o < 75 mm con grietas aleatorias leves alrededor; o sellada rodeada de grietas leves",
+        "H": "Sin sellar > 75 mm; o rodeada de grietas medias o altas; o ~100 mm alrededor muy fracturado"
+      },
+      "reparacion_local": {
+        "L": { "actividad": "sellado_grietas", "conversion": "longitud", "seguridad": false },
+        "M": { "actividad": "sellado_grietas", "conversion": "longitud", "seguridad": false },
+        "H": { "actividad": "parcheo_profundidad_parcial", "conversion": "longitud_por_ancho_grieta", "seguridad": false }
+      }
+    },
+    "11": {
+      "nombre": "Parcheo y parches de servicios",
+      "nombre_en": "Patching and utility cut patching",
+      "unidad": "m2",
+      "grupo": "estructural",
+      "estructural": true,
+      "severidad": {
+        "L": "Parche en buen estado; rodadura baja o mejor",
+        "M": "Parche moderadamente deteriorado o rodadura media",
+        "H": "Parche muy deteriorado o rodadura alta; requiere reemplazo pronto"
+      },
+      "reparacion_local": {
+        "H": { "actividad": "parcheo_profundidad_total", "conversion": "area", "seguridad": false }
+      }
+    },
+    "12": {
+      "nombre": "Agregado pulido",
+      "nombre_en": "Polished aggregate",
+      "unidad": "m2",
+      "grupo": "friccion",
+      "estructural": false,
+      "severidad": { "U": "Sin niveles de severidad; debe ser significativo para registrarse" },
+      "reparacion_local": {},
+      "nota": "Si se registró exudación, no se registra agregado pulido."
+    },
+    "13": {
+      "nombre": "Baches",
+      "nombre_en": "Potholes",
+      "unidad": "und",
+      "grupo": "estructural",
+      "estructural": true,
+      "severidad": {
+        "L": "Según diámetro (100 a 750 mm) y profundidad (13 a 50 mm), Tabla X1.1",
+        "M": "Según Tabla X1.1; o > 750 mm de diámetro y hasta 25 mm de profundidad",
+        "H": "Según Tabla X1.1; o > 750 mm de diámetro y más de 25 mm de profundidad"
+      },
+      "reparacion_local": {
+        "L": { "actividad": "parcheo_profundidad_total", "conversion": "conteo_a_area_bache", "seguridad": true },
+        "M": { "actividad": "parcheo_profundidad_total", "conversion": "conteo_a_area_bache", "seguridad": true },
+        "H": { "actividad": "parcheo_profundidad_total", "conversion": "conteo_a_area_bache", "seguridad": true }
+      }
+    },
+    "14": {
+      "nombre": "Cruce de vía férrea",
+      "nombre_en": "Railroad crossing",
+      "unidad": "m2",
+      "grupo": "otro",
+      "estructural": false,
+      "severidad": { "L": "Rodadura baja", "M": "Rodadura media", "H": "Rodadura alta" },
+      "reparacion_local": {},
+      "nota": "Coordinar con el operador ferroviario; no se presupuesta en el tramo."
+    },
+    "15": {
+      "nombre": "Ahuellamiento",
+      "nombre_en": "Rutting",
+      "unidad": "m2",
+      "grupo": "deformacion",
+      "estructural": true,
+      "severidad": {
+        "L": "Profundidad media 6 a 13 mm",
+        "M": "Más de 13 a 25 mm",
+        "H": "Más de 25 mm"
+      },
+      "reparacion_local": {
+        "M": { "actividad": "relleno_roderas", "conversion": "area", "seguridad": false },
+        "H": { "actividad": "fresado_local", "conversion": "area", "seguridad": true }
+      }
+    },
+    "16": {
+      "nombre": "Desplazamiento",
+      "nombre_en": "Shoving",
+      "unidad": "m2",
+      "grupo": "deformacion",
+      "estructural": false,
+      "severidad": { "L": "Rodadura baja", "M": "Rodadura media", "H": "Rodadura alta" },
+      "reparacion_local": {
+        "M": { "actividad": "fresado_local", "conversion": "area", "seguridad": false },
+        "H": { "actividad": "fresado_local", "conversion": "area", "seguridad": true }
+      }
+    },
+    "17": {
+      "nombre": "Grieta parabólica (deslizamiento)",
+      "nombre_en": "Slippage cracking",
+      "unidad": "m2",
+      "grupo": "grietas",
+      "estructural": false,
+      "severidad": {
+        "L": "Ancho medio < 10 mm",
+        "M": "Ancho medio 10 a 40 mm, o área alrededor moderadamente desprendida",
+        "H": "Ancho medio > 40 mm, o área alrededor fracturada en pedazos removibles"
+      },
+      "reparacion_local": {
+        "M": { "actividad": "parcheo_profundidad_parcial", "conversion": "area", "seguridad": false },
+        "H": { "actividad": "parcheo_profundidad_parcial", "conversion": "area", "seguridad": false }
+      }
+    },
+    "18": {
+      "nombre": "Hinchamiento",
+      "nombre_en": "Swell",
+      "unidad": "m2",
+      "grupo": "deformacion",
+      "estructural": true,
+      "severidad": { "L": "Rodadura baja", "M": "Rodadura media", "H": "Rodadura alta" },
+      "reparacion_local": {
+        "M": { "actividad": "parcheo_profundidad_total", "conversion": "area", "seguridad": false },
+        "H": { "actividad": "parcheo_profundidad_total", "conversion": "area", "seguridad": true }
+      },
+      "nota": "Suele venir de la subrasante (suelos expansivos): revisar drenaje y suelo."
+    },
+    "19.1": {
+      "nombre": "Desprendimiento de agregados",
+      "nombre_en": "Raveling",
+      "unidad": "m2",
+      "grupo": "desgaste",
+      "estructural": false,
+      "severidad": {
+        "M": "Pérdida considerable de agregado grueso (> 20 partículas por m²) o grupos de agregado faltante",
+        "H": "Superficie muy rugosa y picada; puede faltar por completo en partes"
+      },
+      "reparacion_local": {},
+      "nota": "En mezcla densa la norma 2024 solo define M y H. Si hay desprendimiento no se registra meteorización."
+    },
+    "19.2": {
+      "nombre": "Meteorización (desgaste superficial)",
+      "nombre_en": "Weathering (surface wear)",
+      "unidad": "m2",
+      "grupo": "envejecimiento",
+      "estructural": false,
+      "severidad": {
+        "L": "Envejecimiento visible; pérdida de la matriz fina y color desvaído; bordes del agregado grueso expuestos < 1 mm",
+        "M": "Bordes del agregado grueso expuestos hasta 1/4 de su ancho",
+        "H": "Bordes expuestos más de 1/4 de su ancho; pérdida considerable de finos y posible pérdida de agregado grueso"
+      },
+      "reparacion_local": {}
+    }
+  }
+}

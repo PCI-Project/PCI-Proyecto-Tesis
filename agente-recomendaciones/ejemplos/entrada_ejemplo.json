@@ -1,0 +1,116 @@
+{
+  "version": "1.0",
+  "proyecto": {
+    "id": "demo-santiago-2026",
+    "nombre": "Calles de Santiago (ejemplo)",
+    "descripcion": "Datos inventados para probar el agente",
+    "inspector": "Jesús Delgado",
+    "entidad": "UTP Centro Regional de Veraguas",
+    "fecha_inspeccion": "2026-10-20",
+    "ubicacion": "Santiago, Veraguas"
+  },
+  "calibracion": {
+    "tratamientos_disponibles": [
+      "sellado_grietas", "parcheo_profundidad_parcial", "parcheo_profundidad_total", "parcheo_superficial",
+      "fresado_local", "arenado_exudacion", "nivelacion_hombros", "conformacion_hombros",
+      "limpieza_superficie", "riego_liga",
+      "fog_seal", "rejuvenecedor", "slurry_seal", "micropavimento", "chip_seal",
+      "thin_overlay", "mill_and_replace", "reconstruccion"
+    ],
+    "costos_unitarios": {
+      "mill_and_replace": { "valor": 18.4, "unidad": "m2", "fuente": "Tabla de la empresa 2026 (ejemplo)" },
+      "parcheo_profundidad_total": { "valor": 55.0, "unidad": "m2", "fuente": "Cotización 2026-09 (ejemplo)" }
+    },
+    "moneda": "USD",
+    "presupuesto": 120000,
+    "modo_priorizacion": "costo_beneficio"
+  },
+  "tramos": [
+    {
+      "id": "S1", "nombre": "Calle 10ma", "ubicacion": "Est. 0+000 a 0+400",
+      "longitud_m": 400, "ancho_m": 7.2, "area_m2": 2880, "pci": 62.4,
+      "total_unidades_muestra": 13, "muestreo_suficiente": true,
+      "contexto": { "tipo_via": "urbana", "altura_bordillo_cm": 5, "esal_millones": 0.8, "clase_trafico": null, "tpda": 3500,
+                    "anio_construccion": 2009, "anio_ultima_intervencion": 2016, "ultima_intervencion": "slurry_seal",
+                    "drenaje": "regular", "clasificacion_funcional": "colectora", "observaciones": null },
+      "muestras": [
+        { "id": 3, "area_m2": 230.4, "pci": 60.1, "adicional": false, "fallas": [
+          { "tipo": "10", "severidad": "M", "cantidad": 38.5 }, { "tipo": "10", "severidad": "L", "cantidad": 22 },
+          { "tipo": "1", "severidad": "M", "cantidad": 12 }, { "tipo": "13", "severidad": "H", "cantidad": 2 } ] },
+        { "id": 6, "area_m2": 230.4, "pci": 64.0, "adicional": false, "fallas": [
+          { "tipo": "10", "severidad": "M", "cantidad": 25 }, { "tipo": "3", "severidad": "L", "cantidad": 40 },
+          { "tipo": "19.2", "severidad": "M", "cantidad": 120 } ] },
+        { "id": 9, "area_m2": 230.4, "pci": 58.2, "adicional": false, "fallas": [
+          { "tipo": "1", "severidad": "H", "cantidad": 8 }, { "tipo": "13", "severidad": "M", "cantidad": 1 },
+          { "tipo": "10", "severidad": "L", "cantidad": 30 } ] },
+        { "id": 12, "area_m2": 230.4, "pci": 66.5, "adicional": false, "fallas": [
+          { "tipo": "19.2", "severidad": "M", "cantidad": 150 }, { "tipo": "10", "severidad": "M", "cantidad": 18 } ] },
+        { "id": 13, "area_m2": 230.4, "pci": 41.0, "adicional": true, "fallas": [
+          { "tipo": "1", "severidad": "H", "cantidad": 30 }, { "tipo": "13", "severidad": "H", "cantidad": 3 } ] }
+      ]
+    },
+    {
+      "id": "S2", "nombre": "Avenida Central", "ubicacion": "Est. 0+000 a 0+600",
+      "longitud_m": 600, "ancho_m": 9, "area_m2": 5400, "pci": 88.1,
+      "total_unidades_muestra": 24, "muestreo_suficiente": true,
+      "contexto": { "tipo_via": "urbana", "altura_bordillo_cm": 12, "esal_millones": null, "clase_trafico": "alto", "tpda": 14000,
+                    "anio_construccion": 2021, "anio_ultima_intervencion": null, "ultima_intervencion": null,
+                    "drenaje": "bueno", "clasificacion_funcional": "arterial", "observaciones": null },
+      "muestras": [
+        { "id": 2, "area_m2": 225, "pci": 89.0, "adicional": false, "fallas": [
+          { "tipo": "19.2", "severidad": "L", "cantidad": 180 }, { "tipo": "10", "severidad": "L", "cantidad": 12 } ] },
+        { "id": 6, "area_m2": 225, "pci": 87.0, "adicional": false, "fallas": [ { "tipo": "19.2", "severidad": "M", "cantidad": 60 } ] },
+        { "id": 10, "area_m2": 225, "pci": 90.0, "adicional": false, "fallas": [ { "tipo": "19.2", "severidad": "L", "cantidad": 200 } ] },
+        { "id": 14, "area_m2": 225, "pci": 88.0, "adicional": false, "fallas": [
+          { "tipo": "10", "severidad": "L", "cantidad": 20 }, { "tipo": "19.2", "severidad": "L", "cantidad": 100 } ] },
+        { "id": 18, "area_m2": 225, "pci": 86.0, "adicional": false, "fallas": [ { "tipo": "19.2", "severidad": "M", "cantidad": 90 } ] },
+        { "id": 22, "area_m2": 225, "pci": 88.5, "adicional": false, "fallas": [
+          { "tipo": "19.2", "severidad": "L", "cantidad": 150 }, { "tipo": "7", "severidad": "L", "cantidad": 10 } ] }
+      ]
+    },
+    {
+      "id": "S3", "nombre": "Vía a La Mata", "ubicacion": "Km 2+000 a 3+500",
+      "longitud_m": 1500, "ancho_m": 6, "area_m2": 9000, "pci": 47.0,
+      "total_unidades_muestra": 40, "muestreo_suficiente": false,
+      "contexto": { "tipo_via": "rural", "altura_bordillo_cm": null, "esal_millones": null, "clase_trafico": null, "tpda": null,
+                    "anio_construccion": 2012, "anio_ultima_intervencion": null, "ultima_intervencion": null,
+                    "drenaje": "regular", "clasificacion_funcional": "rural secundaria", "observaciones": "Cunetas de tierra con sedimento" },
+      "muestras": [
+        { "id": 1, "area_m2": 225, "pci": 49.0, "adicional": false, "fallas": [
+          { "tipo": "1", "severidad": "M", "cantidad": 35 }, { "tipo": "15", "severidad": "M", "cantidad": 40 }, { "tipo": "9", "severidad": "M", "cantidad": 20 } ] },
+        { "id": 6, "area_m2": 225, "pci": 45.5, "adicional": false, "fallas": [
+          { "tipo": "1", "severidad": "M", "cantidad": 28 }, { "tipo": "10", "severidad": "H", "cantidad": 15 }, { "tipo": "13", "severidad": "M", "cantidad": 2 } ] },
+        { "id": 11, "area_m2": 225, "pci": 50.2, "adicional": false, "fallas": [
+          { "tipo": "15", "severidad": "M", "cantidad": 60 }, { "tipo": "10", "severidad": "M", "cantidad": 30 } ] },
+        { "id": 16, "area_m2": 225, "pci": 44.0, "adicional": false, "fallas": [
+          { "tipo": "1", "severidad": "H", "cantidad": 18 }, { "tipo": "13", "severidad": "H", "cantidad": 1 }, { "tipo": "9", "severidad": "H", "cantidad": 12 } ] },
+        { "id": 21, "area_m2": 225, "pci": 48.0, "adicional": false, "fallas": [
+          { "tipo": "1", "severidad": "M", "cantidad": 30 }, { "tipo": "7", "severidad": "M", "cantidad": 25 } ] },
+        { "id": 26, "area_m2": 225, "pci": 46.1, "adicional": false, "fallas": [
+          { "tipo": "15", "severidad": "M", "cantidad": 45 }, { "tipo": "1", "severidad": "M", "cantidad": 20 } ] },
+        { "id": 31, "area_m2": 225, "pci": 47.3, "adicional": false, "fallas": [
+          { "tipo": "10", "severidad": "M", "cantidad": 28 }, { "tipo": "1", "severidad": "M", "cantidad": 25 } ] },
+        { "id": 36, "area_m2": 225, "pci": 45.9, "adicional": false, "fallas": [
+          { "tipo": "1", "severidad": "H", "cantidad": 15 }, { "tipo": "15", "severidad": "M", "cantidad": 30 } ] }
+      ]
+    },
+    {
+      "id": "S4", "nombre": "Calle 2da", "ubicacion": "Est. 0+000 a 0+200",
+      "longitud_m": 200, "ancho_m": 8, "area_m2": 1600, "pci": 33.5,
+      "total_unidades_muestra": 7, "muestreo_suficiente": true,
+      "contexto": { "tipo_via": "urbana", "altura_bordillo_cm": null, "esal_millones": 0.2, "clase_trafico": null, "tpda": 900,
+                    "anio_construccion": 2003, "anio_ultima_intervencion": null, "ultima_intervencion": null,
+                    "drenaje": "malo", "clasificacion_funcional": "local", "observaciones": "Agua estancada en la cuneta norte" },
+      "muestras": [
+        { "id": 1, "area_m2": 228.6, "pci": 31.0, "adicional": false, "fallas": [
+          { "tipo": "1", "severidad": "H", "cantidad": 60 }, { "tipo": "13", "severidad": "H", "cantidad": 4 }, { "tipo": "11", "severidad": "H", "cantidad": 12 } ] },
+        { "id": 3, "area_m2": 228.6, "pci": 35.2, "adicional": false, "fallas": [
+          { "tipo": "1", "severidad": "M", "cantidad": 70 }, { "tipo": "6", "severidad": "M", "cantidad": 15 }, { "tipo": "13", "severidad": "M", "cantidad": 2 } ] },
+        { "id": 5, "area_m2": 228.6, "pci": 34.0, "adicional": false, "fallas": [
+          { "tipo": "1", "severidad": "H", "cantidad": 45 }, { "tipo": "10", "severidad": "H", "cantidad": 20 } ] },
+        { "id": 7, "area_m2": 228.6, "pci": 33.8, "adicional": false, "fallas": [
+          { "tipo": "1", "severidad": "M", "cantidad": 55 }, { "tipo": "13", "severidad": "H", "cantidad": 3 }, { "tipo": "2", "severidad": "M", "cantidad": 10 } ] }
+      ]
+    }
+  ]
+}

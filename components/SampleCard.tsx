@@ -240,8 +240,15 @@ export const SampleCard: React.FC<SampleCardProps> = ({ sample, sectionWidth, se
                     ) : (
                         <tr>
                             <td colSpan={4} className="text-center py-10 text-text-muted bg-bg-base/40">
-                                <p className="font-semibold">{t('sampleCard.noDistresses')}</p>
-                                <p className="text-xs mt-1">{t('sampleCard.noDistressesHint')}</p>
+                                <p className="font-semibold">{sample.evaluated ? t('sampleCard.evaluatedNoDistresses') : t('sampleCard.noDistresses')}</p>
+                                <p className="text-xs mt-1">{sample.evaluated ? t('sampleCard.evaluatedNoDistressesHint') : t('sampleCard.noDistressesHint')}</p>
+                                <Button
+                                    onClick={() => onUpdate({ ...sample, evaluated: !sample.evaluated })}
+                                    variant={sample.evaluated ? 'ghost' : 'secondary'}
+                                    className="mt-3 inline-flex items-center !text-sm !py-1.5 !px-3"
+                                >
+                                    {sample.evaluated ? t('sampleCard.unmarkEvaluated') : t('sampleCard.markEvaluated')}
+                                </Button>
                             </td>
                         </tr>
                     )}

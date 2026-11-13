@@ -1,10 +1,23 @@
 import { Project } from '../types';
 import { getPCIRating } from '../constants';
 import { ExportOptions } from '../components/ExportModal';
+import { buildSampleUnitRows, formatStation, toUtm } from './gisService';
+import { RouteLocation } from '../types';
 
 // Declare global types for libraries loaded via CDN
 declare const jspdf: any;
 declare const JSZip: any;
+
+// --- Ubicación y unidades de muestra ---
+
+const datumLabel = (datum: string): string => datum === 'NAD27' ? 'NAD 27 (Zona del Canal)' : 'WGS 84';
+const lengthSourceLabel = (hasRoute: boolean): string => hasRoute
+    ? 'Medido sobre el mapa (eje vial de OpenStreetMap, medido en UTM)'
+    : 'Ingresado manualmente';
+const toUtmPoint = (point: [number, number], route: RouteLocation): [number, number] =>
+    toUtm(point, route.utmZone, route.hemisphere, route.datum);
+const geographic = (point?: [number, number]): string => point ? `${point[1].toFixed(6)}, ${point[0].toFixed(6)}` : '';
+const utm = (point?: [number, number]): string => point ? `${point[0].toFixed(2)}, ${point[1].toFixed(2)}` : '';
 
 // --- CSV Generation ---
 
@@ -165,6 +178,104 @@ export const generateCsvZip = async (project: Project, options: ExportOptions, t
     }
 
 
+    if (options.locationData) {
+        const BOM = '\uFEFF'; // para que Excel lea bien los acentos
+        const locationHeaders = [
+            { key: 'SectionName', label: t('projectForm.sectionName') },
+            { key: 'Location', label: 'Ubicación' },
+            { key: 'LengthSource', label: 'Origen del largo' },
+            { key: 'Length_m', label: `${t('projectForm.length')} (m)` },
+            { key: 'RoadLength_m', label: 'Largo sobre el eje vial (m)' },
+            { key: 'UtmLength_m', label: 'Largo UTM oficial (m)' },
+            { key: 'StartStation', label: 'Progresiva inicial' },
+            { key: 'EndStation', label: 'Progresiva final' },
+            { key: 'Datum', label: 'Datum' },
+            { key: 'UtmZone', label: 'Zona UTM' },
+            { key: 'StartLat', label: 'Inicio latitud' },
+            { key: 'StartLon', label: 'Inicio longitud' },
+            { key: 'EndLat', label: 'Fin latitud' },
+            { key: 'EndLon', label: 'Fin longitud' },
+            { key: 'StartEasting', label: 'Inicio este (m)' },
+            { key: 'StartNorthing', label: 'Inicio norte (m)' },
+            { key: 'EndEasting', label: 'Fin este (m)' },
+            { key: 'EndNorthing', label: 'Fin norte (m)' },
+        ];
+        const locationData = project.sections.map(section => {
+            const route = section.routeLocation;
+            const first = route?.routeCoordinates[0];
+            const last = route?.routeCoordinates[route.routeCoordinates.length - 1];
+            const startUtm = route && first ? toUtmPoint(first, route) : undefined;
+            const endUtm = route && last ? toUtmPoint(last, route) : undefined;
+            return {
+                SectionName: section.name,
+                Location: section.location || '',
+                LengthSource: lengthSourceLabel(Boolean(route)),
+                Length_m: section.length.toFixed(2),
+                RoadLength_m: route ? route.routingDistance.toFixed(2) : '',
+                UtmLength_m: route ? route.engineeringLength.toFixed(2) : '',
+                StartStation: formatStation(section.startStation),
+                EndStation: formatStation(section.startStation + section.length),
+                Datum: route ? datumLabel(route.datum) : '',
+                UtmZone: route ? `${route.utmZone}${route.hemisphere}` : '',
+                StartLat: first ? first[1].toFixed(6) : '',
+                StartLon: first ? first[0].toFixed(6) : '',
+                EndLat: last ? last[1].toFixed(6) : '',
+                EndLon: last ? last[0].toFixed(6) : '',
+                StartEasting: startUtm ? startUtm[0].toFixed(2) : '',
+                StartNorthing: startUtm ? startUtm[1].toFixed(2) : '',
+                EndEasting: endUtm ? endUtm[0].toFixed(2) : '',
+                EndNorthing: endUtm ? endUtm[1].toFixed(2) : '',
+            };
+        });
+        zip.file("section_location.csv", BOM + toCSV(locationData, locationHeaders));
+
+        const unitHeaders = [
+            { key: 'SectionName', label: t('projectForm.sectionName') },
+            { key: 'UnitID', label: 'Unidad' },
+            { key: 'Evaluated', label: 'Evaluada' },
+            { key: 'StartStation', label: 'Progresiva inicial' },
+            { key: 'EndStation', label: 'Progresiva final' },
+            { key: 'Datum', label: 'Datum' },
+            { key: 'UtmZone', label: 'Zona UTM' },
+            { key: 'StartLat', label: 'Inicio latitud' },
+            { key: 'StartLon', label: 'Inicio longitud' },
+            { key: 'EndLat', label: 'Fin latitud' },
+            { key: 'EndLon', label: 'Fin longitud' },
+            { key: 'StartEasting', label: 'Inicio este (m)' },
+            { key: 'StartNorthing', label: 'Inicio norte (m)' },
+            { key: 'EndEasting', label: 'Fin este (m)' },
+            { key: 'EndNorthing', label: 'Fin norte (m)' },
+            { key: 'PCI', label: 'PCI' },
+            { key: 'PredominantDistress', label: 'Falla predominante' },
+        ];
+        const unitData: Record<string, any>[] = [];
+        project.sections.forEach(section => {
+            const route = section.routeLocation;
+            buildSampleUnitRows(section).forEach(unit => {
+                unitData.push({
+                    SectionName: section.name,
+                    UnitID: unit.id,
+                    Evaluated: unit.evaluated ? 'Sí' : 'No',
+                    StartStation: formatStation(unit.startStation),
+                    EndStation: formatStation(unit.endStation),
+                    Datum: route ? datumLabel(route.datum) : '',
+                    UtmZone: route ? `${route.utmZone}${route.hemisphere}` : '',
+                    StartLat: unit.start ? unit.start[1].toFixed(6) : '',
+                    StartLon: unit.start ? unit.start[0].toFixed(6) : '',
+                    EndLat: unit.end ? unit.end[1].toFixed(6) : '',
+                    EndLon: unit.end ? unit.end[0].toFixed(6) : '',
+                    StartEasting: unit.startUtm ? unit.startUtm[0].toFixed(2) : '',
+                    StartNorthing: unit.startUtm ? unit.startUtm[1].toFixed(2) : '',
+                    EndEasting: unit.endUtm ? unit.endUtm[0].toFixed(2) : '',
+                    EndNorthing: unit.endUtm ? unit.endUtm[1].toFixed(2) : '',
+                    PCI: unit.pci !== undefined ? unit.pci.toFixed(2) : '',
+                    PredominantDistress: unit.predominant ? t(unit.predominant) : '',
+                });
+            });
+        });
+        zip.file("sample_units.csv", BOM + toCSV(unitData, unitHeaders));
+    }
+
     const content = await zip.generateAsync({ type: "blob" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(content);
@@ -290,6 +401,70 @@ export const generatePdfReport = async (project: Project, options: ExportOptions
             }
         }
 
+        if (options.locationData) {
+            const route = section.routeLocation;
+            const first = route?.routeCoordinates[0];
+            const last = route?.routeCoordinates[route.routeCoordinates.length - 1];
+            const infoRows: string[][] = [
+                ['Ubicación', section.location || 'No indicada'],
+                ['Progresivas', `${formatStation(section.startStation)} – ${formatStation(section.startStation + section.length)}`],
+                ['Largo del tramo', `${section.length.toFixed(2)} m`],
+                ['Origen del largo', lengthSourceLabel(Boolean(route))],
+            ];
+            if (route && first && last) {
+                infoRows.push(
+                    ['Largo sobre el eje vial', `${route.routingDistance.toFixed(2)} m`],
+                    ['Largo UTM oficial', `${route.engineeringLength.toFixed(2)} m`],
+                    ['Datum / zona UTM', `${datumLabel(route.datum)} / ${route.utmZone}${route.hemisphere}`],
+                    ['Inicio (lat, lon)', geographic(first)],
+                    ['Inicio (E, N)', utm(toUtmPoint(first, route))],
+                    ['Fin (lat, lon)', geographic(last)],
+                    ['Fin (E, N)', utm(toUtmPoint(last, route))],
+                );
+            }
+            const infoY = finalY > 225 ? (doc.addPage(), 20) : finalY + 12;
+            doc.setFontSize(13);
+            doc.setTextColor(54, 200, 200);
+            doc.text(`${t('projectForm.sectionName')}: ${section.name} - Ubicación y coordenadas`, 14, infoY);
+            doc.autoTable({
+                startY: infoY + 4,
+                body: infoRows,
+                theme: 'grid',
+                styles: { fontSize: 9 },
+                columnStyles: { 0: { fontStyle: 'bold', cellWidth: 50 } },
+            });
+            finalY = doc.previousAutoTable.finalY;
+
+            const units = buildSampleUnitRows(section);
+            if (units.length > 0) {
+                const withCoordinates = units.some(unit => unit.startUtm);
+                const unitHead = withCoordinates
+                    ? [['Unidad', 'Progresiva', 'Inicio (E, N)', 'Fin (E, N)', 'Evaluada', 'PCI']]
+                    : [['Unidad', 'Progresiva', 'Evaluada', 'PCI']];
+                const unitBody = units.map(unit => {
+                    const stationText = `${formatStation(unit.startStation)} – ${formatStation(unit.endStation)}`;
+                    const evaluatedText = unit.evaluated ? 'Sí' : 'No';
+                    const pciText = unit.pci !== undefined ? unit.pci.toFixed(2) : '-';
+                    return withCoordinates
+                        ? [`#${unit.id}`, stationText, utm(unit.startUtm) || '-', utm(unit.endUtm) || '-', evaluatedText, pciText]
+                        : [`#${unit.id}`, stationText, evaluatedText, pciText];
+                });
+                const unitsY = finalY > 235 ? (doc.addPage(), 20) : finalY + 10;
+                doc.setFontSize(12);
+                doc.setTextColor(29, 35, 42);
+                doc.text('Unidades de muestra: progresivas y coordenadas', 14, unitsY);
+                doc.autoTable({
+                    startY: unitsY + 4,
+                    head: unitHead,
+                    body: unitBody,
+                    theme: 'striped',
+                    headStyles: { fillColor: [54, 200, 200] },
+                    styles: { fontSize: 8 },
+                });
+                finalY = doc.previousAutoTable.finalY;
+            }
+        }
+
         if (options.distressData || options.calculationDetails) {
             // Sort a copy - never mutate the project's own sample array as a side effect.
             [...section.samples].sort((a, b) => a.id - b.id).forEach(sample => {
@@ -352,7 +527,7 @@ export const generatePdfReport = async (project: Project, options: ExportOptions
                  }
 
                  finalY = currentY;
-            });
+             });
         }
     });
 

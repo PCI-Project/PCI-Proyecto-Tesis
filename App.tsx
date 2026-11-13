@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Project, MongoProject, Sample, Section, PavementType, Severity, AppView, ProjectView } from './types';
+import { Project, MongoProject, Sample, Section, PavementType, Severity, AppView, ProjectView, AgentConfig, AgentRun, SectionContext } from './types';
 import { ProjectForm } from './components/ProjectForm';
 import { ResultsDisplay } from './components/ResultsDisplay';
 import { CalculationDetailsView } from './components/CalculationDetailsView';
@@ -15,9 +15,11 @@ import { AuthView } from './components/auth/AuthView';
 import { DataEntryView } from './components/DataEntryView';
 import { ProfileView } from './components/ProfileView';
 import { CurvesSettingsView } from './components/CurvesSettingsView';
+import { AgentPanel } from './components/agent/AgentPanel';
 
-//hola//
-const API = axios.create({ baseURL: 'http://localhost:5000/api' });
+const API = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'https://pci-backend-mqoc.onrender.com/api',
+});
 
 // Interceptor: adjunta el token automáticamente a cada petición
 API.interceptors.request.use((config) => {
@@ -28,7 +30,7 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-const VIEW_ORDER: ProjectView[] = ['SETUP', 'DATA_ENTRY', 'CALCULATION_DETAILS', 'RESULTS'];
+const VIEW_ORDER: ProjectView[] = ['SETUP', 'DATA_ENTRY', 'CALCULATION_DETAILS', 'RESULTS', 'AGENT'];
 
 const mapMongoProjectToProject = (mongoProject: MongoProject): Project => ({
   id: String(mongoProject._id),
@@ -42,6 +44,8 @@ const mapMongoProjectToProject = (mongoProject: MongoProject): Project => ({
   sections: mongoProject.sections || [],
   lastView: mongoProject.lastView || 'SETUP',
   weightedPCI: mongoProject.weightedPCI,
+  agentConfig: mongoProject.agentConfig,
+  agentRuns: mongoProject.agentRuns || [],
 });
 
 const mapProjectToMongoPayload = (project: Project, userId: string) => ({
@@ -53,6 +57,8 @@ const mapProjectToMongoPayload = (project: Project, userId: string) => ({
   weightedPCI: project.weightedPCI,
   propietario: project.propietario || userId,
   sections: project.sections || [],
+  agentConfig: project.agentConfig,
+  // Las consultas del agente (agentRuns) no van aquí: se guardan una a una en /projects/:id/agent-runs.
 });
 
 export const App: React.FC = () => {
@@ -167,6 +173,8 @@ export const App: React.FC = () => {
           weightedPCI: projectToSave.weightedPCI,
           lastView: projectToSave.lastView,
           sections: projectToSave.sections,
+          agentConfig: projectToSave.agentConfig,
+          agentRuns: projectToSave.agentRuns,
         };
 
         setProjects(prev =>
@@ -185,6 +193,23 @@ export const App: React.FC = () => {
       setProjects(prev => prev.filter(p => String(p._id || p.id) !== projectKey));
     } finally {
       savingProjectIdRef.current = null;
+      
+      // Generar recomendaciones automáticamente después de guardar el proyecto
+      if (projectToSave.sections && projectToSave.sections.length > 0) {
+        try {
+          console.log('[saveProjectToStorage] Generando recomendaciones automáticas...');
+          // Llamada al backend para obtener recomendaciones
+          const { data } = await API.post(`/projects/${projectToSave._id || projectToSave.id}/recommendations`, projectToSave);
+          if (data.success) {
+            console.log('[saveProjectToStorage] Recomendaciones generadas:', data.recommendations.length, 'secciones');
+            // Aquí podríamos almacenar las recomendaciones o navegar a la vista
+            // Por ahora, solo registramos en consola
+          }
+        } catch (recError) {
+          // No fallar el guardado si el agente falla
+          console.error('[saveProjectToStorage] Error generando recomendaciones:', recError);
+        }
+      }
     }
   };
 
@@ -196,9 +221,9 @@ export const App: React.FC = () => {
       let projectToLoad = project;
       
       const needsDetailsCalc = targetView === 'CALCULATION_DETAILS' && !project.sections.some(s => s.samples.some(smp => smp.calculationDetails));
-      const needsResultsCalc = targetView === 'RESULTS' && project.weightedPCI === undefined;
+      const needsResultsCalc = (targetView === 'RESULTS' || targetView === 'AGENT') && project.weightedPCI === undefined;
 
-      // Si la vista de destino requiere cálculos que faltan, ejecútalos ahora.
+      // Si la vista de destino requiere cálculos que faltan, execútalos ahora.
       // Esto maneja la recarga de un proyecto que fue cerrado en una página de resultados.
       if (needsDetailsCalc || needsResultsCalc) {
         projectToLoad = calculateProjectPCI(project);
@@ -512,7 +537,7 @@ export const App: React.FC = () => {
       if (!projectToUpdate) return;
       
       // Si se mueve al paso de cálculo, realizar el cálculo primero
-      if (view === 'CALCULATION_DETAILS' || view === 'RESULTS') {
+      if (view === 'CALCULATION_DETAILS' || view === 'RESULTS' || view === 'AGENT') {
           projectToUpdate = calculateProjectPCI(projectToUpdate);
           console.log('VIEW:', view);
           console.log('weightedPCI:', projectToUpdate.weightedPCI);
@@ -540,6 +565,90 @@ export const App: React.FC = () => {
       setCurrentView(view);
   };
   
+  // Guarda datos del agente (configuración, contexto de tramos, consultas) sin borrar los resultados del PCI.
+  const selectedProjectRef = useRef<Project | null>(null);
+  selectedProjectRef.current = selectedProject;
+  const handleAgentSave = async (patch: { agentConfig?: AgentConfig; agentRuns?: AgentRun[]; contexts?: Record<string, SectionContext | null> }) => {
+    const current = selectedProjectRef.current;
+    if (!current) return;
+    const next: Project = { ...current };
+    if (patch.agentConfig !== undefined) next.agentConfig = patch.agentConfig;
+    if (patch.agentRuns !== undefined) next.agentRuns = patch.agentRuns;
+    if (patch.contexts) {
+      next.sections = current.sections.map(section =>
+        section.id in patch.contexts! ? { ...section, context: patch.contexts![section.id] ?? undefined } : section
+      );
+    }
+    selectedProjectRef.current = next;
+    setSelectedProject(next);
+    // saveProjectToStorage descarta la petición si ya hay un guardado en curso: se espera a que termine.
+    const key = String(next._id || next.id);
+    for (let i = 0; i < 100 && savingProjectIdRef.current === key; i++) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+    await saveProjectToStorage(next);
+    if (patch.agentRuns !== undefined) await syncAgentRuns(next, current.agentRuns ?? [], patch.agentRuns);
+  };
+
+  // Consultas del agente en la base de datos: se guardan las nuevas y se borran las que salieron del límite.
+  const syncAgentRuns = async (project: Project, before: AgentRun[], after: AgentRun[]) => {
+    const projectId = project._id;
+    if (!user || !projectId) return; // proyecto de demostración o aún sin guardar: las consultas quedan solo en pantalla
+    const known = new Set(before.map(r => r.id));
+    const kept = new Set(after.map(r => r.id));
+    const jobs = [
+      ...after.filter(r => !known.has(r.id)).map(r => API.put(`/projects/${projectId}/agent-runs/${encodeURIComponent(r.id)}`, r)),
+      ...before.filter(r => !kept.has(r.id)).map(r => API.delete(`/projects/${projectId}/agent-runs/${encodeURIComponent(r.id)}`)),
+    ];
+    const results = await Promise.allSettled(jobs);
+    if (results.some(r => r.status === 'rejected')) console.error('[syncAgentRuns] No se pudo guardar alguna consulta del agente:', results.filter(r => r.status === 'rejected'));
+  };
+
+  // Al abrir un proyecto se traen sus consultas guardadas (no hace falta volver a generarlas).
+  const loadedRunsFor = useRef<string | null>(null);
+  useEffect(() => {
+    const projectId = selectedProject?._id;
+    if (!projectId) { loadedRunsFor.current = null; return; } // al cerrar el proyecto, la próxima apertura vuelve a traerlas
+    if (!user || loadedRunsFor.current === projectId) return;
+    loadedRunsFor.current = projectId;
+    API.get(`/projects/${projectId}/agent-runs`)
+      .then(({ data }) => {
+        const saved: AgentRun[] = Array.isArray(data) ? data : [];
+        setSelectedProject(current => {
+          if (!current || current._id !== projectId) return current;
+          const byId = new Map<string, AgentRun>();
+          [...saved, ...(current.agentRuns ?? [])].forEach(r => byId.set(r.id, r)); // por si ya se generó una antes de que llegaran
+          const merged = [...byId.values()].sort((a, b) => b.number - a.number);
+          selectedProjectRef.current = { ...current, agentRuns: merged };
+          return { ...current, agentRuns: merged };
+        });
+      })
+      .catch(err => { loadedRunsFor.current = null; console.error('[agent-runs] No se pudieron cargar las consultas guardadas:', err); });
+  }, [selectedProject?._id, user]);
+
+  // Panel del agente: las unidades sin datos se confirman como "sin fallas" (evaluadas, PCI 100) y se recalcula el PCI.
+  // Las unidades que nunca se registraron se crean vacías para que el tramo quede con el 100 % de sus unidades evaluadas.
+  const handleMarkNoDistresses = (sectionId: string) => {
+    setSelectedProject(current => {
+      if (!current) return current;
+      const draft: Project = JSON.parse(JSON.stringify(current));
+      const section = draft.sections.find(s => s.id === sectionId);
+      if (!section) return current;
+      const known = new Set(section.samples.map(s => s.id));
+      section.samples.forEach(s => { if (s.distresses.length === 0) s.evaluated = true; });
+      const total = Math.max(section.totalSampleUnits || 0, section.samples.length);
+      for (let id = 1; id <= total; id += 1) {
+        if (!known.has(id)) {
+          section.samples.push({ id, area: section.sampleUnitArea, pavementType: section.pavementType, distresses: [], isAdditional: false, evaluated: true });
+        }
+      }
+      section.samples.sort((a, b) => a.id - b.id);
+      const calculated = calculateProjectPCI(draft);
+      saveProjectToStorage(calculated);
+      return calculated;
+    });
+  };
+
   const handleSampleUpdate = (sectionId: string, updatedSample: Sample) => {
     updateProjectState(draft => {
       const section = draft.sections.find(s => s.id === sectionId);
@@ -679,6 +788,16 @@ export const App: React.FC = () => {
           <ResultsDisplay
             project={selectedProject}
             onEvaluateAdditionalSamples={handleEvaluateAdditional}
+            setCurrentView={setCurrentView}
+          />
+        );
+      case 'AGENT':
+        return (
+          <AgentPanel
+            project={selectedProject}
+            onSave={handleAgentSave}
+            onNavigate={handleNavigate}
+            onMarkNoDistresses={handleMarkNoDistresses}
           />
         );
       default:
