@@ -39,7 +39,7 @@ packaging==26.3
 propcache==0.5.2
 pydantic==2.13.4
 pydantic-settings==2.15.0
-pydantic_core==2.46.4
+pydantic_core==2.50.4
 python-dotenv==1.2.3
 PyYAML==6.0.3
 requests==2.34.2
