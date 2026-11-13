@@ -1,0 +1,29 @@
+{
+  "name": "AsphaltPCI Pro",
+  "short_name": "AsphaltPCI",
+  "description": "Una aplicación web completa para aplicar la norma ASTM D6433 a pavimentos flexibles.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#14181E",
+  "theme_color": "#36C8C8",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Project, Section, PavementType, Sample } from '../types';
+import { Project, Section, PavementType, Sample, RouteLocation } from '../types';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
@@ -8,11 +8,8 @@ import { ASTM_DEFAULTS } from '../constants';
 import { useTranslations } from '../hooks/useTranslations';
 import { useAuth } from '../contexts/AuthContext';
 import { Tooltip } from './ui/Tooltip';
-
-interface ProjectFormProps {
-  onProjectCreateOrUpdate: (project: Omit<Project, 'id' | 'lastView'>) => void;
-  initialProject?: Project | null;
-}
+import { RouteEditor } from './map/RouteEditor';
+import { SectionRouteMap } from './map/SectionRouteMap';
 
 const TrashIcon: React.FC<{className?: string}> = ({className}) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${className}`} viewBox="0 0 20 20" fill="currentColor">
@@ -26,6 +23,31 @@ const QuestionMarkIcon: React.FC<{className?: string}> = ({className}) => (
     </svg>
 );
 
+const MapPinIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+    </svg>
+);
+
+const PencilIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+    </svg>
+);
+
+const CheckIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+    </svg>
+);
+
+// Ubicación sugerida a partir de las vías en que caen el inicio y el final; sin nombres, las coordenadas del inicio.
+const describeLocation = (route: RouteLocation): string => {
+    const names = [route.startName, route.endName].filter((name): name is string => Boolean(name) && name !== 'Vía sin nombre');
+    const unique = names.filter((name, index) => names.indexOf(name) === index);
+    return unique.join(' — ') || `${route.startPoint[1].toFixed(6)}, ${route.startPoint[0].toFixed(6)}`;
+};
+
 const formatStation = (station: number): string => {
     const km = Math.floor(station / 1000);
     const m = station % 1000;
@@ -33,7 +55,7 @@ const formatStation = (station: number): string => {
 };
 
 
-export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdate, initialProject }) => {
+export const ProjectForm: React.FC<{ onProjectCreateOrUpdate: (project: Omit<Project, 'id' | 'lastView'>) => void; initialProject?: Project | null }> = ({ onProjectCreateOrUpdate, initialProject }) => {
   const { t } = useTranslations();
   const { user } = useAuth();
   const [projectData, setProjectData] = useState({
@@ -42,9 +64,12 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdat
     inspectionDate: initialProject?.inspectionDate || new Date().toISOString().split('T')[0],
   });
   const [sections, setSections] = useState<Section[]>(initialProject?.sections || []);
+  const [useMap, setUseMap] = useState(true);
+  const [detectedLocation, setDetectedLocation] = useState('');
+  const [locationEdited, setLocationEdited] = useState(false);
   const [newSection, setNewSection] = useState({
       name: '',
-      length: '3000',
+      length: '',
       width: '6.5',
       startStation: '0',
       sampleUnitArea: ASTM_DEFAULTS.FLEXIBLE_SAMPLE_AREA.toString(),
@@ -52,6 +77,8 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdat
       allowableError: ASTM_DEFAULTS.ALLOWABLE_ERROR.toString(),
       evaluateAllSamples: false,
       startSampleUnit: '1',
+      location: '',
+      routeLocation: undefined as RouteLocation | undefined,
   });
 
   const newSectionParams = useMemo(() => {
@@ -73,6 +100,12 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdat
     return calculateSectionParameters(area, sampleUnitArea, stdDev, allowableError, false);
   }, [newSection.length, newSection.width, newSection.sampleUnitArea, newSection.stdDev, newSection.allowableError, newSection.evaluateAllSamples]);
 
+  const newSliceLength = useMemo(() => {
+    const width = parseFloat(newSection.width);
+    const area = parseFloat(newSection.sampleUnitArea);
+    return width > 0 && area > 0 ? area / width : undefined;
+  }, [newSection.width, newSection.sampleUnitArea]);
+
   useEffect(() => {
     const startUnit = parseInt(newSection.startSampleUnit, 10);
     const interval = newSectionParams.samplingInterval;
@@ -81,6 +114,17 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdat
     }
   }, [newSection.startSampleUnit, newSection.evaluateAllSamples, newSectionParams.samplingInterval]);
   
+  const handleUseMapChange = (enabled: boolean) => {
+    setUseMap(enabled);
+    if (enabled) {
+      // El largo queda bloqueado: se completa solo al confirmar la ruta, no se arrastra un valor escrito a mano.
+      setNewSection(prev => ({ ...prev, length: prev.routeLocation ? prev.length : '' }));
+    } else {
+      setNewSection(prev => ({ ...prev, routeLocation: undefined, location: locationEdited ? prev.location : '' }));
+      setDetectedLocation('');
+    }
+  };
+
   const handleProjectDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProjectData({ ...projectData, [e.target.name]: e.target.value });
   };
@@ -97,6 +141,10 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdat
   };
 
   const handleAddSection = () => {
+    if (useMap && !newSection.routeLocation) {
+      alert('Confirme la ruta en el mapa o elija ingresar los datos manualmente.');
+      return;
+    }
     const length = parseFloat(newSection.length);
     const width = parseFloat(newSection.width);
     const startStation = parseFloat(newSection.startStation);
@@ -110,7 +158,6 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdat
       return;
     }
     
-    // ejemplo de prueba
     const calculatedParams = newSectionParams;
 
     const samplingInterval = calculatedParams.samplingInterval > 0 ? calculatedParams.samplingInterval : 1;
@@ -142,13 +189,15 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdat
         sampleUnitLength: width > 0 ? sampleUnitArea / width : 0,
         ...calculatedParams,
         samples,
+        location: newSection.location || undefined,
+        routeLocation: newSection.routeLocation,
     };
 
     setSections([...sections, newSectionToAdd]);
     // Reset form for the next section
     setNewSection({
         name: '',
-        length: '1000',
+        length: useMap ? '' : '1000',
         width: '7',
         startStation: String(startStation + length),
         sampleUnitArea: ASTM_DEFAULTS.FLEXIBLE_SAMPLE_AREA.toString(),
@@ -156,7 +205,11 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdat
         allowableError: ASTM_DEFAULTS.ALLOWABLE_ERROR.toString(),
         evaluateAllSamples: false,
         startSampleUnit: '1',
+        location: '',
+        routeLocation: undefined,
     });
+    setDetectedLocation('');
+    setLocationEdited(false);
   };
 
   const handleRemoveSection = (id: string) => {
@@ -222,6 +275,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdat
                                     <TrashIcon />
                                 </Button>
                             </div>
+                            <SectionRouteMap section={section} />
                             <div className="pt-3 border-t border-border-muted/50 grid sm:grid-cols-2 md:grid-cols-4 gap-4 text-center">
                                 <div>
                                     <p className="text-sm text-text-muted">{t('projectForm.totalUnits')}</p>
@@ -253,6 +307,34 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdat
         <Card className="mb-6">
             <h3 className="text-xl font-bold text-primary mb-4">{t('projectForm.addNewSection')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+                <div className="md:col-span-2 lg:col-span-3">
+                    <p className="mb-1.5 text-sm font-medium text-text-muted">Ubicación del tramo</p>
+                    <div role="radiogroup" aria-label="Ubicación del tramo" className="grid gap-3 sm:grid-cols-2">
+                        {[
+                            { value: true, title: 'Fijar la ruta en el mapa', description: 'La ubicación y el largo se calculan al confirmar la ruta, y las unidades de muestra se dibujan sobre la vía.', icon: <MapPinIcon /> },
+                            { value: false, title: 'Ingresar los datos a mano', description: 'Usted escribe la ubicación y el largo del tramo, sin usar el mapa.', icon: <PencilIcon /> },
+                        ].map(option => {
+                            const selected = useMap === option.value;
+                            return (
+                                <button
+                                    key={String(option.value)}
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={selected}
+                                    onClick={() => handleUseMapChange(option.value)}
+                                    className={`flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40 ${selected ? 'border-primary bg-primary/10 shadow-md shadow-primary/10' : 'border-border-muted bg-bg-surface hover:border-primary/50'}`}
+                                >
+                                    <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg transition-colors ${selected ? 'bg-primary text-text-inverted' : 'bg-bg-base text-text-muted'}`}>{option.icon}</span>
+                                    <span className="min-w-0 flex-1">
+                                        <span className="block font-bold text-text-base">{option.title}</span>
+                                        <span className="mt-0.5 block text-sm text-text-muted">{option.description}</span>
+                                    </span>
+                                    <span className={`mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition-colors ${selected ? 'border-primary bg-primary text-text-inverted' : 'border-border-base'}`}>{selected && <CheckIcon />}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
                 <Input
                     label={t('projectForm.sectionName')}
                     name="name"
@@ -261,12 +343,50 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectCreateOrUpdat
                     placeholder={t('projectForm.sectionNamePlaceholder')}
                     containerClassName="md:col-span-2 lg:col-span-3"
                 />
+                {useMap && <RouteEditor
+                    sliceLength={newSliceLength}
+                    value={newSection.routeLocation}
+                    onConfirm={(routeLocation) => {
+                        const detected = describeLocation(routeLocation);
+                        setDetectedLocation(detected);
+                        setNewSection(previous => ({
+                            ...previous,
+                            routeLocation,
+                            length: routeLocation.engineeringLength.toFixed(2),
+                            location: locationEdited ? previous.location : detected,
+                        }));
+                    }}
+                    onClear={() => {
+                        setDetectedLocation('');
+                        setNewSection(previous => ({ ...previous, routeLocation: undefined, length: '', location: locationEdited ? previous.location : '' }));
+                    }}
+                />}
+                <div className="md:col-span-2">
+                    <Input
+                        label="Ubicación"
+                        name="location"
+                        value={newSection.location}
+                        onChange={event => { setLocationEdited(true); handleNewSectionChange(event); }}
+                        placeholder={useMap ? 'Se completa al confirmar la ruta; puede corregirla' : 'Descripción de la ubicación (opcional)'}
+                    />
+                    {useMap && detectedLocation && (
+                        <p className="mt-1.5 flex flex-wrap items-center gap-x-2 text-xs text-text-muted">
+                            Detectada por la app: <strong className="text-text-base">{detectedLocation}</strong>
+                            {newSection.location !== detectedLocation && (
+                                <button type="button" onClick={() => { setLocationEdited(false); setNewSection(previous => ({ ...previous, location: detectedLocation })); }} className="font-semibold text-primary hover:underline">Usar la detectada</button>
+                            )}
+                        </p>
+                    )}
+                </div>
                  <Input
                     label={t('projectForm.length')}
                     name="length"
                     type="number"
                     value={newSection.length}
                     onChange={handleNewSectionChange}
+                    readOnly={useMap}
+                    placeholder={useMap ? 'Se calcula al confirmar la ruta' : undefined}
+                    info={useMap ? 'Bloqueado porque la ruta se fija en el mapa: el largo es la longitud medida sobre la vía (en UTM) y no se puede sobrescribir. Para escribirlo a mano, elija "Ingresar los datos a mano".' : undefined}
                 />
                  <Input
                     label={t('projectForm.width')}

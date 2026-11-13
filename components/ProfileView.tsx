@@ -30,7 +30,7 @@ type ProfileTab = 'info' | 'password' | 'settings' | 'admin' | 'danger';
 
 export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete, onNavigate }) => {
     const { t } = useTranslations();
-    const { user, updateUser, changePassword, isLoading, error } = useAuth();
+    const { user, updateUser, changePassword, generateRecoveryCode, isLoading, error } = useAuth();
     const [activeTab, setActiveTab] = useState<ProfileTab>('info');
     
     const [formData, setFormData] = useState({
@@ -122,17 +122,28 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onInitiateDelete, onNa
                 );
             case 'password':
                 return (
-                    <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                        <h3 className="text-xl font-bold text-text-base mb-4">{t('profile.changePassword')}</h3>
-                        <Input label={t('profile.currentPassword')} name="currentPassword" type="password" value={passwordData.currentPassword} onChange={handlePasswordChange} required />
-                        <Input label={t('profile.newPassword')} name="newPassword" type="password" value={passwordData.newPassword} onChange={handlePasswordChange} required />
-                        <Input label={t('profile.confirmNewPassword')} name="confirmNewPassword" type="password" value={passwordData.confirmNewPassword} onChange={handlePasswordChange} required />
-                        <div className="pt-2 flex justify-end">
-                            <Button type="submit" variant="secondary" disabled={isLoading} className="flex items-center">
-                                {isLoading && <LoadingSpinner />} {t('profile.updatePasswordButton')}
-                            </Button>
-                        </div>
-                    </form>
+                    <>
+                        <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                            <h3 className="text-xl font-bold text-text-base mb-4">{t('profile.changePassword')}</h3>
+                            <Input label={t('profile.currentPassword')} name="currentPassword" type="password" value={passwordData.currentPassword} onChange={handlePasswordChange} required />
+                            <Input label={t('profile.newPassword')} name="newPassword" type="password" value={passwordData.newPassword} onChange={handlePasswordChange} required />
+                            <Input label={t('profile.confirmNewPassword')} name="confirmNewPassword" type="password" value={passwordData.confirmNewPassword} onChange={handlePasswordChange} required />
+                            <div className="pt-2 flex justify-end">
+                                <Button type="submit" variant="secondary" disabled={isLoading} className="flex items-center">
+                                    {isLoading && <LoadingSpinner />} {t('profile.updatePasswordButton')}
+                                </Button>
+                            </div>
+                        </form>
+                        <button
+                            type="button"
+                            onClick={async () => {
+                                await generateRecoveryCode();
+                            }}
+                            className="text-sm font-semibold text-primary hover:text-primary hover:underline mt-2"
+                        >
+                            {t('profile.recoveryCodeButton')}
+                        </button>
+                    </>
                 );
             case 'settings':
                 return (

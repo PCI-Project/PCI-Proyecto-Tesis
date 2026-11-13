@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "asphaltpci/agente/entrada/1.0",
+  "title": "Entrada del agente de recomendaciones",
+  "type": "object",
+  "required": ["version", "proyecto", "calibracion", "tramos"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": "1.0" },
+    "proyecto": {
+      "type": "object",
+      "required": ["id", "nombre", "inspector", "fecha_inspeccion"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "descripcion": { "type": "string" },
+        "inspector": { "type": "string" },
+        "entidad": { "type": "string", "description": "Empresa o institución del inspector" },
+        "fecha_inspeccion": { "type": "string", "format": "date" },
+        "ubicacion": { "type": "string" }
+      }
+    },
+    "calibracion": {
+      "type": "object",
+      "required": ["tratamientos_disponibles"],
+      "additionalProperties": false,
+      "properties": {
+        "tratamientos_disponibles": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": { "type": "string" },
+          "description": "IDs de catalogo/tratamientos.json (tratamientos y actividades) que el inspector puede ejecutar con su equipo o contratista"
+        },
+        "costos_unitarios": {
+          "type": "object",
+          "description": "Costos que reemplazan a los estándar. Clave = ID del catálogo",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["valor"],
+            "additionalProperties": false,
+            "properties": {
+              "valor": { "type": "number", "minimum": 0 },
+              "unidad": { "enum": ["m2", "m", "global"] },
+              "fuente": { "type": "string", "description": "Ej.: tabla de la empresa 2026, cotización, MOP" }
+            }
+          }
+        },
+        "moneda": { "type": "string", "default": "USD" },
+        "presupuesto": { "type": ["number", "null"], "minimum": 0, "description": "null = sin tope: se valora todo y solo se ordena" },
+        "modo_analisis": { "enum": ["completo", "diagnostico"], "default": "completo", "description": "diagnostico = informe patológico sin costos, presupuesto, beneficio/costo ni prioridad: tramos en orden de inspección y solo cantidades físicas. En ese modo se ignoran costos_unitarios, presupuesto, moneda y modo_priorizacion" },
+    "modo_priorizacion": { "enum": ["costo_beneficio", "peor_primero"] },
+        "umbrales_pci": {
+          "type": "object",
+          "description": "Límite inferior de cada nivel si el inspector los cambia",
+          "additionalProperties": false,
+          "properties": {
+            "A1": { "type": "number" }, "A2": { "type": "number" },
+            "B1": { "type": "number" }, "B2": { "type": "number" },
+            "C1": { "type": "number" }
+          }
+        },
+        "parametros": {
+          "type": "object",
+          "description": "Reemplaza valores de catalogo/parametros_defecto.json (misma clave, solo el valor)"
+        }
+      }
+    },
+    "tramos": {
+      "type": "array", "minItems": 1,
+      "items": { "$ref": "#/$defs/tramo" }
+    }
+  },
+  "$defs": {
+    "severidad": { "enum": ["L", "M", "H", "U"] },
+    "falla": {
+      "type": "object",
+      "required": ["tipo", "severidad", "cantidad"],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": { "enum": ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19.1","19.2"] },
+        "severidad": { "$ref": "#/$defs/severidad" },
+        "cantidad": { "type": "number", "exclusiveMinimum": 0, "description": "m², m o unidades según la falla (ASTM D6433)" },
+        "valor_deducido": { "type": "number", "minimum": 0, "description": "Opcional, lo calcula la app" }
+      }
+    },
+    "muestra": {
+      "type": "object",
+      "required": ["id", "area_m2", "fallas"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": ["integer", "string"] },
+        "area_m2": { "type": "number", "exclusiveMinimum": 0 },
+        "pci": { "type": "number", "minimum": 0, "maximum": 100 },
+        "adicional": { "type": "boolean", "default": false, "description": "Muestra adicional ASTM (no representativa): no se extrapola" },
+        "evaluada": { "type": "boolean", "default": true, "description": "false = la unidad fue generada por el plan de muestreo pero aún no se inspecciona. Con alguna muestra en false el motor rechaza la entrada (COBERTURA_INCOMPLETA)" },
+        "fallas": { "type": "array", "items": { "$ref": "#/$defs/falla" } }
+      }
+    },
+    "contexto": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tipo_via": { "enum": ["urbana", "rural", null] },
+        "altura_bordillo_cm": { "type": ["number", "null"], "minimum": 0 },
+        "esal_millones": { "type": ["number", "null"], "minimum": 0, "description": "ESAL de diseño o acumulados en el periodo de análisis" },
+        "clase_trafico": { "enum": ["bajo", "medio", "alto", null] },
+        "tpda": { "type": ["number", "null"], "minimum": 0 },
+        "anio_construccion": { "type": ["integer", "null"] },
+        "anio_ultima_intervencion": { "type": ["integer", "null"] },
+        "ultima_intervencion": { "type": ["string", "null"] },
+        "drenaje": { "enum": ["bueno", "regular", "malo", null] },
+        "clasificacion_funcional": { "type": ["string", "null"], "description": "Ej.: arterial, colectora, local" },
+        "observaciones": { "type": ["string", "null"] }
+      }
+    },
+    "tramo": {
+      "type": "object",
+      "required": ["id", "nombre", "longitud_m", "ancho_m", "pci", "muestras"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "ubicacion": { "type": "string" },
+        "longitud_m": { "type": "number", "exclusiveMinimum": 0 },
+        "ancho_m": { "type": "number", "exclusiveMinimum": 0 },
+        "area_m2": { "type": "number", "exclusiveMinimum": 0, "description": "Si falta: longitud × ancho" },
+        "pci": { "type": "number", "minimum": 0, "maximum": 100 },
+        "total_unidades_muestra": { "type": "integer" },
+        "muestreo_suficiente": { "type": "boolean" },
+        "contexto": { "$ref": "#/$defs/contexto" },
+        "muestras": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/muestra" } }
+      }
+    }
+  }
+}

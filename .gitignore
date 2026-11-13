@@ -41,3 +41,8 @@ agent/venv/
 agent/__pycache__/
 *.pyc
 .pytest_cache/
+# Servicio del agente de recomendaciones (Python)
+agente-recomendaciones/**/__pycache__/
+agente-recomendaciones/ejemplos/salida/
+agente-recomendaciones/.env
+agente-recomendaciones/venv/

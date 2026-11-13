@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "asphaltpci/agente/narrativa/1.0",
+  "title": "Texto del informe redactado por el modelo de lenguaje",
+  "type": "object",
+  "required": ["resumen_ejecutivo", "tramos", "priorizacion", "alertas", "conclusiones", "recomendaciones", "limitaciones", "glosario"],
+  "additionalProperties": false,
+  "properties": {
+    "resumen_ejecutivo": { "type": "string", "description": "150–250 palabras: estado de la red, qué se recomienda, cuánto cuesta y qué queda sin financiar" },
+    "tramos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tramo_id", "diagnostico", "justificacion", "trabajos_previos", "consecuencia_si_se_difiere"],
+        "additionalProperties": false,
+        "properties": {
+          "tramo_id": { "type": "string" },
+          "diagnostico": { "type": "string", "description": "Qué fallas dominan, con severidad, densidad y su significado físico" },
+          "justificacion": { "type": "string", "description": "Por qué ese nivel y ese tratamiento, citando la regla y la fuente" },
+          "trabajos_previos": { "type": "string", "description": "Por qué cada paliativo es obligatorio antes del tratamiento" },
+          "consecuencia_si_se_difiere": { "type": "string" },
+          "nota_equipo": { "type": "string", "description": "Solo si el tratamiento ideal no estaba disponible" }
+        }
+      }
+    },
+    "priorizacion": { "type": "string", "description": "Explica el modo elegido, qué se financia, qué se difiere y la comparación con el otro modo" },
+    "alertas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["codigo", "texto"],
+        "additionalProperties": false,
+        "properties": {
+          "codigo": { "type": "string" },
+          "tramo_id": { "type": ["string", "null"] },
+          "texto": { "type": "string" }
+        }
+      }
+    },
+    "conclusiones": { "type": "array", "items": { "type": "string" } },
+    "recomendaciones": { "type": "array", "items": { "type": "string" }, "description": "Incluye la próxima inspección y la recalibración anual" },
+    "limitaciones": { "type": "array", "items": { "type": "string" } },
+    "glosario": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["termino_en", "termino_es", "definicion"],
+        "additionalProperties": false,
+        "properties": {
+          "termino_en": { "type": "string" },
+          "termino_es": { "type": "string" },
+          "definicion": { "type": "string" }
+        }
+      }
+    }
+  }
+}
