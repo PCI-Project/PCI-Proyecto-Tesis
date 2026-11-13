@@ -84,6 +84,13 @@ app.use('/api/projects', jsonLargo, Projectroute);
 
 // Puerto: valor por defecto en desarrollo, requerida en producción
 const PORT = process.env.PORT || (process.env.NODE_ENV === 'production' ? 5000 : 5000);
+
+// Middleware de manejo de errores global
+app.use((err, req, res, next) => {
+  console.error('Error interno:', err.message);
+  res.status(500).json({ msg: 'Error interno del servidor.' });
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
 });
