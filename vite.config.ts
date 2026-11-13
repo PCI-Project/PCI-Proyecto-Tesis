@@ -21,7 +21,7 @@ const overpassProxy = {
   '/api/osm/map': {
     target: 'https://api.openstreetmap.org',
     changeOrigin: true,
-    rewrite: pathName => pathName.replace('/api/osm/map', '/api/0.6/map'),
+    rewrite: (pathName: string) => pathName.replace('/api/osm/map', '/api/0.6/map'),
   },
 };
 
