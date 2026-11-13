@@ -1,0 +1,39 @@
+version: 2
+updates:
+  # Dependencias de Node.js (frontend y servidor)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependabot"
+      - "security"
+
+  - package-ecosystem: "npm"
+    directory: "/server"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependabot"
+      - "security"
+
+  # Dependencias de Python (agente de recomendaciones)
+  - package-ecosystem: "pip"
+    directory: "/agente-recomendaciones"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependabot"
+      - "security"
+
+  - package-ecosystem: "pip"
+    directory: "/agent"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependabot"
+      - "security"
