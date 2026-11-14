@@ -43,8 +43,8 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
-  // Siempre de la red: index.html, raíz e init.js (cambian en cada despliegue)
-  if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '/init.js') {
+  // Siempre de la red: index.html, raíz, init.js e index.css (cambian en cada despliegue)
+  if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '/init.js' || url.pathname === '/index.css') {
     event.respondWith(
       fetch(event.request)
         .then(response => {
