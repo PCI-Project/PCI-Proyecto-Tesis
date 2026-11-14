@@ -1,8 +1,7 @@
-const CACHE_NAME = 'asphalt-pci-pro-cache-v2';
+const CACHE_NAME = 'asphalt-pci-pro-cache-v3';
+
+// Assets estáticos que rara vez cambian: seguros para cache-first
 const URLS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/init.js',
   '/manifest.json',
   '/brand/emblema-positivo.svg',
   '/brand/emblema-negativo.svg',
@@ -13,15 +12,13 @@ const URLS_TO_CACHE = [
   '/icon-192.png',
   '/icon-512.png',
   '/icon-maskable-512.png'
-  // The index.tsx and CDN dependencies will be fetched by the browser when it loads index.html
-  // and are best handled by the standard HTTP cache.
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Service Worker: Caching app shell');
+        console.log('Service Worker: Caching static assets');
         return cache.addAll(URLS_TO_CACHE);
       })
   );
@@ -44,14 +41,31 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+
+  // Siempre de la red: index.html, raíz e init.js (cambian en cada despliegue)
+  if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '/init.js') {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // Si la red falla, intentar caché como respaldo
+          if (!response || response.status !== 200) {
+            return caches.match(event.request);
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Para el resto de assets estáticos: caché primero, red como respaldo
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Return response from cache if available.
         if (response) {
           return response;
         }
-        // Otherwise, fetch from the network.
         return fetch(event.request);
       })
   );
