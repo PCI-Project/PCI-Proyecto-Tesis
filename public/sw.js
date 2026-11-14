@@ -1,6 +1,6 @@
-const CACHE_NAME = 'asphalt-pci-pro-cache-v3';
+const CACHE_NAME = 'asphalt-pci-pro-cache-v4';
 
-// Assets estáticos que rara vez cambian: seguros para cache-first
+// Assets estáticos del mismo dominio que rara vez cambian: seguros para cache-first
 const URLS_TO_CACHE = [
   '/manifest.json',
   '/brand/emblema-positivo.svg',
@@ -43,6 +43,12 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
 
+  // Solo manejar peticiones del mismo dominio. Los recursos externos (CDNs, etc.)
+  // se dejan pasar directo a la red sin intervención del Service Worker.
+  if (url.origin !== location.origin) {
+    return;
+  }
+
   // Siempre de la red: index.html, raíz, init.js e index.css (cambian en cada despliegue)
   if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '/init.js' || url.pathname === '/index.css') {
     event.respondWith(
@@ -59,7 +65,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Para el resto de assets estáticos: caché primero, red como respaldo
+  // Para el resto de assets estáticos del mismo dominio: caché primero, red como respaldo
   event.respondWith(
     caches.match(event.request)
       .then(response => {
